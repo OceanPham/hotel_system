@@ -113,10 +113,7 @@ export class BookinghistoryComponent implements OnInit {
   private baseApiUrl = `${API_URL}/api`;
   private readonly BOOKING_API_URL = `${this.baseApiUrl}/bookings/my`;
   private readonly CANCEL_API_URL = `${this.baseApiUrl}/bookings`; // + /{id}/cancel
-  private readonly FEEDBACK_API_URL = `${this.baseApiUrl.replace(
-    '/api',
-    '/api/v1'
-  )}/feedbacks`;
+  private readonly FEEDBACK_API_URL = `${this.baseApiUrl}/v1/feedbacks`;
 
   constructor(
     private router: Router,
@@ -790,17 +787,19 @@ export class BookinghistoryComponent implements OnInit {
     return this.notificationMessage().replace(/\n/g, '<br>');
   }
   getFullImageUrl(path: string | null | undefined): string {
-    if (!path || typeof path !== 'string') {
-      // Trả về một ảnh mặc định duy nhất, không random ở đây
-      return `${API_URL}/uploads/default.jpg`;
-    }
+    // if (!path || typeof path !== 'string') {
+    //   // Trả về một ảnh mặc định duy nhất, không random ở đây
+    //   return `${API_URL}/uploads/default.jpg`;
+    // }
 
-    if (path.startsWith('http')) {
-      return path;
-    } else if (path.startsWith('/uploads/')) {
-      return `${API_URL}${path}`;
-    } else {
-      return `${API_URL}/uploads/${path}`;
-    }
+    // if (path.startsWith('http')) {
+    //   return path;
+    // } else if (path.startsWith('/uploads/')) {
+    //   return `${API_URL}${path}`;
+    // } else {
+    //   return `${API_URL}/uploads/${path}`;
+    // }
+
+    return 'https://res.cloudinary.com/oceanmind/image/upload/v1754898380/Screenshot_44_pewi7r.png';
   }
 }
