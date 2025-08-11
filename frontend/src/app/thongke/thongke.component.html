@@ -1,0 +1,502 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>Azure Hotel.</h2>
+    </div>
+
+    <nav class="navigation">
+      <ul>
+        <li class="nav-item" [class.active]="isActiveRoute('/thongke')">
+          <a routerLink="/thongke" class="nav-link" (click)="setActiveRoute('/thongke')">
+            <i class="icon thongke-icon"></i>
+            <span>Thống kê</span>
+          </a>
+        </li>
+
+        <li class="nav-item" [class.active]="isActiveRoute('/quanlyhoadon')">
+          <a routerLink="/quanlyhoadon" class="nav-link" (click)="setActiveRoute('/quanlyhoadon')">
+            <i class="icon hoadon-icon"></i>
+            <span>Quản lý hóa đơn</span>
+          </a>
+        </li>
+
+        <li class="nav-item" [class.active]="isActiveRoute('/message')">
+          <a routerLink="/message" class="nav-link" (click)="setActiveRoute('/message')">
+            <i class="icon message-icon"></i>
+            <span>Message</span>
+          </a>
+        </li>
+
+        <li class="nav-item" [class.active]="isActiveRoute('/help')">
+          <a routerLink="/help" class="nav-link" (click)="setActiveRoute('/help')">
+            <i class="icon help-icon"></i>
+            <span>Help</span>
+          </a>
+        </li>
+
+        <li class="nav-item" [class.active]="isActiveRoute('/setting')">
+          <a routerLink="/setting" class="nav-link" (click)="setActiveRoute('/setting')">
+            <i class="icon setting-icon"></i>
+            <span>Setting</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <div class="greeting-section">
+          <h1>Hello, {{userInfo().fullName}}</h1>
+          <p class="greeting-subtitle">Have a nice day</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="search-container">
+          <input type="text"
+                 class="search-input"
+                 placeholder="Tìm kiếm..."
+                 [(ngModel)]="searchTerm"
+                 (input)="onSearchChange()">
+          <div class="search-icon"></div>
+        </div>
+        <div class="header-actions">
+          <div class="notification-btn" (click)="toggleNotifications()">
+            <div class="notification-icon"></div>
+            <div class="notification-badge" *ngIf="notifications().length > 0">
+              {{notifications().length}}
+            </div>
+          </div>
+
+          <!-- Notifications Dropdown -->
+          <div class="notifications-dropdown" *ngIf="showNotifications()"
+               (document:click)="closeNotificationsIfClickOutside($event)">
+            <div class="dropdown-header">
+              <h4>Thông báo</h4>
+              <button class="clear-all-btn" (click)="clearAllNotifications()">Xóa tất cả</button>
+            </div>
+            <div class="notifications-list">
+              <div class="notification-item"
+                   *ngFor="let notification of notifications()"
+                   [class.unread]="!notification.read"
+                   (click)="markAsRead(notification.id)">
+                <div class="notification-content">
+                  <p class="notification-text">{{notification.message}}</p>
+                  <span class="notification-time">{{formatTime(notification.time)}}</span>
+                </div>
+              </div>
+              <div class="no-notifications" *ngIf="notifications().length === 0">
+                <p>Không có thông báo mới</p>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- User Profile with Dropdown -->
+          <div class="user-profile-container" [class.open]="showUserDropdown()">
+            <div class="user-profile" (click)="toggleUserDropdown($event)">
+              <img [src]="'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face&auto=format'"  class="user-avatar">
+              <div class="user-info">
+                <span class="user-name">{{ userInfo().fullName }}</span>
+                <span class="user-role">Người dùng</span> <!-- hoặc dynamic nếu có -->
+              </div>
+              <button class="dropdown-btn" type="button" title="Menu">
+                <i class="dropdown-icon" [class.rotated]="showUserDropdown()"></i>
+              </button>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="user-dropdown" *ngIf="showUserDropdown()" (click)="$event.stopPropagation()">
+              <div class="dropdown-content">
+                <button class="dropdown-item" type="button" (click)="goToProfile()">
+                  <i class="profile-menu-icon"></i>
+                  <span>Hồ sơ cá nhân</span>
+                </button>
+                <button class="dropdown-item" type="button" (click)="changeTheme()">
+                  <i class="theme-icon"></i>
+                  <span>Đổi giao diện</span>
+                </button>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout" (click)="logout()"href="javascript:void(0)">
+                  <i class="logout-icon"></i>
+                  <span>Đăng xuất</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Content -->
+    <div class="thongke-content">
+      <!-- Report Header -->
+      <div class="report-header">
+        <div class="report-title">
+          <h2>Báo cáo chi phí</h2>
+          <p>Thống kê chi phí và doanh thu tháng {{ getCurrentMonth() }}/{{ getCurrentYear() }}</p>
+        </div>
+
+        <div class="report-actions">
+          <!-- Bộ lọc thời gian -->
+          <div class="time-filter">
+            <select class="filter-select" [(ngModel)]="selectedTimeFilter" (change)="onTimeFilterChange()">
+              <option value="today">Hôm nay</option>
+              <option value="week">Tuần này</option>
+              <option value="month">Tháng này</option>
+              <option value="quarter">Quý này</option>
+              <option value="year">Năm này</option>
+            </select>
+          </div>
+
+          <!-- Nút Phân tích xu hướng -->
+          <button
+            class="action-btn secondary"
+            (click)="showExportConfirmation()"
+            [disabled]="isExporting()"
+          >
+            <i class="export-icon" *ngIf="!isExporting()"></i>
+            <div class="spinner" *ngIf="isExporting()"></div>
+            <span>{{ isExporting() ? 'Đang phân tích...' : 'Phân tích xu hướng' }}</span>
+          </button>
+
+          <!-- Nút Lưu báo cáo -->
+          <button
+            class="action-btn primary"
+            (click)="showExportConfirmation()"
+            [disabled]="isExporting()"
+          >
+            <i class="save-icon" *ngIf="!isExporting()"></i>
+             <div class="spinner" *ngIf="isExporting()"></div>
+            <span>{{ isExporting() ? 'Đang xuất PDF...' : 'Xuất PDF' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card"
+             [class.highlight]="highlightedCard() === 'invoice'"
+             (click)="highlightCard('invoice')">
+          <div class="stat-header">
+            <div class="stat-icon invoice">
+              <i class="stat-emoji">📄</i>
+            </div>
+            <span class="stat-label">TỔNG CHI HÓA ĐƠN</span>
+          </div>
+          <div class="stat-value">{{thongkeData().totalInvoices}}</div>
+          <div class="stat-trend positive">
+            <span class="trend-icon">{{getTrendIcon('invoice')}}</span>
+            <span class="trend-text">{{getTrendPercentage('invoice')}}% so với kỳ trước</span>
+          </div>
+        </div>
+
+        <div class="stat-card"
+             [class.highlight]="highlightedCard() === 'room'"
+             (click)="highlightCard('room')">
+          <div class="stat-header">
+            <div class="stat-icon room">
+              <i class="stat-emoji">🏠</i>
+            </div>
+            <span class="stat-label">TỔNG TIỀN PHÒNG</span>
+          </div>
+          <div class="stat-value">{{formatCurrency(thongkeData().totalRoomCost)}}</div>
+          <div class="stat-trend positive">
+            <span class="trend-icon">{{getTrendIcon('room')}}</span>
+            <span class="trend-text">{{getTrendPercentage('room')}}% so với kỳ trước</span>
+          </div>
+        </div>
+
+        <div class="stat-card"
+             [class.highlight]="highlightedCard() === 'service'"
+             (click)="highlightCard('service')">
+          <div class="stat-header">
+            <div class="stat-icon service">
+              <i class="stat-emoji">💰</i>
+            </div>
+            <span class="stat-label">TỔNG TIỀN DỊCH VỤ</span>
+          </div>
+          <div class="stat-value">{{formatCurrency(thongkeData().totalServiceCost)}}</div>
+          <div class="stat-trend positive">
+            <span class="trend-icon">{{getTrendIcon('service')}}</span>
+            <span class="trend-text">{{getTrendPercentage('service')}}% so với kỳ trước</span>
+          </div>
+        </div>
+
+        <div class="stat-card"
+             [class.highlight]="highlightedCard() === 'revenue'"
+             (click)="highlightCard('revenue')">
+          <div class="stat-header">
+            <div class="stat-icon revenue">
+              <i class="stat-emoji">📊</i>
+            </div>
+            <span class="stat-label">TỔNG DOANH THU</span>
+          </div>
+          <div class="stat-value">{{formatCurrency(thongkeData().totalRevenue)}}</div>
+          <div class="stat-trend positive">
+            <span class="trend-icon">{{getTrendIcon('revenue')}}</span>
+            <span class="trend-text">{{getTrendPercentage('revenue')}}% so với kỳ trước</span>
+          </div>
+        </div>
+      </div>
+
+    <!-- Chart Section -->
+    <div class="chart-section">
+      <div class="chart-header">
+        <h3>Xu hướng chi phí {{ getTimeRangeText() }}</h3>
+
+        <div class="chart-controls">
+          <!-- Nút đổi sang biểu đồ cột -->
+          <button
+            class="chart-type-btn"
+            [class.active]="chartType() === 'bar'"
+            (click)="changeChartType('bar')"
+          >
+            <i class="bar-chart-icon"></i>
+            Biểu đồ cột
+          </button>
+
+          <!-- Nút đổi sang biểu đồ đường -->
+          <button
+            class="chart-type-btn"
+            [class.active]="chartType() === 'line'"
+            (click)="changeChartType('line')"
+          >
+            <i class="line-chart-icon"></i>
+            Biểu đồ đường
+          </button>
+
+          <!-- Nút làm mới -->
+          <button class="refresh-btn" (click)="refreshChart()" [disabled]="isRefreshing()">
+            <i class="refresh-icon" [class.spinning]="isRefreshing()"></i>
+            Làm mới
+          </button>
+        </div>
+      </div>
+
+      <!-- Chart Canvas + Loading -->
+      <div class="chart-container" [class.loading]="isRefreshing()">
+        <div class="chart-loading" *ngIf="isRefreshing()">
+          <div class="loading-spinner"></div>
+          <p>Đang tải dữ liệu...</p>
+        </div>
+
+        <canvas
+          #thongkeChart
+          width="800"
+          height="400"
+          *ngIf="!isRefreshing()"
+        ></canvas>
+      </div>
+
+      <!-- Chart Legend -->
+      <div class="chart-legend" *ngIf="!isRefreshing()">
+        <div class="legend-item">
+          <div class="legend-color" style="background: #6366f1;"></div>
+          <span>Chi phí ({{ formatCurrency(getTotalExpense()) }})</span>
+        </div>
+
+        <div class="legend-item" *ngIf="chartType() === 'line'">
+          <div class="legend-color" style="background: #f59e0b;"></div>
+          <span>Trung bình ({{ formatCurrency(getAverageExpense()) }})</span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Quick Stats -->
+      <div class="quick-stats">
+        <div class="quick-stat-item">
+          <h4>Tổng chi phí hôm nay</h4>
+          <p class="quick-value">{{formatCurrency(todayExpense())}}</p>
+        </div>
+        <div class="quick-stat-item">
+          <h4>Chi phí cao nhất</h4>
+          <p class="quick-value">{{formatCurrency(maxExpense())}}</p>
+          <span class="quick-date">{{maxExpenseDate()}}</span>
+        </div>
+        <div class="quick-stat-item">
+          <h4>Chi phí thấp nhất</h4>
+          <p class="quick-value">{{formatCurrency(minExpense())}}</p>
+          <span class="quick-date">{{minExpenseDate()}}</span>
+        </div>
+        <div class="quick-stat-item">
+          <h4>Tăng trưởng trung bình</h4>
+          <p class="quick-value" [class.positive]="averageGrowth() > 0"
+             [class.negative]="averageGrowth() < 0">
+            {{averageGrowth() > 0 ? '+' : ''}}{{averageGrowth().toFixed(1)}}%
+          </p>
+        </div>
+      </div>
+
+  </main>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container">
+    <div class="toast"
+         *ngIf="showToast()"
+         [class]="toastType()">
+      <div class="toast-icon">
+        <i [class]="getToastIcon()"></i>
+      </div>
+      <div class="toast-content">
+        <h4>{{toastTitle()}}</h4>
+        <p>{{toastMessage()}}</p>
+      </div>
+      <button class="toast-close" (click)="closeToast()">×</button>
+    </div>
+  </div>
+
+  <!-- Export Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showExportModal()" (click)="cancelExport()">
+    <div class="modal-content export-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Xác nhận phân tích xu hướng</h3>
+        <button class="modal-close" (click)="cancelExport()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-icon">
+          <i class="analysis-icon">📈</i>
+        </div>
+        <p class="modal-title">Bạn có muốn phân tích xu hướng chi phí không?</p>
+        <p class="modal-description">
+          Hệ thống sẽ phân tích dữ liệu {{getTimeRangeText()}} và tạo báo cáo xu hướng chi phí chi tiết.
+        </p>
+        <div class="analysis-preview">
+          <h4>Sẽ phân tích:</h4>
+          <ul>
+            <li>Xu hướng chi phí theo thời gian</li>
+            <li>So sánh với kỳ trước</li>
+            <li>Dự báo xu hướng tương lai</li>
+            <li>Đề xuất tối ưu hóa chi phí</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="cancelExport()">
+          <i class="cancel-icon"></i>
+          Hủy
+        </button>
+        <button class="btn btn-primary" (click)="confirmExport()">
+          <i class="confirm-icon"></i>
+          Xác nhận phân tích
+        </button>
+      </div>
+    </div>
+  </div>
+
+<!-- Save Confirmation Modal -->
+<div class="modal-overlay" *ngIf="showSaveModal()" (click)="cancelSave()">
+  <div class="modal-content save-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Xác nhận lưu báo cáo</h3>
+      <button class="modal-close" (click)="cancelSave()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-icon">
+        <i class="save-report-icon">💾</i>
+      </div>
+      <p class="modal-title">Bạn có muốn lưu báo cáo thống kê này không?</p>
+      <p class="modal-description">
+        Báo cáo sẽ được lưu với dữ liệu {{ getTimeRangeText() }} hiện tại.
+      </p>
+
+      <div class="save-options">
+        <!-- Tên báo cáo -->
+        <div class="save-option">
+          <label for="reportName">Tên báo cáo:</label>
+          <input
+            type="text"
+            id="reportName"
+            class="report-name-input"
+            [(ngModel)]="reportName"
+            [placeholder]="'Báo cáo chi phí ' + getCurrentMonth() + '/' + getCurrentYear()"
+          />
+        </div>
+
+        <!-- Định dạng -->
+        <div class="save-option">
+          <label for="reportFormat">Định dạng:</label>
+          <select
+            id="reportFormat"
+            class="report-format-select"
+            [(ngModel)]="reportFormat"
+          >
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+            <option value="csv">CSV</option>
+          </select>
+        </div>
+
+        <!-- Bao gồm biểu đồ -->
+        <div class="save-option checkbox-option">
+          <input
+            type="checkbox"
+            id="includeCharts"
+            [(ngModel)]="includeCharts"
+          />
+          <label for="includeCharts">Bao gồm biểu đồ</label>
+        </div>
+
+        <!-- Gửi email tự động -->
+        <div class="save-option checkbox-option">
+          <input
+            type="checkbox"
+            id="autoEmail"
+            [(ngModel)]="autoEmail"
+          />
+          <label for="autoEmail">Gửi email tự động</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nút hành động -->
+    <div class="modal-actions">
+      <button class="btn btn-secondary" (click)="cancelSave()">
+        <i class="cancel-icon"></i>
+        Hủy
+      </button>
+      <button class="btn btn-success" (click)="confirmSave()">
+        <i class="save-icon"></i>
+        Lưu báo cáo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Logout Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showLogoutModal()" (click)="cancelLogout()">
+    <div class="modal-content logout-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Xác nhận đăng xuất</h3>
+        <button class="modal-close" (click)="cancelLogout()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-icon">
+          <i class="logout-big-icon">🚪</i>
+        </div>
+        <p class="modal-title">Bạn có chắc chắn muốn đăng xuất?</p>
+        <p class="modal-description">
+          Dữ liệu chưa lưu sẽ bị mất. Vui lòng lưu công việc trước khi đăng xuất.
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="cancelLogout()">
+          <i class="cancel-icon"></i>
+          Hủy
+        </button>
+        <button class="btn btn-danger" (click)="confirmLogout()">
+          <i class="logout-confirm-icon"></i>
+          Đăng xuất
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

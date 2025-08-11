@@ -1,0 +1,231 @@
+/* Reset toàn bộ để loại bỏ khoảng trắng */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.login-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.image-section {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  height: 100vh;
+}
+
+.hotel-image {
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.form-section {
+  flex: 1;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px 20px;
+}
+
+.welcome-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 40px;
+  text-align: center;
+  line-height: 1.2;
+
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #4c6ef5;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.1);
+}
+
+.form-input::placeholder {
+  color: #adb5bd;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
+  accent-color: #4c6ef5;
+}
+
+.checkbox-label {
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  user-select: none;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #4c6ef5 0%, #5c7cfa 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.login-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #3b5bdb 0%, #4c6ef5 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 110, 245, 0.3);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: #666;
+}
+
+.signup-link a {
+  color: #4c6ef5;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+    position: static;
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  .image-section {
+    height: 40vh;
+    flex: none;
+  }
+  
+  .hotel-image {
+    height: 40vh;
+    position: relative;
+  }
+  
+  .form-section {
+    padding: 20px;
+    flex: 1;
+    height: auto;
+    min-height: 60vh;
+  }
+  
+  .login-form {
+    padding: 20px 0;
+  }
+  
+  .welcome-title {
+    font-size: 24px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .image-section {
+    height: 30vh;
+  }
+  
+  .hotel-image {
+    height: 30vh;
+  }
+  
+  .form-section {
+    padding: 15px;
+    min-height: 70vh;
+  }
+  
+  .welcome-title {
+    font-size: 22px;
+    margin-bottom: 30px;
+  }
+  
+  .form-input {
+    padding: 14px;
+  }
+  
+  .login-btn {
+    padding: 14px;
+  }
+}

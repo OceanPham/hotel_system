@@ -1,0 +1,411 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>Azure Hotel.</h2>
+    </div>
+
+    <nav class="navigation">
+      <ul>
+        <li class="nav-item">
+          <a routerLink="/dashboard" class="nav-link">
+            <i class="icon dashboard-icon"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a routerLink="/listroom" class="nav-link">
+            <i class="icon room-icon"></i>
+            <span>Phòng</span>
+          </a>
+        </li>
+        <li class="nav-item active">
+          <a routerLink="/listbooking" class="nav-link">
+            <i class="icon booking-icon"></i>
+            <span>Đơn đặt phòng</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/listservice" class="nav-link">
+            <i class="icon service-icon"></i>
+            <span>Dịch vụ</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/message" class="nav-link">
+            <i class="icon message-icon"></i>
+            <span>Message</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/helps" class="nav-link">
+            <i class="icon help-icon"></i>
+            <span>Help</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/setting" class="nav-link">
+            <i class="icon setting-icon"></i>
+            <span>Setting</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1>Admin Dashboard</h1>
+      </div>
+
+      <div class="header-right">
+        <div class="search-container">
+          <input
+            type="text"
+            placeholder="Search"
+            class="search-input"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)">
+          <i class="search-icon"></i>
+        </div>
+
+        <div class="header-actions">
+          <button class="notification-btn" title="Thông báo">
+            <i class="notification-icon"></i>
+            <span class="notification-badge">3</span>
+          </button>
+
+          <!-- User Profile with Dropdown -->
+          <div class="user-profile-container" [class.open]="showUserDropdown()">
+            <div class="user-profile" (click)="toggleUserDropdown($event)">
+              <img [src]="'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face&auto=format'"  class="user-avatar">
+              <div class="user-info">
+                <span class="user-name">{{ userInfo().fullName }}</span>
+                <span class="user-role">Người dùng</span>
+              </div>
+              <button class="dropdown-btn" type="button" title="Menu">
+                <i class="dropdown-icon" [class.rotated]="showUserDropdown()"></i>
+              </button>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="user-dropdown" *ngIf="showUserDropdown()" (click)="$event.stopPropagation()">
+              <div class="dropdown-content">
+                <button class="dropdown-item" type="button" (click)="goToProfile()">
+                  <i class="profile-menu-icon"></i>
+                  <span>Profile</span>
+                </button>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout" (click)="logout()"href="javascript:void(0)">
+                  <i class="logout-icon"></i>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Filter Section -->
+    <section class="filter-section">
+      <div class="filter-header">
+        <h3>Danh sách đặt phòng</h3>
+      </div>
+
+      <div class="filter-controls">
+        <div class="filter-group">
+          <label for="search">Tìm kiếm</label>
+          <input
+            id="search"
+            type="text"
+            placeholder="Tìm theo tên hoặc số phòng"
+            class="filter-select"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            (input)="onFilterChange()">
+        </div>
+
+        <div class="filter-group">
+          <label for="roomType">Loại phòng</label>
+          <select
+            id="roomType"
+            class="filter-select"
+            [ngModel]="selectedRoomType()"
+            (ngModelChange)="selectedRoomType.set($event)"
+            (change)="onFilterChange()">
+            <option value="">Tất cả loại phòng</option>
+            <option value="Standard">Tiêu chuẩn</option>
+            <option value="Deluxe">Cao cấp</option>
+            <option value="Suite">Suite</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="status">Trạng thái</label>
+          <select
+            id="status"
+            class="filter-select"
+            [ngModel]="selectedStatus()"
+            (ngModelChange)="selectedStatus.set($event)"
+            (change)="onFilterChange()">
+            <option value="">Tất cả trạng thái</option>
+            <option value="Confirmed">Đã xác nhận</option>
+            <option value="Cancelled">Đã hủy</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="date">Ngày nhận phòng</label>
+          <div class="date-picker-container">
+            <input
+              id="date"
+              type="date"
+              class="filter-date-input"
+              [ngModel]="selectedDate()"
+              (ngModelChange)="selectedDate.set($event)"
+              (change)="onFilterChange()">
+            <button
+              *ngIf="selectedDate()"
+              class="clear-date-btn"
+              (click)="clearDate()"
+              title="Xóa ngày">
+              <i class="clear-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <button class="refresh-btn" (click)="refreshData()" title="Làm mới">
+          <i class="refresh-icon"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- Content Area -->
+    <div class="content-wrapper">
+      <!-- Left Content -->
+      <div class="left-content">
+
+        <!-- Booking Table -->
+        <section class="booking-table-section">
+          <div class="table-container">
+            <table class="booking-table">
+              <thead>
+              <tr>
+                <th>Ảnh</th>
+                <th>Số phòng</th>
+                <th>Tên khách hàng</th>
+                <th>Thời gian</th>
+                <th>Trạng thái</th>
+                <th>Tổng tiền</th>
+                <th>Action</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let booking of paginatedBookings()" class="booking-row">
+                <td>
+                  <img *ngIf="booking.mainImageUrl"
+                       [src]="booking.mainImageUrl"
+                       [alt]="booking.roomNumber"
+                       class="room-thumbnail" />
+
+                </td>
+
+                <td>
+                  <span class="room-number">{{booking.roomNumber}}</span>
+                </td>
+                <td>
+                  <span class="customer-name">{{booking.fullName}}</span>
+                </td>
+                <td>
+                  <div class="time-info">
+                    <div class="check-in">
+                      <span class="time-label">Nhận phòng:</span>
+                      <span class="time-value">{{formatDate(booking.checkInDate)}}</span>
+                    </div>
+                    <div class="check-out">
+                      <span class="time-label">Trả phòng:</span>
+                      <span class="time-value">{{formatDate(booking.checkOutDate)}}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                    <span class="status-badge" [ngClass]="booking.status.toLowerCase()">
+                      {{booking.status === 'Confirmed' ? 'Đã xác nhận' : 'Đã hủy'}}
+                    </span>
+                </td>
+                <td>
+                  <span class="total-amount">{{ formatPrice(booking.totalAmount) }}</span>
+                </td>
+<td>
+  <div class="action-buttons">
+    <button class="action-btn view-btn" (click)="viewBooking(booking)" title="Xem chi tiết">
+      <i class="view-icon"></i>
+    </button>
+    <button class="action-btn delete-btn" (click)="deleteBooking(booking)" title="Xóa">
+      <i class="delete-icon"></i>
+    </button>
+  </div>
+</td>
+
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+<!-- Pagination -->
+<div class="pagination">
+  <span class="pagination-info">
+    Hiển thị {{ (currentPage() - 1) * itemsPerPage() + 1 }} -
+    {{ currentPage() * itemsPerPage() > filteredBookings().length ? filteredBookings().length : currentPage() * itemsPerPage() }}
+    của {{ filteredBookings().length }} đặt phòng
+  </span>
+  <div class="pagination-controls">
+    <button class="pagination-btn" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
+      <i class="arrow-left"></i>
+    </button>
+    <span class="page-numbers">
+      <button
+        *ngFor="let page of getPageNumbers()"
+        class="page-btn"
+        [class.active]="page === currentPage()"
+        (click)="goToPage(page)">
+        {{ page }}
+      </button>
+    </span>
+    <button class="pagination-btn" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
+      <i class="arrow-right"></i>
+    </button>
+  </div>
+</div>
+        </section>
+
+        <!-- View Booking Modal - Modern Design -->
+        <div class="modern-modal-overlay" *ngIf="showViewModal()" (click)="closeViewModal()">
+          <div class="modern-modal-container view-modal" (click)="$event.stopPropagation()">
+            <div class="modern-modal-header">
+              <h2>Chi tiết đơn đặt phòng</h2>
+              <button class="modern-close-btn" (click)="closeViewModal()">
+                <i class="modern-close-icon"></i>
+              </button>
+            </div>
+
+            <div class="modern-modal-body" *ngIf="currentBooking()">
+              <div class="booking-image-section" *ngIf="currentBooking()!.mainImageUrl">
+                <img [src]="currentBooking()!.mainImageUrl" [alt]="currentBooking()!.roomNumber" class="booking-main-image">
+              </div>
+
+              <div class="booking-details-grid">
+                <div class="detail-card">
+                  <div class="card-header">
+                    <h3>Thông tin phòng</h3>
+                    <i class="card-icon room-info-icon"></i>
+                  </div>
+                  <div class="card-content">
+                    <div class="info-row">
+                      <span class="info-label">Số phòng:</span>
+                      <span class="info-value room-number">{{currentBooking()!.roomNumber}}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="info-label">Loại phòng:</span>
+                      <span class="info-value">{{getRoomTypeText(currentBooking()!.roomType)}}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-card">
+                  <div class="card-header">
+                    <h3>Thông tin khách hàng</h3>
+                    <i class="card-icon customer-icon"></i>
+                  </div>
+                  <div class="card-content">
+                    <div class="info-row">
+                      <span class="info-label">Tên khách hàng:</span>
+                      <span class="info-value customer-name">{{currentBooking()!.fullName}}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="info-label">Số điện thoại:</span>
+                      <span class="info-value">{{currentBooking()!.phone || 'Chưa cập nhật'}}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="info-label">Email:</span>
+                      <span class="info-value">{{currentBooking()!.email || 'Chưa cập nhật'}}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-card booking-info-card">
+                  <div class="card-header">
+                    <h3>Thông tin đặt phòng</h3>
+                    <i class="card-icon booking-icon"></i>
+                  </div>
+                  <div class="card-content">
+                    <div class="info-row">
+                      <span class="info-label">Ngày nhận phòng:</span>
+                      <span class="info-value date-value">{{formatDate(currentBooking()!.checkInDate)}}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="info-label">Ngày trả phòng:</span>
+                      <span class="info-value date-value">{{formatDate(currentBooking()!.checkOutDate)}}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="info-label">Tổng tiền:</span>
+                      <span class="info-value price-value">{{ formatPrice(currentBooking()!.totalAmount) }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="info-label">Trạng thái:</span>
+                      <span class="info-value">
+                        <span class="modern-status-badge" [ngClass]="getStatusClass(currentBooking()!.status)">
+                          {{getStatusText(currentBooking()!.status)}}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modern-modal-footer">
+              <button class="modern-btn-secondary" (click)="closeViewModal()">Đóng</button>
+              <button class="modern-btn-primary" (click)="closeViewModal()">In chi tiết</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modern-modal-overlay" *ngIf="showDeleteConfirm()" (click)="cancelDelete()">
+          <div class="modern-modal-container delete-modal" (click)="$event.stopPropagation()">
+            <div class="modern-modal-header delete-header">
+              <h2>Xác nhận xóa</h2>
+              <button class="modern-close-btn" (click)="cancelDelete()">
+                <i class="modern-close-icon"></i>
+              </button>
+            </div>
+
+            <div class="modern-modal-body">
+              <div class="delete-confirmation-content">
+                <div class="warning-icon">⚠️</div>
+                <h3>Bạn có chắc chắn muốn xóa đơn đặt phòng này?</h3>
+                <p class="warning-text">
+                  Đơn đặt phòng <strong>{{pendingDeleteBooking()?.roomNumber}}</strong>
+                  của khách hàng <strong>{{pendingDeleteBooking()?.fullName}}</strong>
+                  sẽ bị xóa vĩnh viễn và không thể khôi phục.
+                </p>
+              </div>
+            </div>
+
+            <div class="modern-modal-footer">
+              <button class="modern-btn-secondary" (click)="cancelDelete()">Hủy</button>
+              <button class="modern-btn-danger" (click)="confirmDelete()">Xóa đơn đặt phòng</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>

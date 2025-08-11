@@ -1,0 +1,482 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>Azure Hotel.</h2>
+    </div>
+
+    <nav class="navigation">
+      <ul>
+        <li class="nav-item">
+          <a routerLink="/dashboard" class="nav-link">
+            <i class="icon dashboard-icon"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/listroom" class="nav-link">
+            <i class="icon room-icon"></i>
+            <span>Phòng</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/listbooking" class="nav-link">
+            <i class="icon booking-icon"></i>
+            <span>Đơn đặt phòng</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/listservice" class="nav-link">
+            <i class="icon service-icon"></i>
+            <span>Dịch vụ</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/message" class="nav-link">
+            <i class="icon message-icon"></i>
+            <span>Message</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/helps" class="nav-link">
+            <i class="icon help-icon"></i>
+            <span>Help</span>
+          </a>
+        </li>
+        <li class="nav-item active">
+          <a routerLink="/setting" class="nav-link">
+            <i class="icon setting-icon"></i>
+            <span>Setting</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1>Settings</h1>
+      </div>
+
+      <div class="header-right">
+        <div class="search-container">
+          <input
+            type="text"
+            placeholder="Search settings"
+            class="search-input"
+            [(ngModel)]="searchQuery">
+          <i class="search-icon"></i>
+        </div>
+
+        <div class="header-actions">
+          <button class="notification-btn" title="Thông báo">
+            <i class="notification-icon"></i>
+            <span class="notification-badge">3</span>
+          </button>
+
+          <!-- User Profile with Dropdown -->
+          <div class="user-profile-container" [class.open]="showUserDropdown()">
+            <div class="user-profile" (click)="toggleUserDropdown($event)">
+              <img [src]="userProfile().avatar"
+                   alt="User" class="user-avatar">
+              <div class="user-info">
+                <span class="user-name">{{userProfile().name}}</span>
+                <span class="user-role">{{userProfile().role}}</span>
+              </div>
+              <button class="dropdown-btn" type="button" title="Menu">
+                <i class="dropdown-icon" [class.rotated]="showUserDropdown()"></i>
+              </button>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="user-dropdown" *ngIf="showUserDropdown()" (click)="$event.stopPropagation()">
+              <div class="dropdown-content">
+                <button class="dropdown-item" type="button" (click)="goToProfile()">
+                  <i class="profile-menu-icon"></i>
+                  <span>Profile</span>
+                </button>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout" (click)="logout()"href="javascript:void(0)">
+                  <i class="logout-icon"></i>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content-wrapper">
+      <div class="settings-container">
+        <!-- Settings Navigation -->
+        <div class="settings-nav">
+          <div class="nav-tabs">
+            <button
+              *ngFor="let tab of settingTabs"
+              class="tab-btn"
+              [class.active]="activeTab() === tab.key"
+              (click)="setActiveTab(tab.key)">
+              <i [class]="tab.iconClass"></i>
+              <span>{{tab.label}}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="settings-content">
+          <!-- Profile Settings -->
+          <div *ngIf="activeTab() === 'profile'" class="setting-panel">
+            <div class="panel-header">
+              <h2>Thông tin cá nhân</h2>
+              <p>Quản lý thông tin cá nhân và tài khoản của bạn</p>
+            </div>
+
+            <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="setting-form">
+              <div class="form-section">
+                <div class="avatar-section">
+                  <div class="current-avatar">
+                    <img [src]="userProfile().avatar" [alt]="userProfile().name" class="avatar-image">
+                    <button type="button" class="avatar-edit-btn" (click)="triggerAvatarUpload()">
+                      <i class="edit-icon"></i>
+                    </button>
+                  </div>
+                  <input type="file" #avatarInput (change)="onAvatarChange($event)" accept="image/*" style="display: none;">
+                  <div class="avatar-info">
+                    <h4>Ảnh đại diện</h4>
+                    <p>Định dạng JPG, PNG. Kích thước tối đa 2MB</p>
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Họ và tên</label>
+                    <input type="text" formControlName="name" class="form-input" placeholder="Nhập họ và tên">
+                    <div *ngIf="profileForm.get('name')?.errors?.['required'] && profileForm.get('name')?.touched" class="error-message">
+                      Họ và tên không được để trống
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" formControlName="email" class="form-input" placeholder="Nhập email">
+                    <div *ngIf="profileForm.get('email')?.errors?.['email'] && profileForm.get('email')?.touched" class="error-message">
+                      Email không đúng định dạng
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Số điện thoại</label>
+                    <input type="tel" formControlName="phone" class="form-input" placeholder="Nhập số điện thoại">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Chức vụ</label>
+                    <select formControlName="role" class="form-select">
+                      <option value="admin">Quản trị viên</option>
+                      <option value="manager">Quản lý</option>
+                      <option value="staff">Nhân viên</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group full-width">
+                    <label>Địa chỉ</label>
+                    <textarea formControlName="address" class="form-textarea" rows="3" placeholder="Nhập địa chỉ"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" (click)="resetProfileForm()">Hủy</button>
+                <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid">Lưu thay đổi</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Security Settings -->
+          <div *ngIf="activeTab() === 'security'" class="setting-panel">
+            <div class="panel-header">
+              <h2>Bảo mật</h2>
+              <p>Quản lý mật khẩu và cài đặt bảo mật tài khoản</p>
+            </div>
+
+            <form [formGroup]="securityForm" (ngSubmit)="changePassword()" class="setting-form">
+              <div class="form-section">
+                <h3>Đổi mật khẩu</h3>
+
+                <div class="form-group">
+                  <label>Mật khẩu hiện tại</label>
+                  <div class="password-input-container">
+                    <input
+                      [type]="showCurrentPassword() ? 'text' : 'password'"
+                      formControlName="currentPassword"
+                      class="form-input"
+                      placeholder="Nhập mật khẩu hiện tại">
+                    <button type="button" class="password-toggle" (click)="togglePasswordVisibility('current')">
+                      <i [class]="showCurrentPassword() ? 'eye-off-icon' : 'eye-icon'"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Mật khẩu mới</label>
+                  <div class="password-input-container">
+                    <input
+                      [type]="showNewPassword() ? 'text' : 'password'"
+                      formControlName="newPassword"
+                      class="form-input"
+                      placeholder="Nhập mật khẩu mới">
+                    <button type="button" class="password-toggle" (click)="togglePasswordVisibility('new')">
+                      <i [class]="showNewPassword() ? 'eye-off-icon' : 'eye-icon'"></i>
+                    </button>
+                  </div>
+                  <div class="password-strength">
+                    <div class="strength-bar">
+                      <div class="strength-fill" [style.width.%]="passwordStrength()"></div>
+                    </div>
+                    <span class="strength-text">{{getPasswordStrengthText()}}</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Xác nhận mật khẩu mới</label>
+                  <div class="password-input-container">
+                    <input
+                      [type]="showConfirmPassword() ? 'text' : 'password'"
+                      formControlName="confirmPassword"
+                      class="form-input"
+                      placeholder="Xác nhận mật khẩu mới">
+                    <button type="button" class="password-toggle" (click)="togglePasswordVisibility('confirm')">
+                      <i [class]="showConfirmPassword() ? 'eye-off-icon' : 'eye-icon'"></i>
+                    </button>
+                  </div>
+                  <div *ngIf="securityForm.errors?.['passwordMismatch'] && securityForm.get('confirmPassword')?.touched" class="error-message">
+                    Mật khẩu xác nhận không khớp
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3>Bảo mật nâng cao</h3>
+
+                <div class="security-option">
+                  <div class="option-info">
+                    <h4>Xác thực hai yếu tố (2FA)</h4>
+                    <p>Tăng cường bảo mật bằng cách yêu cầu mã xác thực từ ứng dụng di động</p>
+                  </div>
+                  <div class="option-control">
+                    <label class="toggle-switch">
+                      <input type="checkbox" [checked]="securitySettings().twoFactorEnabled" (change)="toggleTwoFactor($event)">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="security-option">
+                  <div class="option-info">
+                    <h4>Thông báo đăng nhập</h4>
+                    <p>Nhận thông báo khi có đăng nhập từ thiết bị mới</p>
+                  </div>
+                  <div class="option-control">
+                    <label class="toggle-switch">
+                      <input type="checkbox" [checked]="securitySettings().loginNotifications" (change)="toggleLoginNotifications($event)">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" (click)="resetSecurityForm()">Hủy</button>
+                <button type="submit" class="btn btn-primary" [disabled]="securityForm.invalid">Cập nhật mật khẩu</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Notification Settings -->
+          <div *ngIf="activeTab() === 'notifications'" class="setting-panel">
+            <div class="panel-header">
+              <h2>Thông báo</h2>
+              <p>Tùy chỉnh các loại thông báo bạn muốn nhận</p>
+            </div>
+
+            <div class="setting-form">
+              <div class="form-section">
+                <h3>Thông báo Email</h3>
+
+                <div class="notification-option" *ngFor="let option of emailNotificationOptions">
+                  <div class="option-info">
+                    <h4>{{option.title}}</h4>
+                    <p>{{option.description}}</p>
+                  </div>
+                  <div class="option-control">
+                    <label class="toggle-switch">
+                      <input type="checkbox" [checked]="option.enabled" (change)="toggleEmailNotification(option.key, $event)">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3>Thông báo Push</h3>
+
+                <div class="notification-option" *ngFor="let option of pushNotificationOptions">
+                  <div class="option-info">
+                    <h4>{{option.title}}</h4>
+                    <p>{{option.description}}</p>
+                  </div>
+                  <div class="option-control">
+                    <label class="toggle-switch">
+                      <input type="checkbox" [checked]="option.enabled" (change)="togglePushNotification(option.key, $event)">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" (click)="resetNotificationSettings()">Đặt lại mặc định</button>
+                <button type="button" class="btn btn-primary" (click)="saveNotificationSettings()">Lưu cài đặt</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- System Settings -->
+          <div *ngIf="activeTab() === 'system'" class="setting-panel">
+            <div class="panel-header">
+              <h2>Hệ thống</h2>
+              <p>Cài đặt giao diện và tùy chọn hệ thống</p>
+            </div>
+
+            <form [formGroup]="systemForm" (ngSubmit)="saveSystemSettings()" class="setting-form">
+              <div class="form-section">
+                <h3>Giao diện</h3>
+
+                <div class="form-group">
+                  <label>Chủ đề</label>
+                  <div class="theme-options">
+                    <div class="theme-option" *ngFor="let theme of themeOptions">
+                      <input type="radio" [id]="theme.key" [value]="theme.key" formControlName="theme">
+                      <label [for]="theme.key" class="theme-label">
+                        <div class="theme-preview" [ngClass]="theme.class"></div>
+                        <span>{{theme.name}}</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Ngôn ngữ</label>
+                  <select formControlName="language" class="form-select">
+                    <option value="vi">Tiếng Việt</option>
+                    <option value="en">English</option>
+                    <option value="zh">中文</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Múi giờ</label>
+                  <select formControlName="timezone" class="form-select">
+                    <option value="Asia/Ho_Chi_Minh">GMT+7 (Việt Nam)</option>
+                    <option value="Asia/Bangkok">GMT+7 (Bangkok)</option>
+                    <option value="Asia/Singapore">GMT+8 (Singapore)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3>Hiển thị</h3>
+
+                <div class="form-group">
+                  <label>Số mục trên mỗi trang</label>
+                  <select formControlName="itemsPerPage" class="form-select">
+                    <option value="5">5 mục</option>
+                    <option value="10">10 mục</option>
+                    <option value="20">20 mục</option>
+                    <option value="50">50 mục</option>
+                  </select>
+                </div>
+
+                <div class="system-option">
+                  <div class="option-info">
+                    <h4>Sidebar thu gọn</h4>
+                    <p>Thu gọn sidebar để tiết kiệm không gian màn hình</p>
+                  </div>
+                  <div class="option-control">
+                    <label class="toggle-switch">
+                      <input type="checkbox" [checked]="systemSettings().collapsedSidebar" (change)="toggleSidebarCollapse($event)">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="system-option">
+                  <div class="option-info">
+                    <h4>Animations</h4>
+                    <p>Bật/tắt hiệu ứng chuyển động trong giao diện</p>
+                  </div>
+                  <div class="option-control">
+                    <label class="toggle-switch">
+                      <input type="checkbox" [checked]="systemSettings().animations" (change)="toggleAnimations($event)">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" (click)="resetSystemForm()">Khôi phục mặc định</button>
+                <button type="submit" class="btn btn-primary">Lưu cài đặt</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div *ngIf="showToast()" class="toast-notification" [ngClass]="toastType()">
+      <div class="toast-content">
+        <i [class]="getToastIcon()"></i>
+        <div class="toast-text">
+          <h4>{{toastTitle()}}</h4>
+          <p>{{toastMessage()}}</p>
+        </div>
+        <button class="toast-close" (click)="hideToast()">
+          <i class="close-icon"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div *ngIf="showLogoutModal()" class="modal-overlay" (click)="cancelLogout()">
+      <div class="modal-container logout-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Xác nhận đăng xuất</h2>
+          <button class="close-btn" (click)="cancelLogout()">
+            <i class="close-icon"></i>
+          </button>
+        </div>
+
+        <div class="modal-content">
+          <div class="logout-content">
+            <div class="logout-icon-large">
+              <i class="logout-icon-big"></i>
+            </div>
+            <p>Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?</p>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelLogout()">Hủy</button>
+          <button type="button" class="btn btn-danger" (click)="confirmLogout()">Đăng xuất</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

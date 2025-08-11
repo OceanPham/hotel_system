@@ -1,0 +1,290 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>Azure Hotel.</h2>
+    </div>
+
+    <nav class="navigation">
+      <ul>
+        <li class="nav-item">
+          <a routerLink="/dashboard" class="nav-link">
+            <i class="icon dashboard-icon"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a routerLink="/listroom" class="nav-link">
+            <i class="icon room-icon"></i>
+            <span>Phòng</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a routerLink="/listbooking" class="nav-link">
+            <i class="icon booking-icon"></i>
+            <span>Đơn đặt phòng</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a routerLink="/listservice" class="nav-link">
+            <i class="icon service-icon"></i>
+            <span>Dịch vụ</span>
+          </a>
+        </li>
+
+        <li class="nav-item active">
+          <a routerLink="/message" class="nav-link">
+            <i class="icon message-icon"></i>
+            <span>Message</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a routerLink="/helps" class="nav-link">
+            <i class="icon help-icon"></i>
+            <span>Help</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a routerLink="/setting" class="nav-link">
+            <i class="icon setting-icon"></i>
+            <span>Setting</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <h1>Tin nhắn</h1>
+      </div>
+      <div class="header-right">
+        <div class="search-container">
+          <input type="text" class="search-input" placeholder="Tìm kiếm tin nhắn..." [(ngModel)]="searchText" (input)="searchConversations()">
+          <div class="search-icon"></div>
+        </div>
+        <div class="header-actions">
+          <div class="notification-btn">
+            <div class="notification-icon"></div>
+            <div class="notification-badge">{{ getTotalUnreadCount() }}</div>
+          </div>
+
+          <!-- User Profile with Dropdown -->
+          <div class="user-profile-container" [class.open]="showUserDropdown()">
+            <div class="user-profile" (click)="toggleUserDropdown($event)">
+              <img [src]="userProfile().avatar"
+                   alt="User" class="user-avatar">
+              <div class="user-info">
+                <span class="user-name">{{userProfile().name}}</span>
+                <span class="user-role">{{getRoleDisplayName()}}</span>
+              </div>
+              <button class="dropdown-btn" type="button" title="Menu">
+                <i class="dropdown-icon" [class.rotated]="showUserDropdown()"></i>
+              </button>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="user-dropdown" *ngIf="showUserDropdown()" (click)="$event.stopPropagation()">
+              <div class="dropdown-content">
+                <button class="dropdown-item" type="button" (click)="goToProfile()">
+                  <i class="profile-menu-icon"></i>
+                  <span>Profile</span>
+                </button>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout" type="button" (click)="showLogoutConfirmation()">
+                  <i class="logout-icon"></i>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Content -->
+    <div class="message-content">
+      <div class="message-layout">
+        <!-- Conversations Sidebar -->
+        <div class="conversations-sidebar">
+          <div class="conversations-header">
+            <h3>Cuộc trò chuyện</h3>
+            <button class="new-chat-btn" (click)="startNewChat()">
+              <i class="icon plus-icon"></i>
+            </button>
+          </div>
+
+          <div class="conversations-list">
+            <div
+              *ngFor="let conversation of filteredConversations; let i = index"
+              class="conversation-item"
+              [class.active]="selectedConversation?.id === conversation.id"
+              (click)="selectConversation(conversation, i)">
+              <div class="conversation-avatar">
+                <img [src]="conversation.avatar" [alt]="conversation.name">
+                <div class="status-indicator" [class.online]="conversation.isOnline"></div>
+              </div>
+              <div class="conversation-info">
+                <div class="conversation-name">{{ conversation.name }}</div>
+                <div class="last-message">{{ conversation.lastMessage }}</div>
+                <div class="message-time">{{ conversation.lastMessageTime }}</div>
+              </div>
+              <div class="conversation-badges" *ngIf="conversation.unreadCount > 0">
+                <span class="unread-badge">{{ conversation.unreadCount }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+          <!-- Chat Header -->
+          <div class="chat-header" *ngIf="selectedConversation">
+            <div class="chat-user-info">
+              <img [src]="selectedConversation.avatar" [alt]="selectedConversation.name" class="chat-avatar">
+              <div class="chat-user-details">
+                <h4>{{ selectedConversation.name }}</h4>
+                <span class="user-status" [class.online]="selectedConversation.isOnline">
+                  {{ selectedConversation.isOnline ? 'Đang hoạt động' : 'Offline' }}
+                </span>
+              </div>
+            </div>
+            <div class="chat-actions">
+              <button class="action-btn" title="Gọi điện" (click)="makeCall()">
+                <i class="icon phone-icon"></i>
+              </button>
+              <button class="action-btn" title="Video call" (click)="makeVideoCall()">
+                <i class="icon video-icon"></i>
+              </button>
+              <button class="action-btn" title="Thông tin" (click)="showInfo()">
+                <i class="icon info-icon"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Messages Container -->
+          <div class="messages-container" #messagesContainer *ngIf="selectedConversation">
+            <div class="messages-list">
+              <div *ngFor="let message of currentMessages; let i = index"
+                   class="message-wrapper"
+                   [class.own-message]="message.senderId === currentUserId">
+                <div class="message-bubble">
+                  <div class="message-content">
+                    <p>{{ message.text }}</p>
+                  </div>
+                  <div class="message-meta">
+                    <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+                    <div class="message-status" *ngIf="message.senderId === currentUserId">
+                      <i class="icon check-icon" [class.read]="message.status === 'read'"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" *ngIf="isTyping">
+              <div class="typing-bubble">
+                <div class="typing-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message Input -->
+          <div class="message-input-area" *ngIf="selectedConversation">
+            <form (submit)="sendMessage($event)" class="message-form">
+              <div class="input-wrapper">
+                <button type="button" class="attachment-btn" (click)="attachFile()">
+                  <i class="icon attachment-icon"></i>
+                </button>
+                <input
+                  type="text"
+                  [(ngModel)]="newMessage"
+                  name="newMessage"
+                  class="message-input"
+                  placeholder="Nhập tin nhắn..."
+                  (keyup)="handleTyping()"
+                  (keyup.enter)="sendMessage($event)"
+                  autocomplete="off">
+                <button type="button" class="emoji-btn" (click)="toggleEmojiPicker()">
+                  <i class="icon emoji-icon"></i>
+                </button>
+                <button type="submit" class="send-btn" [disabled]="!newMessage || !newMessage.trim()">
+                  <i class="icon send-icon"></i>
+                </button>
+              </div>
+            </form>
+
+            <!-- Emoji Picker -->
+            <div class="emoji-picker" *ngIf="showEmojiPicker">
+              <div class="emoji-grid">
+                <span *ngFor="let emoji of emojis" class="emoji-item" (click)="addEmoji(emoji)">{{ emoji }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-chat-state" *ngIf="!selectedConversation">
+            <div class="empty-icon">💬</div>
+            <h3>Chọn một cuộc trò chuyện</h3>
+            <p>Chọn một cuộc trò chuyện từ danh sách bên trái để bắt đầu nhắn tin.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Logout Confirmation Modal -->
+  <div *ngIf="showLogoutModal()" class="modal-overlay" (click)="cancelLogout()">
+    <div class="modal-container logout-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Xác nhận đăng xuất</h2>
+        <button class="close-btn" (click)="cancelLogout()">
+          <i class="close-icon"></i>
+        </button>
+      </div>
+
+      <div class="modal-content">
+        <div class="logout-content">
+          <div class="logout-icon-large">
+            <i class="logout-icon-big"></i>
+          </div>
+          <p>Bạn có chắc chắn muốn đăng xuất khỏi tài khoản?</p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="cancelLogout()">Hủy</button>
+        <button class="btn btn-danger" (click)="confirmLogout()">Đăng xuất</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div *ngIf="showToast()" class="toast-container" [ngClass]="'toast-' + toastType()">
+    <div class="toast">
+      <div class="toast-icon">
+        <i [class]="getToastIcon()"></i>
+      </div>
+      <div class="toast-content">
+        <div class="toast-title">{{toastTitle()}}</div>
+        <div class="toast-message">{{toastMessage()}}</div>
+      </div>
+      <button class="toast-close" (click)="hideToast()">
+        <i class="close-icon small"></i>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,458 @@
+<div class="booking-payment-container">
+  <!-- Header -->
+  <header class="payment-header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <span class="logo-text">Azure Hotel</span>
+        </div>
+        <button class="back-btn" (click)="goToHome()">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+          </svg>
+          Quay lại
+        </button>
+      </div>
+    </div>
+  </header>
+
+
+
+
+  <!-- Notification Section -->
+  <div class="notification-overlay"
+       *ngIf="showNotification()"
+       [class.show]="showNotification()">
+    <div class="notification-container"
+         [ngClass]="'notification-' + notificationType()">
+      <div class="notification-icon">
+        <span *ngIf="notificationType() === 'success'">✅</span>
+        <span *ngIf="notificationType() === 'error'">❌</span>
+        <span *ngIf="notificationType() === 'warning'">⚠️</span>
+        <span *ngIf="notificationType() === 'info'">ℹ️</span>
+      </div>
+      <div class="notification-content">
+        <p [innerHTML]="getFormattedNotificationMessage()"></p>
+      </div>
+      <button class="notification-close" (click)="hideNotification()">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+
+
+  <!-- Main Content -->
+  <main class="payment-main">
+    <div class="container">
+      <!-- Progress Steps -->
+      <div class="progress-steps">
+        <div class="step"
+             *ngFor="let step of [1,2,3,4]; let i = index"
+             [class.active]="currentStep() === step"
+             [class.completed]="currentStep() > step"
+             (click)="goToStep(step)">
+          <div class="step-circle">
+            <span *ngIf="currentStep() > step">✓</span>
+            <span *ngIf="currentStep() <= step">{{step}}</span>
+          </div>
+          <span class="step-label">{{getStepTitle(step)}}</span>
+        </div>
+      </div>
+
+      <!-- Step Content -->
+      <div class="step-content">
+
+        <!-- Step 1: Booking Information -->
+        <div class="step-panel" *ngIf="currentStep() === 1">
+          <div class="step-header">
+            <h2>Thông tin đặt phòng</h2>
+            <p>Xem lại thông tin đặt phòng của bạn</p>
+          </div>
+
+          <!-- Loading state -->
+          <div *ngIf="isLoadingData()" class="loading-state">
+            <div class="spinner"></div>
+            <p>Đang tải thông tin đặt phòng...</p>
+          </div>
+
+          <!-- Error state -->
+          <div *ngIf="loadingError()" class="error-state">
+            <div class="error-icon">⚠️</div>
+            <p>{{loadingError()}}</p>
+            <button class="btn btn-secondary" (click)="goToHome()">Về trang chủ</button>
+          </div>
+
+          <!-- Booking data -->
+          <div *ngIf="bookingData() && !isLoadingData() && !loadingError()" class="booking-summary-card">
+            <!-- User info section -->
+            <div class="user-info-section" *ngIf="currentUser()">
+              <h3>Thông tin khách hàng</h3>
+              <p><strong>Tên:</strong> {{ currentUser()?.fullName }}</p>
+              <p><strong>Email:</strong> {{ currentUser()?.email }}</p>
+              <p><strong>SĐT:</strong> {{ currentUser()?.phone }}</p>
+            </div>
+
+            <div class="room-info">
+              <img [src]="bookingData()!.room.roomImage" [alt]="bookingData()!.room.roomName" class="room-image">
+              <div class="room-details">
+                <h3>{{bookingData()!.room.roomName}}</h3>
+                <div class="room-meta">
+                  <span>{{bookingData()!.room.capacity}} khách</span>
+                  <span>•</span>
+                  <span>{{bookingData()!.room.bedCount}} giường</span>
+                  <span>•</span>
+                  <span>{{bookingData()!.room.rating}} sao</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="booking-details">
+              <div class="detail-row">
+                <span class="label">Ngày nhận phòng:</span>
+                <span class="value">{{formatDate(bookingData()!.checkInDate)}} - {{bookingData()!.checkInTime}}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Ngày trả phòng:</span>
+                <span class="value">{{formatDate(bookingData()!.checkOutDate)}} - {{bookingData()!.checkOutTime}}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Số ngày:</span>
+                <span class="value">{{bookingData()!.nights}} ngày</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Số khách:</span>
+                <span class="value">{{bookingData()!.guestCount}} khách</span>
+              </div>
+              <div class="detail-row" *ngIf="bookingData()!.specialRequests">
+                <span class="label">Yêu cầu đặc biệt:</span>
+                <span class="value">{{bookingData()!.specialRequests}}</span>
+              </div>
+            </div>
+
+            <div class="services-summary" *ngIf="bookingData()!.selectedServices.length > 0">
+              <h4>Dịch vụ đã chọn:</h4>
+              <div class="service-item" *ngFor="let service of bookingData()!.selectedServices">
+                <span>{{service.name}} x{{service.quantity}}</span>
+                <span>{{formatPrice(service.price * service.quantity)}}</span>
+              </div>
+            </div>
+
+            <div class="price-summary">
+              <div class="price-row">
+                <span>Giá phòng ({{bookingData()!.nights}} đêm):</span>
+                <span>{{formatPrice(bookingData()!.roomTotalPrice)}}</span>
+              </div>
+              <div class="price-row" *ngIf="bookingData()!.servicesTotalPrice > 0">
+                <span>Dịch vụ:</span>
+                <span>{{formatPrice(bookingData()!.servicesTotalPrice)}}</span>
+              </div>
+              <div class="price-row">
+                <span>Thuế & phí dịch vụ:</span>
+                <span>{{formatPrice(bookingData()!.taxes + bookingData()!.serviceFee)}}</span>
+              </div>
+              <div class="total-price">
+                <span>Tổng thanh toán:</span>
+                <span class="amount">{{formatPrice(bookingData()!.totalPrice)}}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn btn-primary" (click)="nextStep()" [disabled]="!isStep1Valid()">
+              Tiếp tục
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Choose Payment Method -->
+        <div class="step-panel" *ngIf="currentStep() === 2">
+          <div class="step-header">
+            <h2>Chọn phương thức thanh toán</h2>
+            <p>Bạn muốn thanh toán bằng hình thức nào?</p>
+          </div>
+
+          <div class="payment-methods">
+            <div class="payment-method"
+                 *ngFor="let method of paymentMethods"
+                 [class.selected]="paymentForm.method === method.id"
+                 (click)="selectPaymentMethod(method.id)">
+              <div class="method-icon">{{method.icon}}</div>
+              <div class="method-info">
+                <span class="method-name">{{method.name}}</span>
+                <span class="method-type" *ngIf="method.type === 'credit'"></span>
+                <span class="method-type" *ngIf="method.type === 'ewallet'"></span>
+                <span class="method-type" *ngIf="method.type === 'bank'"></span>
+                <span class="method-type" *ngIf="method.type === 'cash'"></span>
+              </div>
+              <div class="method-radio">
+                <input type="radio"
+                       [value]="method.id"
+                       [checked]="paymentForm.method === method.id"
+                       (change)="selectPaymentMethod(method.id)">
+              </div>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn btn-secondary" (click)="previousStep()">Quay lại</button>
+            <button class="btn btn-primary" (click)="nextStep()" [disabled]="!isStep2Valid()">
+              Tiếp tục
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Payment Details -->
+        <div class="step-panel" *ngIf="currentStep() === 3">
+          <div class="step-header">
+            <h2>Thông tin thanh toán</h2>
+            <p>Điền thông tin để hoàn tất thanh toán</p>
+          </div>
+
+          <!-- Processing payment state -->
+          <div *ngIf="isProcessingPayment()" class="processing-payment">
+            <div class="spinner"></div>
+            <p>Đang xử lý thanh toán...</p>
+          </div>
+
+          <!-- Payment error -->
+          <div *ngIf="paymentError() && !isProcessingPayment()" class="payment-error">
+            <div class="error-icon">❌</div>
+            <p>{{paymentError()}}</p>
+          </div>
+
+          <!-- Credit Card Payment -->
+          <div class="payment-form" *ngIf="paymentForm.method === 'credit' && !isProcessingPayment()">
+            <div class="form-group">
+              <label>Số thẻ</label>
+              <input type="text"
+                     [(ngModel)]="paymentForm.cardNumber"
+                     placeholder="1234 5678 9012 3456"
+                     class="form-input">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Ngày hết hạn</label>
+                <input type="text"
+                       [(ngModel)]="paymentForm.expiryDate"
+                       placeholder="MM/YY"
+                       class="form-input">
+              </div>
+              <div class="form-group">
+                <label>CVV</label>
+                <input type="text"
+                       [(ngModel)]="paymentForm.cvv"
+                       placeholder="123"
+                       class="form-input">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Tên chủ thẻ</label>
+              <input type="text"
+                     [(ngModel)]="paymentForm.cardName"
+                     [value]="currentUser()?.fullName || ''"
+                     placeholder="NGUYEN VAN A"
+                     class="form-input">
+            </div>
+          </div>
+
+          <!-- Bank Transfer -->
+          <div class="payment-form" *ngIf="paymentForm.method === 'bank' && !isProcessingPayment()">
+            <div class="bank-transfer-info">
+              <h4>Thông tin chuyển khoản</h4>
+              <div class="bank-details">
+                <div class="bank-row">
+                  <span class="label">Ngân hàng:</span>
+                  <span class="value">{{bankQRData.bankName}}</span>
+                </div>
+                <div class="bank-row">
+                  <span class="label">Số tài khoản:</span>
+                  <span class="value">{{bankQRData.accountNumber}}</span>
+                </div>
+                <div class="bank-row">
+                  <span class="label">Tên tài khoản:</span>
+                  <span class="value">{{bankQRData.accountName}}</span>
+                </div>
+                <div class="bank-row">
+                  <span class="label">Số tiền:</span>
+                  <span class="value amount">{{formatPrice(bankQRData.amount)}}</span>
+                </div>
+                <div class="bank-row">
+                  <span class="label">Nội dung:</span>
+                  <span class="value">{{bankQRData.description}}</span>
+                </div>
+              </div>
+
+              <div class="qr-code-section">
+                <h5>Quét mã QR để chuyển khoản</h5>
+                <div class="qr-code-placeholder">
+                  <img src="https://i.imghippo.com/files/UpG8909PnE.jpg" alt="" border="0">
+                  <p>Quét mã để chuyển khoản tự động</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Số điện thoại</label>
+              <input type="tel"
+                     [(ngModel)]="paymentForm.phone"
+                     [value]="currentUser()?.phone || ''"
+                     placeholder="0987654321"
+                     class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email"
+                     [(ngModel)]="paymentForm.email"
+                     [value]="currentUser()?.email || ''"
+                     placeholder="email@example.com"
+                     class="form-input">
+            </div>
+          </div>
+
+          <!-- E-wallet (VNPay, MoMo) -->
+          <div class="payment-form" *ngIf="(paymentForm.method === 'vnpay' || paymentForm.method === 'momo') && !isProcessingPayment()">
+            <div class="ewallet-info">
+              <h4>Thanh toán bằng {{paymentForm.method === 'vnpay' ? 'VNPay' : 'MoMo'}}</h4>
+              <p>Bạn sẽ được chuyển hướng đến trang thanh toán của {{paymentForm.method === 'vnpay' ? 'VNPay' : 'MoMo'}}</p>
+            </div>
+
+            <div class="form-group">
+              <label>Số điện thoại</label>
+              <input type="tel"
+                     [(ngModel)]="paymentForm.phone"
+                     [value]="currentUser()?.phone || ''"
+                     placeholder="0987654321"
+                     class="form-input">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email"
+                     [(ngModel)]="paymentForm.email"
+                     [value]="currentUser()?.email || ''"
+                     placeholder="email@example.com"
+                     class="form-input">
+            </div>
+          </div>
+
+          <!-- Cash Payment -->
+          <div class="payment-form" *ngIf="paymentForm.method === 'cash' && !isProcessingPayment()">
+            <div class="cash-payment-info">
+              <div class="info-box">
+                <h4>Thanh toán tại khách sạn</h4>
+                <p>Bạn có thể thanh toán trực tiếp tại quầy lễ tân khi nhận phòng.</p>
+                <ul>
+                  <li>Chấp nhận tiền mặt (VNĐ)</li>
+                  <li>Chấp nhận thẻ tín dụng/ghi nợ</li>
+                  <li>Vui lòng mang theo CMND/CCCD</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-actions" *ngIf="!isProcessingPayment()">
+            <button class="btn btn-secondary" (click)="previousStep()">Quay lại</button>
+            <button class="btn btn-primary" (click)="processPayment()" [disabled]="!isStep3Valid()">
+              Xác nhận thanh toán
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 4: Booking Success -->
+        <div class="step-panel" *ngIf="currentStep() === 4">
+          <div class="success-content">
+            <div class="success-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <h2>Đặt phòng thành công!</h2>
+            <p>Cảm ơn bạn đã tin tưởng Azure Hotel. Chúng tôi đã ghi nhận đặt phòng của bạn.</p>
+
+            <div class="booking-confirmation" *ngIf="bookingData()">
+              <h4>Thông tin đặt phòng</h4>
+              <div class="confirmation-details">
+                <div class="detail-item">
+                  <span class="label">Mã đặt phòng:</span>
+                  <span class="value">{{bookingId()}}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Phòng:</span>
+                  <span class="value">{{bookingData()!.room.roomName}}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Ngày nhận phòng:</span>
+                  <span class="value">{{formatDate(bookingData()!.checkInDate)}}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Tổng tiền:</span>
+                  <span class="value amount">{{formatPrice(bookingData()!.totalPrice)}}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="success-actions">
+              <button class="btn btn-secondary" (click)="goToBookingHistory()">
+                Xem lịch sử đặt phòng
+              </button>
+              <button class="btn btn-primary" (click)="goToHome()">
+                Về trang chủ
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+<!-- SUCCESS MODAL - THÊM CODE NÀY VÀO ĐÂY -->
+<div class="success-modal-overlay" *ngIf="showSuccessModal" (click)="closeSuccessModal()">
+  <div class="success-modal" (click)="$event.stopPropagation()">
+    <div class="success-icon">
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" fill="#4CAF50"/>
+        <path d="m9 12 2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <h2>Đặt phòng thành công!</h2>
+    <p>Cảm ơn bạn đã tin tưởng dịch vụ của chúng tôi</p>
+
+    <div class="booking-details">
+      <div class="detail-row">
+        <span class="label">Họ tên:</span>
+        <span class="value">{{successBookingData?.fullName}}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Phòng:</span>
+        <span class="value">{{successBookingData?.roomNumber}}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Ngày nhận phòng:</span>
+        <span class="value">{{successBookingData?.checkInDate}}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Ngày trả phòng:</span>
+        <span class="value">{{successBookingData?.checkOutDate}}</span>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="goToHome()">
+        Về trang chủ
+      </button>
+      <button class="btn-primary" (click)="goToBookingHistory()">
+        Xem lịch sử đặt phòng
+      </button>
+    </div>
+
+    <button class="close-btn" (click)="closeSuccessModal()">
+      ×
+    </button>
+  </div>
+</div>
+
+</div> <!-- ← Dòng cuối cùng giữ nguyên -->

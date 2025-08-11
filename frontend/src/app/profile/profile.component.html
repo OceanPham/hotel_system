@@ -1,0 +1,210 @@
+<div class="profile-page">
+  <!-- Header -->
+  <header class="profile-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="back-btn" (click)="goBack()" title="Quay lại">
+          <i class="back-icon"></i>
+        </button>
+        <div class="header-title">
+          <h1>Thông tin cá nhân</h1>
+          <p>Quản lý thông tin tài khoản của bạn</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="user-profile-container" [class.open]="showUserDropdown()">
+          <div class="user-profile" (click)="toggleUserDropdown($event)">
+            <div class="user-info">
+              <span class="user-name">{{ userProfile().fullName }}</span>
+              <span class="user-role">{{ getRoleDisplayName() }}</span>
+            </div>
+            <button class="dropdown-btn" type="button" title="Menu">
+              <i class="dropdown-icon" [class.rotated]="showUserDropdown()"></i>
+            </button>
+          </div>
+
+          <div class="user-dropdown" *ngIf="showUserDropdown()" (click)="$event.stopPropagation()">
+            <div class="dropdown-content">
+              <button class="dropdown-item" type="button" (click)="goToSettings()">
+                <i class="settings-menu-icon"></i>
+                <span>Cài đặt</span>
+              </button>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item logout" (click)="logout()"href="javascript:void(0)">
+                <i class="logout-icon"></i>
+                <span>Đăng xuất</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="profile-main">
+    <div class="profile-container">
+      <div class="profile-overview-card">
+        <div class="profile-banner">
+          <div class="banner-gradient"></div>
+        </div>
+
+        <div class="profile-overview-content">
+          <div class="profile-avatar-section">
+            <div class="avatar-container">
+              <div class="main-avatar default-avatar"></div>
+            </div>
+
+            <div class="profile-basic-info">
+              <h2 class="profile-name">{{ userProfile().fullName }}</h2>
+              <p class="profile-email">{{ userProfile().email }}</p>
+              <span class="profile-role-badge" [ngClass]="getRoleBadgeClass()">{{ getRoleDisplayName() }}</span>
+            </div>
+          </div>
+
+          <div class="profile-stats">
+            <div class="stat-item">
+              <span class="stat-label">Trạng thái</span>
+              <span class="stat-value status-active">Hoạt động</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Details Section -->
+      <div class="profile-details-section">
+        <div class="section-grid">
+          <div class="detail-card">
+            <div class="card-header">
+              <h3>Thông tin cá nhân</h3>
+              <button class="edit-btn" (click)="toggleEditMode()" [class.active]="isEditMode()">
+                <i [class]="isEditMode() ? 'close-icon' : 'edit-icon'"></i>
+                <span>{{ isEditMode() ? 'Hủy' : 'Chỉnh sửa' }}</span>
+              </button>
+            </div>
+
+            <div class="card-content">
+              <form *ngIf="isEditMode()" [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Họ và tên</label>
+                    <input type="text" formControlName="fullName" class="form-input" placeholder="Nhập họ và tên" />
+                    <div *ngIf="profileForm.get('fullName')?.errors?.['required'] && profileForm.get('fullName')?.touched" class="error-message">
+                      Họ và tên không được để trống
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" formControlName="email" class="form-input" placeholder="Nhập email" />
+                    <div *ngIf="profileForm.get('email')?.errors?.['email'] && profileForm.get('email')?.touched" class="error-message">
+                      Email không đúng định dạng
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Số điện thoại</label>
+                    <input type="tel" formControlName="phone" class="form-input" placeholder="Nhập số điện thoại" />
+                    <div *ngIf="profileForm.get('phone')?.errors?.['pattern'] && profileForm.get('phone')?.touched" class="error-message">
+                      Số điện thoại không đúng định dạng
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Giới tính</label>
+                    <select formControlName="gender" class="form-input">
+                      <option value="">Chọn giới tính</option>
+                      <option value="Nam">Nam</option>
+                      <option value="Nữ">Nữ</option>
+                      <option value="Khác">Khác</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Quốc tịch</label>
+                    <input type="text" formControlName="nationality" class="form-input" placeholder="Nhập quốc tịch" />
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Hủy</button>
+                  <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid">
+                    <i class="save-icon"></i> Lưu thay đổi
+                  </button>
+                </div>
+              </form>
+
+              <div *ngIf="!isEditMode()" class="profile-view">
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">Họ và tên</span>
+                    <span class="info-value">{{ userProfile().fullName }}</span>
+                  </div>
+
+                  <div class="info-item">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">{{ userProfile().email }}</span>
+                  </div>
+
+                  <div class="info-item">
+                    <span class="info-label">Số điện thoại</span>
+                    <span class="info-value">{{ userProfile().phone || 'Chưa cập nhật' }}</span>
+                  </div>
+
+                  <div class="info-item">
+                    <span class="info-label">Giới tính</span>
+                    <span class="info-value">{{ userProfile().gender || 'Chưa cập nhật' }}</span>
+                  </div>
+
+                  <div class="info-item">
+                    <span class="info-label">Quốc tịch</span>
+                    <span class="info-value">{{ userProfile().nationality || 'Chưa cập nhật' }}</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Account Settings Card -->
+          <div class="detail-card">
+            <div class="card-header">
+              <h3>Cài đặt tài khoản</h3>
+            </div>
+
+            <div class="card-content">
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h4>Đăng xuất</h4>
+                  <p>Thoát khỏi tài khoản hiện tại</p>
+                </div>
+                <button class="btn btn-danger" (click)="showLogoutConfirmation()">
+                  <i class="logout-icon"></i> Đăng xuất
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Logout Confirmation Modal -->
+  <div *ngIf="showLogoutModal()" class="modal-overlay" (click)="cancelLogout()">
+    <div class="modal-container logout-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <i class="logout-icon large"></i>
+        </div>
+        <h2>Xác nhận đăng xuất</h2>
+        <p>Bạn có chắc chắn muốn đăng xuất khỏi tài khoản?</p>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancelLogout()">Hủy</button>
+        <button type="button" class="btn btn-danger" (click)="confirmLogout()">Đăng xuất</button>
+      </div>
+    </div>
+  </div>
+</div>

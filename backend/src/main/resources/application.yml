@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/htms
+    username: root
+    password: 039402
+  profiles:
+    active: loc
+
+  web:
+    resources:
+      static-locations:
+        - classpath:/static/
+        - file:./uploads/
+      add-mappings: true
+
+jwt:
+  secret: "8u3LLyFJbzBNSMKe9tTjcqrGA/n6dDdc+a5XzFzoat5kNBI2E1uMW+MZRni3/msk+rrCyzPrGBF0oSxoIxmp4w=="
+  expiration: 86400000
+
+debug: false
+
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: huutien01092019@gmail.com
+  password: "seygbgphtoqrelrq"
+  smtp:
+    auth: true
+    starttls:
+      enable: true
+    debug: true
+  from: huutien01092019@gmail.com

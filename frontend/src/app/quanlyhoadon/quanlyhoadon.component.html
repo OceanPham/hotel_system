@@ -1,0 +1,509 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>Azure Hotel.</h2>
+    </div>
+
+    <nav class="navigation">
+      <ul>
+        <li class="nav-item" [class.active]="isActiveRoute('/thongke')">
+          <a routerLink="/thongke" class="nav-link" (click)="setActiveRoute('/thongke')">
+            <i class="icon thongke-icon"></i>
+            <span>Thống kê</span>
+          </a>
+        </li>
+
+        <li class="nav-item" [class.active]="isActiveRoute('/quanlyhoadon')">
+          <a routerLink="/quanlyhoadon" class="nav-link" (click)="setActiveRoute('/quanlyhoadon')">
+            <i class="icon hoadon-icon"></i>
+            <span>Quản lý hóa đơn</span>
+          </a>
+        </li>
+
+        <li class="nav-item" [class.active]="isActiveRoute('/message')">
+          <a routerLink="/message" class="nav-link" (click)="setActiveRoute('/message')">
+            <i class="icon message-icon"></i>
+            <span>Message</span>
+          </a>
+        </li>
+
+        <li class="nav-item" [class.active]="isActiveRoute('/help')">
+          <a routerLink="/help" class="nav-link" (click)="setActiveRoute('/help')">
+            <i class="icon help-icon"></i>
+            <span>Help</span>
+          </a>
+        </li>
+
+        <li class="nav-item" [class.active]="isActiveRoute('/setting')">
+          <a routerLink="/setting" class="nav-link" (click)="setActiveRoute('/setting')">
+            <i class="icon setting-icon"></i>
+            <span>Setting</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <div class="greeting-section">
+          <h1>Hello, {{userInfo().fullName}}</h1>
+          <p class="greeting-subtitle">Have a nice day</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="search-container">
+          <input type="text"
+                 class="search-input"
+                 placeholder="Tìm kiếm..."
+                 [(ngModel)]="searchTerm"
+                 (input)="onSearchChange()">
+          <div class="search-icon"></div>
+        </div>
+        <div class="header-actions">
+          <div class="notification-btn" (click)="toggleNotifications()">
+            <div class="notification-icon"></div>
+            <div class="notification-badge" *ngIf="notifications().length > 0">
+              {{notifications().length}}
+            </div>
+          </div>
+
+          <!-- Notifications Dropdown -->
+          <!-- Sửa dòng này -->
+          <div class="notifications-dropdown" *ngIf="showNotifications()"
+               (document:click)="closeNotificationsIfClickOutside($event)">
+
+          <div class="dropdown-header">
+              <h4>Thông báo</h4>
+              <button class="clear-all-btn" (click)="clearAllNotifications()">Xóa tất cả</button>
+            </div>
+            <div class="notifications-list">
+              <div class="notification-item"
+                   *ngFor="let notification of notifications()"
+                   [class.unread]="!notification.read"
+                   (click)="markAsRead(notification.id)">
+                <div class="notification-content">
+                  <p class="notification-text">{{notification.message}}</p>
+                  <span class="notification-time">{{formatTime(notification.time)}}</span>
+                </div>
+              </div>
+              <div class="no-notifications" *ngIf="notifications().length === 0">
+                <p>Không có thông báo mới</p>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- User Profile with Dropdown -->
+          <div class="user-profile-container" [class.open]="showUserDropdown()">
+            <div class="user-profile" (click)="toggleUserDropdown($event)">
+              <img [src]="'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face&auto=format'"  class="user-avatar">
+              <div class="user-info">
+                <span class="user-name">{{ userInfo().fullName }}</span>
+                <span class="user-role">Người dùng</span> <!-- hoặc dynamic nếu có -->
+              </div>
+              <button class="dropdown-btn" type="button" title="Menu">
+                <i class="dropdown-icon" [class.rotated]="showUserDropdown()"></i>
+              </button>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="user-dropdown" *ngIf="showUserDropdown()" (click)="$event.stopPropagation()">
+              <div class="dropdown-content">
+                <button class="dropdown-item" type="button" (click)="goToProfile()">
+                  <i class="profile-menu-icon"></i>
+                  <span>Hồ sơ cá nhân</span>
+                </button>
+                <button class="dropdown-item" type="button" (click)="changeTheme()">
+                  <i class="theme-icon"></i>
+                  <span>Đổi giao diện</span>
+                </button>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout" (click)="logout()"href="javascript:void(0)">
+                  <i class="logout-icon"></i>
+                  <span>Đăng xuất</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoice Management Content -->
+    <div class="invoice-content">
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card"
+             [class.highlight]="highlightedCard() === 'total'"
+             (click)="highlightCard('total')">
+          <div class="stat-header">
+            <div class="stat-icon total">
+              <i class="stat-emoji">📄</i>
+            </div>
+            <span class="stat-label">TỔNG HÓA ĐƠN</span>
+          </div>
+          <div class="stat-value">{{invoiceStats().total}}</div>
+          <div class="stat-trend positive">
+            <span class="trend-icon">↗️</span>
+            <span class="trend-text">+8% so với tháng trước</span>
+          </div>
+        </div>
+
+        <div class="stat-card"
+             [class.highlight]="highlightedCard() === 'paid'"
+             (click)="highlightCard('paid')">
+          <div class="stat-header">
+            <div class="stat-icon paid">
+              <i class="stat-emoji">✅</i>
+            </div>
+            <span class="stat-label">ĐÃ THANH TOÁN</span>
+          </div>
+          <div class="stat-value">{{invoiceStats().paid}}</div>
+          <div class="stat-trend positive">
+            <span class="trend-icon">↗️</span>
+            <span class="trend-text">+12% so với tháng trước</span>
+          </div>
+        </div>
+
+        <div class="stat-card"
+             [class.highlight]="highlightedCard() === 'pending'"
+             (click)="highlightCard('pending')">
+          <div class="stat-header">
+            <div class="stat-icon pending">
+              <i class="stat-emoji">⏳</i>
+            </div>
+            <span class="stat-label">CHỜ THANH TOÁN</span>
+          </div>
+          <div class="stat-value">{{invoiceStats().pending}}</div>
+          <div class="stat-trend negative">
+            <span class="trend-icon">↘️</span>
+            <span class="trend-text">-3% so với tháng trước</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invoice Table -->
+      <div class="invoice-table-section">
+        <div class="table-header">
+          <h3>Danh sách hóa đơn</h3>
+          <div class="table-actions">
+            <button class="action-btn secondary" (click)="filterInvoices()">
+              <i class="filter-icon"></i>
+              <span>Lọc</span>
+            </button>
+            <button class="action-btn secondary" (click)="exportInvoices()">
+              <i class="export-icon"></i>
+              <span>Xuất Excel</span>
+            </button>
+            <button class="action-btn primary" (click)="showAddInvoiceModal()">
+              <i class="add-icon"></i>
+              <span>Thêm mới</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="invoice-table-container">
+          <table class="invoice-table">
+            <thead>
+              <tr>
+                <th>Mã hóa đơn</th>
+                <th>Tên khách hàng</th>
+                <th>Phòng</th>
+                <th>Số tiền</th>
+                <th>Ngày tạo</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let invoice of filteredInvoices()"
+                class="invoice-row"
+                [class.highlight]="selectedInvoice() == invoice.idcode">
+              <td class="invoice-code">{{ invoice.idcode }}</td>
+              <td class="customer-name">{{ invoice.fullName || '---' }}</td>
+              <td class="room">{{ invoice.roomNumber || 'Không rõ' }}</td>
+              <td class="amount">{{ formatCurrency(invoice.totalAmount || 0) }}</td>
+              <td class="date">{{ formatDate(invoice.createdAt) || '---' }}</td>
+              <td class="status">
+    <span class="status-badge" [class]="getStatusClass(invoice.status)">
+      {{ getStatusText(invoice.status) || 'Không xác định' }}
+    </span>
+              </td>
+              <td class="actions">
+                <button class="action-btn-sm view"
+                        (click)="viewInvoice(invoice)"
+                        title="Xem chi tiết">
+                  <i class="view-icon"></i>
+                </button>
+                <button class="action-btn-sm edit"
+                        (click)="editInvoice(invoice)"
+                        title="Chỉnh sửa">
+                  <i class="edit-icon"></i>
+                </button>
+                <button class="action-btn-sm delete"
+                        (click)="deleteInvoice(invoice)"
+                        title="Xóa">
+                  <i class="delete-icon"></i>
+                </button>
+              </td>
+            </tr>
+
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Add Invoice Modal -->
+<div class="modal-overlay" *ngIf="showAddModal()" (click)="closeAddModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Thêm hóa đơn mới</h3>
+      <button class="modal-close" (click)="closeAddModal()">
+        <i class="close-icon"></i>
+      </button>
+    </div>
+    <form (ngSubmit)="addInvoice()" class="modal-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Mã hóa đơn</label>
+          <input type="text" [(ngModel)]="newInvoice.idcode" name="invoiceCode" readonly>
+        </div>
+        <div class="form-group">
+          <label>Tên khách hàng</label>
+          <input type="text" [(ngModel)]="newInvoice.fullName" name="customerName" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phòng</label>
+          <input type="text" [(ngModel)]="newInvoice.roomNumber" name="room" required>
+        </div>
+        <div class="form-group">
+          <label>Số tiền</label>
+          <input type="number" [(ngModel)]="newInvoice.totalAmount" name="amount" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Trạng thái</label>
+          <select [(ngModel)]="newInvoice.status" name="status">
+            <option value="pending">Chờ thanh toán</option>
+            <option value="paid">Đã thanh toán</option>
+            <option value="overdue">Quá hạn</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="closeAddModal()">Hủy</button>
+        <button type="submit" class="btn-save">Tạo hóa đơn</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Invoice Modal -->
+<div class="modal-overlay" *ngIf="showEditModal()" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Chỉnh sửa hóa đơn</h3>
+      <button class="modal-close" (click)="closeEditModal()">
+        <i class="close-icon"></i>
+      </button>
+    </div>
+    <form (ngSubmit)="updateInvoice()" class="modal-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Mã hóa đơn</label>
+          <input type="text" [(ngModel)]="editingInvoice.idcode" name="invoiceCode" readonly>
+        </div>
+        <div class="form-group">
+          <label>Tên khách hàng</label>
+          <input type="text" [(ngModel)]="editingInvoice.fullName" name="customerName" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phòng</label>
+          <input type="text" [(ngModel)]="editingInvoice.roomNumber" name="room" required>
+        </div>
+        <div class="form-group">
+          <label>Số tiền</label>
+          <input type="number" [(ngModel)]="editingInvoice.totalAmount" name="amount" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Trạng thái</label>
+          <select [(ngModel)]="editingInvoice.status" name="status">
+            <option value="pending">Chờ thanh toán</option>
+            <option value="paid">Đã thanh toán</option>
+            <option value="overdue">Quá hạn</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="closeEditModal()">Hủy</button>
+        <button type="submit" class="btn-save">Cập nhật</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- View Invoice Modal -->
+<div class="modal-overlay" *ngIf="showViewModal()" (click)="closeViewModal()">
+  <div class="modal-content view-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Chi tiết hóa đơn</h3>
+      <button class="modal-close" (click)="closeViewModal()">
+        <i class="close-icon"></i>
+      </button>
+    </div>
+    <div class="modal-form" *ngIf="viewingInvoice">
+      <div class="invoice-detail-header">
+        <div class="invoice-code-large">{{viewingInvoice.idcode}}</div>
+        <div class="invoice-status-large" [class]="getStatusClass(viewingInvoice.status)">
+          {{getStatusText(viewingInvoice.status)}}
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>Thông tin khách hàng</h4>
+        <div class="detail-row">
+          <div class="detail-item">
+            <label>Tên khách hàng:</label>
+            <span>{{viewingInvoice.fullName}}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>Thông tin phòng</h4>
+        <div class="detail-row">
+          <div class="detail-item">
+            <label>Phòng:</label>
+            <span>{{viewingInvoice.roomNumber}}</span>
+          </div>
+          <div class="detail-item">
+            <label>Số tiền:</label>
+            <span class="amount-large">{{formatCurrency(viewingInvoice.totalAmount)}}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>Thông tin hóa đơn</h4>
+        <div class="detail-row">
+          <div class="detail-item">
+            <label>Ngày tạo:</label>
+            <span>{{formatDate(viewingInvoice.createdAt)}}</span>
+          </div>
+          <div class="detail-item">
+            <label>Trạng thái:</label>
+            <span [class]="getStatusClass(viewingInvoice.status)">{{getStatusText(viewingInvoice.status)}}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="closeViewModal()">Đóng</button>
+        <button type="button" class="btn-save" (click)="editInvoice(viewingInvoice); closeViewModal()">Chỉnh sửa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal-overlay" *ngIf="showFilterModal()" (click)="closeFilterModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Lọc hóa đơn</h3>
+      <button class="modal-close" (click)="closeFilterModal()">
+        <i class="close-icon"></i>
+      </button>
+    </div>
+    <div class="modal-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Trạng thái</label>
+          <select [(ngModel)]="filterOptions.status" name="status">
+            <option value="">Tất cả</option>
+            <option value="pending">Chờ thanh toán</option>
+            <option value="paid">Đã thanh toán</option>
+            <option value="overdue">Quá hạn</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Phòng</label>
+          <input type="text" [(ngModel)]="filterOptions.room" name="room" placeholder="Tìm theo phòng...">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Từ ngày</label>
+          <input type="date" [(ngModel)]="filterOptions.dateFrom" name="dateFrom">
+        </div>
+        <div class="form-group">
+          <label>Đến ngày</label>
+          <input type="date" [(ngModel)]="filterOptions.dateTo" name="dateTo">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Số tiền từ (VND)</label>
+          <input type="number" [(ngModel)]="filterOptions.minAmount" name="minAmount" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label>Số tiền đến (VND)</label>
+          <input type="number" [(ngModel)]="filterOptions.maxAmount" name="maxAmount" placeholder="999,999,999">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="clearFilters()">Xóa bộ lọc</button>
+        <button type="button" class="btn-cancel" (click)="closeFilterModal()">Hủy</button>
+        <button type="button" class="btn-save" (click)="applyFilters()">Áp dụng</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Dialog -->
+<div class="modal-overlay" *ngIf="showConfirmDialog()" (click)="closeConfirmDialog()">
+  <div class="modal-content confirm-dialog" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{confirmDialogTitle()}}</h3>
+      <button class="modal-close" (click)="closeConfirmDialog()">
+        <i class="close-icon"></i>
+      </button>
+    </div>
+    <div class="confirm-content">
+      <div class="confirm-message">{{confirmDialogMessage()}}</div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="closeConfirmDialog()">Hủy</button>
+        <button type="button" class="btn-save" (click)="confirmAction()">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container">
+  <div class="toast" *ngIf="showToast()" [class]="'toast-' + toastType()">
+    <div class="toast-content">
+      <i class="toast-icon" [class]="getToastIcon()"></i>
+      <div class="toast-text">
+        <div class="toast-title">{{toastTitle()}}</div>
+        <div class="toast-message">{{toastMessage()}}</div>
+      </div>
+    </div>
+  </div>
+</div>

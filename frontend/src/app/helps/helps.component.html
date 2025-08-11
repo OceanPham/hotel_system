@@ -1,0 +1,402 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>Azure Hotel.</h2>
+    </div>
+
+    <nav class="navigation">
+      <ul>
+        <li class="nav-item">
+          <a routerLink="/dashboard" class="nav-link">
+            <i class="icon dashboard-icon"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a routerLink="/listroom" class="nav-link">
+            <i class="icon room-icon"></i>
+            <span>Phòng</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a routerLink="/listbooking" class="nav-link">
+            <i class="icon booking-icon"></i>
+            <span>Đơn đặt phòng</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a routerLink="/listservice" class="nav-link">
+            <i class="icon service-icon"></i>
+            <span>Dịch vụ</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a routerLink="/message" class="nav-link">
+            <i class="icon message-icon"></i>
+            <span>Message</span>
+          </a>
+        </li>
+
+        <li class="nav-item active">
+          <a routerLink="/help" class="nav-link">
+            <i class="icon help-icon"></i>
+            <span>Help</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a routerLink="/setting" class="nav-link">
+            <i class="icon setting-icon"></i>
+            <span>Setting</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <h1>Trung tâm trợ giúp</h1>
+      </div>
+      <div class="header-right">
+        <div class="search-container">
+          <input type="text" class="search-input" placeholder="Tìm kiếm câu hỏi..." [(ngModel)]="searchText" (input)="searchFAQ()">
+          <div class="search-icon"></div>
+        </div>
+        <div class="header-actions">
+          <div class="notification-btn">
+            <div class="notification-icon"></div>
+            <div class="notification-badge">{{ unresolvedTicketsCount }}</div>
+          </div>
+
+          <!-- User Profile with Dropdown -->
+          <div class="user-profile-container" [class.open]="showUserDropdown()">
+            <div class="user-profile" (click)="toggleUserDropdown($event)">
+              <img [src]="userProfile().avatar"
+                   alt="User" class="user-avatar">
+              <div class="user-info">
+                <span class="user-name">{{userProfile().name}}</span>
+                <span class="user-role">{{getRoleDisplayName()}}</span>
+              </div>
+              <button class="dropdown-btn" type="button" title="Menu">
+                <i class="dropdown-icon" [class.rotated]="showUserDropdown()"></i>
+              </button>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="user-dropdown" *ngIf="showUserDropdown()" (click)="$event.stopPropagation()">
+              <div class="dropdown-content">
+                <button class="dropdown-item" type="button" (click)="goToProfile()">
+                  <i class="profile-menu-icon"></i>
+                  <span>Profile</span>
+                </button>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout" (click)="logout()"href="javascript:void(0)">
+                  <i class="logout-icon"></i>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help Content -->
+    <div class="help-content">
+      <!-- Stats Cards -->
+      <div class="stats-section">
+        <div class="stat-card">
+          <div class="stat-icon pending-icon"></div>
+          <div class="stat-info">
+            <h3>{{ pendingTicketsCount }}</h3>
+            <p>Yêu cầu chờ xử lý</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon resolved-icon"></div>
+          <div class="stat-info">
+            <h3>{{ resolvedTicketsCount }}</h3>
+            <p>Đã giải quyết hôm nay</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon faq-icon"></div>
+          <div class="stat-info">
+            <h3>{{ totalFAQCount }}</h3>
+            <p>Câu hỏi FAQ</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon rating-icon"></div>
+          <div class="stat-info">
+            <h3>4.8</h3>
+            <p>Điểm hài lòng</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="help-layout">
+        <!-- FAQ Management -->
+        <div class="faq-section">
+          <div class="section-header">
+            <h3>Quản lý FAQ</h3>
+            <button class="add-btn" (click)="toggleAddFAQ()">
+              <i class="icon plus-icon"></i>
+              Thêm FAQ
+            </button>
+          </div>
+
+          <!-- Add FAQ Form -->
+          <div class="add-faq-form" *ngIf="showAddFAQ">
+            <form (submit)="addFAQ($event)" class="faq-form">
+              <div class="form-group">
+                <label>Câu hỏi</label>
+                <input
+                  type="text"
+                  [(ngModel)]="newFAQ.question"
+                  name="question"
+                  placeholder="Nhập câu hỏi..."
+                  required>
+                <div class="error-message" *ngIf="formErrors.question">{{ formErrors.question }}</div>
+              </div>
+              <div class="form-group">
+                <label>Câu trả lời</label>
+                <textarea
+                  [(ngModel)]="newFAQ.answer"
+                  name="answer"
+                  rows="3"
+                  placeholder="Nhập câu trả lời..."
+                  required></textarea>
+                <div class="error-message" *ngIf="formErrors.answer">{{ formErrors.answer }}</div>
+              </div>
+              <div class="form-group">
+                <label>Danh mục</label>
+                <select [(ngModel)]="newFAQ.category" name="category" required>
+                  <option value="">Chọn danh mục</option>
+                  <option value="booking">Đặt phòng</option>
+                  <option value="payment">Thanh toán</option>
+                  <option value="account">Tài khoản</option>
+                  <option value="service">Dịch vụ</option>
+                  <option value="other">Khác</option>
+                </select>
+                <div class="error-message" *ngIf="formErrors.category">{{ formErrors.category }}</div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="save-btn">Lưu FAQ</button>
+                <button type="button" class="cancel-btn" (click)="cancelAddFAQ()">Hủy</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- FAQ List -->
+          <div class="faq-list">
+            <div class="faq-filters">
+              <button
+                *ngFor="let category of faqCategories"
+                class="filter-btn"
+                [class.active]="selectedCategory === category.value"
+                (click)="filterFAQ(category.value)">
+                {{ category.label }}
+              </button>
+            </div>
+
+            <div class="faq-items">
+              <div
+                *ngFor="let faq of filteredFAQ; let i = index"
+                class="faq-item"
+                [class.editing]="editingFAQ === faq.id">
+                <div class="faq-header" (click)="toggleFAQ(faq.id)">
+                  <div class="faq-question">
+                    <span class="category-badge" [class]="faq.category">{{ getCategoryLabel(faq.category) }}</span>
+                    <strong>{{ faq.question }}</strong>
+                  </div>
+                  <div class="faq-actions" (click)="$event.stopPropagation()">
+                    <button class="action-btn edit-btn" (click)="editFAQ(faq.id)" title="Sửa">
+                      <i class="icon edit-icon"></i>
+                    </button>
+                    <button class="action-btn delete-btn" (click)="deleteFAQ(faq.id)" title="Xóa">
+                      <i class="icon delete-icon"></i>
+                    </button>
+                    <i class="icon expand-icon" [class.expanded]="faq.expanded"></i>
+                  </div>
+                </div>
+
+                <div class="faq-answer" *ngIf="faq.expanded">
+                  <div *ngIf="editingFAQ !== faq.id">
+                    <p>{{ faq.answer }}</p>
+                    <div class="faq-meta">
+                      <span>Cập nhật: {{ formatDate(faq.updatedAt) }}</span>
+                      <span>Lượt xem: {{ faq.views }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Edit Form -->
+                  <form *ngIf="editingFAQ === faq.id" (submit)="updateFAQ($event, faq.id)" class="edit-form">
+                    <div class="form-group">
+                      <label>Câu hỏi</label>
+                      <input type="text" [(ngModel)]="editFAQData.question" name="editQuestion" required>
+                    </div>
+                    <div class="form-group">
+                      <label>Câu trả lời</label>
+                      <textarea [(ngModel)]="editFAQData.answer" name="editAnswer" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label>Danh mục</label>
+                      <select [(ngModel)]="editFAQData.category" name="editCategory" required>
+                        <option value="booking">Đặt phòng</option>
+                        <option value="payment">Thanh toán</option>
+                        <option value="account">Tài khoản</option>
+                        <option value="service">Dịch vụ</option>
+                        <option value="other">Khác</option>
+                      </select>
+                    </div>
+                    <div class="form-actions">
+                      <button type="submit" class="save-btn">Cập nhật</button>
+                      <button type="button" class="cancel-btn" (click)="cancelEdit()">Hủy</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support Tickets -->
+        <div class="tickets-section">
+          <div class="section-header">
+            <h3>Yêu cầu hỗ trợ</h3>
+            <div class="ticket-filters">
+              <select [(ngModel)]="selectedTicketStatus" (change)="filterTickets()">
+                <option value="all">Tất cả</option>
+                <option value="pending">Chờ xử lý</option>
+                <option value="in-progress">Đang xử lý</option>
+                <option value="resolved">Đã giải quyết</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tickets-list">
+            <div
+              *ngFor="let ticket of filteredTickets"
+              class="ticket-item"
+              [class]="ticket.priority">
+              <div class="ticket-header">
+                <div class="ticket-info">
+                  <h4>{{ ticket.subject }}</h4>
+                  <p class="ticket-meta">
+                    <span>{{ ticket.customerName }}</span> •
+                    <span>{{ ticket.email }}</span> •
+                    <span>{{ formatDate(ticket.createdAt) }}</span>
+                  </p>
+                </div>
+                <div class="ticket-status">
+                  <span class="status-badge" [class]="ticket.status">{{ getStatusLabel(ticket.status) }}</span>
+                  <span class="priority-badge" [class]="ticket.priority">{{ getPriorityLabel(ticket.priority) }}</span>
+                </div>
+              </div>
+
+              <div class="ticket-content">
+                <p>{{ ticket.content }}</p>
+              </div>
+
+              <div class="ticket-actions">
+                <button
+                  *ngIf="ticket.status === 'pending'"
+                  class="action-btn primary"
+                  (click)="updateTicketStatus(ticket.id, 'in-progress')">
+                  Bắt đầu xử lý
+                </button>
+                <button
+                  *ngIf="ticket.status === 'in-progress'"
+                  class="action-btn success"
+                  (click)="updateTicketStatus(ticket.id, 'resolved')">
+                  Đánh dấu hoàn thành
+                </button>
+                <button class="action-btn secondary" (click)="replyTicket(ticket.id)">
+                  Trả lời
+                </button>
+                <button class="action-btn danger" (click)="deleteTicket(ticket.id)">
+                  Xóa
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <h3>Thao tác nhanh</h3>
+        <div class="action-buttons">
+          <button class="action-btn export" (click)="exportFAQ()">
+            <i class="icon export-icon"></i>
+            Xuất FAQ
+          </button>
+          <button class="action-btn import" (click)="importFAQ()">
+            <i class="icon import-icon"></i>
+            Nhập FAQ
+          </button>
+          <button class="action-btn report" (click)="generateReport()">
+            <i class="icon report-icon"></i>
+            Tạo báo cáo
+          </button>
+          <button class="action-btn backup" (click)="backupData()">
+            <i class="icon backup-icon"></i>
+            Sao lưu dữ liệu
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Logout Confirmation Modal -->
+  <div *ngIf="showLogoutModal()" class="modal-overlay" (click)="cancelLogout()">
+    <div class="modal-container logout-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Xác nhận đăng xuất</h2>
+        <button class="close-btn" (click)="cancelLogout()">
+          <i class="close-icon"></i>
+        </button>
+      </div>
+
+      <div class="modal-content">
+        <div class="logout-content">
+          <div class="logout-icon-large">
+            <i class="logout-icon-big"></i>
+          </div>
+          <p>Bạn có chắc chắn muốn đăng xuất khỏi tài khoản?</p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="cancelLogout()">Hủy</button>
+        <button class="btn btn-danger" (click)="confirmLogout()">Đăng xuất</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div *ngIf="showToast()" class="toast-container" [ngClass]="'toast-' + toastType()">
+    <div class="toast">
+      <div class="toast-icon">
+        <i [class]="getToastIcon()"></i>
+      </div>
+      <div class="toast-content">
+        <div class="toast-title">{{toastTitle()}}</div>
+        <div class="toast-message">{{toastMessage()}}</div>
+      </div>
+      <button class="toast-close" (click)="hideToast()">
+        <i class="close-icon small"></i>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,745 @@
+<div class="homepage-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="logo">
+            <span class="logo-text">Azure Hotel</span>
+          </div>
+        </div>
+
+        <nav class="navigation">
+          <a href="#" class="nav-link" (click)="showNavigationConfirmation('home', 'Bạn có muốn quay về trang chủ không?')">Trang chủ</a>
+          <a href="#" class="nav-link" (click)="showNavigationConfirmation('rooms', 'Bạn có muốn xem danh sách phòng không?')">Phòng</a>
+          <a href="#" class="nav-link" (click)="showNavigationConfirmation('services', 'Bạn có muốn xem dịch vụ không?')">Dịch vụ</a>
+          <a href="#" class="nav-link" (click)="showNavigationConfirmation('contact', 'Bạn có muốn xem thông tin liên hệ không?')">Liên hệ</a>
+        </nav>
+
+        <div class="header-right">
+          <div class="hamburger-menu" (click)="toggleMobileMenu()">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </div>
+          <div class="user-profile-container">
+            <div class="user-profile-icon" (click)="toggleUserMenu()">
+              <svg class="user-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+            </div>
+            <div class="user-dropdown" [class.active]="userMenuOpen()">
+              <div class="dropdown-content">
+                <div class="user-info" *ngIf="currentUser()">
+                  <div class="user-avatar">
+                    <svg class="user-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                  </div>
+                  <div class="user-details">
+                    <span class="user-name">{{currentUser()?.name}}</span>
+                    <span class="user-email">{{currentUser()?.email}}</span>
+                  </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item" (click)="showNavigationConfirmation('profile', 'Bạn có muốn xem hồ sơ cá nhân không?')">
+                  <svg class="dropdown-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                  </svg>
+                  <span>Hồ sơ cá nhân</span>
+                </button>
+                <button class="dropdown-item active">
+                  <svg class="dropdown-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2-7h-3V2h-2v2H8V2H6v2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H3V9h14v11z"/>
+                  </svg>
+                  <span>Lịch sử đặt phòng</span>
+                </button>
+                <button class="dropdown-item logout" (click)="logout()"href="javascript:void(0)">
+                  <svg class="dropdown-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                  </svg>
+                  <span>Đăng xuất</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notification Section -->
+  <div class="notification-overlay"
+       *ngIf="showNotification()"
+       [class.show]="showNotification()">
+    <div class="notification-container"
+         [ngClass]="'notification-' + notificationType()">
+      <div class="notification-icon">
+        <span *ngIf="notificationType() === 'success'">✅</span>
+        <span *ngIf="notificationType() === 'error'">❌</span>
+        <span *ngIf="notificationType() === 'warning'">⚠️</span>
+        <span *ngIf="notificationType() === 'info'">ℹ️</span>
+        <span *ngIf="notificationType() === 'confirm'">❓</span>
+      </div>
+      <div class="notification-content">
+        <p style="white-space: pre-line;">{{ notificationMessage() }}</p>
+      </div>
+      <div class="notification-actions" *ngIf="notificationType() === 'confirm'">
+        <button class="confirm-btn" (click)="confirmAction()">Xác nhận</button>
+        <button class="cancel-btn" (click)="hideNotification()">Hủy</button>
+      </div>
+      <button class="notification-close" *ngIf="notificationType() !== 'confirm'" (click)="hideNotification()">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.active]="mobileMenuOpen()">
+    <div class="mobile-menu-content">
+      <nav class="mobile-navigation">
+        <button class="mobile-nav-link" (click)="showNavigationConfirmation('home', 'Bạn có muốn quay về trang chủ không?')">Trang chủ</button>
+        <button class="mobile-nav-link" (click)="showNavigationConfirmation('rooms', 'Bạn có muốn xem danh sách phòng không?')">Phòng</button>
+        <button class="mobile-nav-link" (click)="showNavigationConfirmation('services', 'Bạn có muốn xem dịch vụ không?')">Dịch vụ</button>
+        <button class="mobile-nav-link" (click)="showNavigationConfirmation('contact', 'Bạn có muốn xem thông tin liên hệ không?')">Liên hệ</button>
+        <button class="mobile-nav-link booking-history-btn active">
+          <svg class="booking-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2-7h-3V2h-2v2H8V2H6v2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H3V9h14v11z"/>
+          </svg>
+          <span>Lịch sử đặt phòng</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="booking-history-main">
+    <div class="container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="breadcrumb">
+          <span class="breadcrumb-item">Trang chủ</span>
+          <svg class="breadcrumb-arrow" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+          </svg>
+          <span class="breadcrumb-item active">Lịch sử đặt phòng</span>
+        </div>
+        <h1 class="page-title">Lịch sử đặt phòng</h1>
+        <p class="page-subtitle">Quản lý và theo dõi các đặt phòng của bạn tại Azure Hotel</p>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-section" *ngIf="!isLoading() && bookings().length > 0">
+        <div class="stats-grid">
+          <div class="stat-card confirmed">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ confirmedBookings() }}</div>
+              <div class="stat-label">Đã xác nhận</div>
+            </div>
+          </div>
+
+          <div class="stat-card completed">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2-7h-3V2h-2v2H8V2H6v2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H3V9h14v11z"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ completedBookings() }}</div>
+              <div class="stat-label">Hoàn thành</div>
+            </div>
+          </div>
+
+          <div class="stat-card total">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ bookings().length }}</div>
+              <div class="stat-label">Tổng đặt phòng</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-section" *ngIf="isLoading()">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Đang tải lịch sử đặt phòng...</p>
+      </div>
+
+      <!-- Booking List -->
+      <div class="booking-list-section" *ngIf="!isLoading() && bookings().length > 0">
+        <div class="section-header">
+          <h2>Danh sách đặt phòng</h2>
+          <button class="refresh-btn" (click)="refreshBookings()" [disabled]="isLoading()">
+            <svg class="refresh-icon" [class.spinning]="isLoading()" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+            </svg>
+            Làm mới
+          </button>
+        </div>
+
+        <div class="booking-grid">
+          <div class="booking-card" *ngFor="let booking of bookings(); trackBy: trackByBookingId"
+               [class.cancelled]="booking.status === 'Cancelled'">
+            <div class="booking-image">
+              <img
+                [attr.src]="getFullImageUrl(booking?.mainImageUrl || null)"
+                [attr.alt]="booking?.roomName || 'Ảnh phòng'"
+                (error)="onImageError($event)"
+              >
+              <div class="booking-status" [ngClass]="'status-' + booking.status">
+                {{ getStatusText(booking.status) }}
+              </div>
+              <div class="booking-id">#{{ formatBookingId(booking.id) }}</div>
+            </div>
+
+            <div class="booking-content">
+              <div class="booking-header">
+                <h3 class="room-name">{{ booking.roomName }}</h3>
+                <div class="booking-date">{{ formatDate(booking.createdAt) }}</div>
+              </div>
+
+              <div class="booking-details">
+                <div class="detail-row">
+                  <div class="detail-item">
+                    <svg class="detail-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2-7h-3V2h-2v2H8V2H6v2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H3V9h14v11z"/>
+                    </svg>
+                    <span class="detail-label">Nhận phòng:</span>
+                    <span class="detail-value">{{ formatDate(booking.checkInDate) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <svg class="detail-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2-7h-3V2h-2v2H8V2H6v2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H3V9h14v11z"/>
+                    </svg>
+                    <span class="detail-label">Trả phòng:</span>
+                    <span class="detail-value">{{ formatDate(booking.checkOutDate) }}</span>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <div class="detail-item" *ngIf="booking.bookingType">
+                    <svg class="detail-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
+                    </svg>
+                    <span class="detail-label">Thời gian:</span>
+                    <span class="detail-value">{{ booking.bookingType }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="booking-footer">
+                <div class="price-section">
+                  <span class="price-label">Tổng tiền:</span>
+                  <span class="price-value">{{ booking.totalAmount }}</span>
+                </div>
+
+                <div class="booking-actions">
+                  <button class="action-btn view-btn" (click)="viewBookingDetails(booking)">
+                    Chi tiết
+                  </button>
+
+                  <!-- Nếu booking đã Completed -->
+                  <button class="action-btn rate-btn"
+                          *ngIf="booking.status === 'Completed'"
+                          (click)="rateBooking(booking.id)">
+                    Đánh giá
+                  </button>
+                </div>
+                <div class="existing-feedback" *ngIf="booking.feedback">
+                  <p><strong>Đánh giá:</strong> {{ booking.feedback.rating }} ★</p>
+                  <p><em>{{ booking.feedback.comment }}</em></p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!isLoading() && bookings().length === 0">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2-7h-3V2h-2v2H8V2H6v2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H3V9h14v11z"/>
+          </svg>
+        </div>
+        <h3 class="empty-title">Chưa có đặt phòng nào</h3>
+        <p class="empty-text">Bạn chưa có lịch sử đặt phòng. Hãy khám phá các phòng nghỉ tuyệt vời của chúng tôi!</p>
+        <button class="explore-btn" (click)="showNavigationConfirmation('rooms', 'Bạn có muốn xem danh sách phòng không?')">
+          <svg class="explore-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+          Khám phá phòng nghỉ
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section footer-main">
+          <div class="footer-logo">
+            <span class="logo-text">Azure Hotel</span>
+          </div>
+          <p class="footer-description">
+            Trải nghiệm nghỉ dưỡng đẳng cấp tại Azure Hotel với dịch vụ 5 sao và tầm nhìn biển tuyệt đẹp.
+          </p>
+          <div class="social-links">
+            <a href="#" class="social-link" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="Twitter">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-section footer-contact">
+          <h4 class="footer-title">Thông tin liên hệ</h4>
+          <div class="contact-info">
+            <div class="contact-item">
+              <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              <div class="contact-details">
+                <span class="contact-label">Địa chỉ</span>
+                <span class="contact-value">123 Đường Trần Phú, Nha Trang, Khánh Hòa</span>
+              </div>
+            </div>
+            <div class="contact-item">
+              <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              </svg>
+              <div class="contact-details">
+                <span class="contact-label">Điện thoại</span>
+                <span class="contact-value">+84 258 123 4567</span>
+              </div>
+            </div>
+            <div class="contact-item">
+              <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+              <div class="contact-details">
+                <span class="contact-label">Email</span>
+                <span class="contact-value">info&#64;azurehotel.com</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-section footer-map">
+          <h4 class="footer-title">Vị trí khách sạn</h4>
+          <div class="map-container">
+            <div class="map-card" (click)="openMapModal()">
+              <div class="map-preview">
+                <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                     alt="Azure Hotel Location" class="map-image">
+                <div class="map-overlay">
+                  <div class="map-content">
+                    <svg class="map-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                    <span class="map-text">Xem bản đồ</span>
+                    <small class="map-address">Nha Trang, Khánh Hòa</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-bottom-content">
+          <p class="copyright">© 2024 Azure Hotel. Tất cả quyền được bảo lưu.</p>
+          <div class="footer-bottom-links">
+            <a href="#" class="footer-bottom-link">Chính sách bảo mật</a>
+            <a href="#" class="footer-bottom-link">Điều khoản dịch vụ</a>
+            <a href="#" class="footer-bottom-link">Chính sách cookie</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cancel Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showCancelModal()" (click)="closeCancelModal()">
+    <div class="modal-content cancel-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header cancel-header">
+        <div class="cancel-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+          </svg>
+        </div>
+        <h2 class="modal-title">Xác nhận hủy đặt phòng</h2>
+      </div>
+
+      <div class="modal-body">
+        <div class="cancel-booking-info" *ngIf="selectedCancelBooking()">
+          <div class="cancel-booking-card">
+            <img
+              [attr.src]="getFullImageUrl(selectedCancelBooking()?.mainImageUrl || null)"
+              [attr.alt]="selectedCancelBooking()?.roomName || 'Room Image'"
+              class="cancel-room-image"
+              (error)="onImageError($event)"
+            >
+            <div class="cancel-booking-details">
+              <h3 class="cancel-room-name">{{ selectedCancelBooking()?.roomName }}</h3>
+              <div class="cancel-booking-id">Mã đặt phòng: #{{ formatBookingId(selectedCancelBooking()?.id || 0) }}</div>
+              <div class="cancel-dates">
+                <span>{{ formatDate(selectedCancelBooking()?.checkInDate || '') }}</span>
+                <span>→</span>
+                <span>{{ formatDate(selectedCancelBooking()?.checkOutDate || '') }}</span>
+              </div>
+              <div class="cancel-price">{{ selectedCancelBooking()?.totalAmount }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cancel-warning">
+          <h4 class="warning-title">⚠️ Lưu ý quan trọng</h4>
+          <ul class="warning-list">
+            <li>Việc hủy đặt phòng có thể áp dụng phí hủy theo chính sách của khách sạn</li>
+            <li>Thời gian hoàn tiền có thể từ 3-7 ngày làm việc</li>
+            <li>Một số loại phòng có chính sách hủy đặc biệt</li>
+            <li>Bạn sẽ nhận được email xác nhận sau khi hủy thành công</li>
+          </ul>
+        </div>
+
+        <div class="cancel-reason">
+          <h4 class="reason-title">Lý do hủy (không bắt buộc)</h4>
+          <textarea
+            class="reason-textarea"
+            [ngModel]="cancelReason()"
+            (ngModelChange)="cancelReason.set($event)"
+            placeholder="Vui lòng cho chúng tôi biết lý do hủy để cải thiện dịch vụ...">
+          </textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeCancelModal()">Giữ đặt phòng</button>
+        <button
+          class="btn btn-danger"
+          (click)="confirmCancelBooking()"
+          [disabled]="isCancelling()">
+          {{ isCancelling() ? 'Đang xử lý...' : 'Xác nhận hủy' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map Modal -->
+  <div class="modal-overlay" *ngIf="showMapModalFlag()" (click)="closeMapModal()">
+    <div class="modal-content map-modal" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeMapModal()">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+
+      <div class="map-modal-header">
+        <h2 class="map-modal-title">
+          <svg class="title-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+          Vị trí Azure Hotel
+        </h2>
+        <p class="map-modal-subtitle">123 Đường Trần Phú, Nha Trang, Khánh Hòa, Việt Nam</p>
+      </div>
+
+      <div class="map-modal-body">
+        <div class="map-placeholder-large">
+          <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+               alt="Azure Hotel Map" class="full-map-image">
+
+          <!-- Quick Action Buttons -->
+          <div class="map-quick-actions">
+            <button class="quick-action-btn" (click)="zoomIn()" title="Phóng to">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                <path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/>
+              </svg>
+            </button>
+            <button class="quick-action-btn" (click)="zoomOut()" title="Thu nhỏ">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                <path d="M7 9h5v1H7z"/>
+              </svg>
+            </button>
+            <button class="quick-action-btn" (click)="resetView()" title="Đặt lại">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Main Controls -->
+          <div class="map-controls">
+            <button class="map-control-btn" (click)="getDirections()">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21.71 11.29l-9-9c-.39-.39-1.02-.39-1.41 0l-9 9c-.39.39-.39 1.02 0 1.41l9 9c.39.39 1.02.39 1.41 0l9-9c.39-.38.39-1.01 0-1.41zM14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5L17 11l-3 3.5z"/>
+              </svg>
+              Chỉ đường
+            </button>
+            <button class="map-control-btn" (click)="openExternalMap()">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+              </svg>
+              Google Maps
+            </button>
+          </div>
+        </div>
+
+        <div class="map-info">
+          <div class="info-section">
+            <h4 class="info-title">Thông tin vị trí</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <svg class="info-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                <span>Ngay trung tâm thành phố Nha Trang</span>
+              </div>
+              <div class="info-item">
+                <svg class="info-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M14 6l-3.75 5 2.85 3.8-1.6 1.2C9.81 13.75 7 10 7 10l-6 8h22L14 6z"/>
+                </svg>
+                <span>Cách bãi biển Nha Trang chỉ 2 phút đi bộ</span>
+              </div>
+              <div class="info-item">
+                <svg class="info-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                </svg>
+                <span>Cách sân bay Cam Ranh 30km (45 phút lái xe)</span>
+              </div>
+              <div class="info-item">
+                <svg class="info-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3z"/>
+                </svg>
+                <span>Gần các điểm tham quan nổi tiếng</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-modal-footer">
+        <div class="footer-left">
+          <button class="btn btn-secondary" (click)="closeMapModal()">Đóng</button>
+        </div>
+        <div class="footer-right">
+          <button class="btn btn-outline" (click)="shareLocation()">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+            </svg>
+            Chia sẻ
+          </button>
+          <button class="btn btn-primary" (click)="openExternalMap()">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            Mở trong Google Maps
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Detail Modal -->
+  <div class="modal-overlay" *ngIf="showBookingModal()" (click)="closeBookingModal()">
+    <div class="modal-content booking-modal" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeBookingModal()">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+
+      <div class="modal-header">
+        <h2 class="modal-title">Chi tiết đặt phòng</h2>
+        <div class="booking-id-large">#{{ getSelectedBookingId() }}</div>
+      </div>
+
+      <div class="modal-body">
+        <div class="booking-detail-grid">
+          <div class="detail-section">
+            <h3 class="section-title">Thông tin phòng</h3>
+            <div class="detail-list">
+              <div class="detail-row">
+                <span class="detail-label">Tên phòng:</span>
+                <span class="detail-value">{{ getSelectedBookingField('roomName') }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Số đêm:</span>
+                <span class="detail-value">{{ getSelectedBookingField('bookingType') }} đêm</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3 class="section-title">Thời gian</h3>
+            <div class="detail-list">
+              <div class="detail-row">
+                <span class="detail-label">Nhận phòng:</span>
+                <span class="detail-value">
+                  {{ formatDate(getSelectedBookingField('checkInDate')) }}
+                </span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Trả phòng:</span>
+                <span class="detail-value">
+                  {{ formatDate(getSelectedBookingField('checkOutDate')) }}
+                </span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Ngày đặt:</span>
+                <span class="detail-value">{{ formatDate(getSelectedBookingField('createdAt')) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3 class="section-title">Chi phí</h3>
+            <div class="detail-list">
+              <div class="detail-row">
+                <span class="detail-label">Tổng tiền:</span>
+                <span class="detail-value price-highlight">{{ getSelectedBookingField('totalAmount') }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Trạng thái:</span>
+                <span class="detail-value">
+                  <span class="status-inline" [ngClass]="'status-' + getSelectedBookingField('status')">
+                    {{ getStatusText(getSelectedBookingField('status')) }}
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating Modal -->
+  <div class="modal-overlay" *ngIf="showRatingModal()" (click)="closeRatingModal()">
+    <div class="modal-content rating-modal" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeRatingModal()">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+
+      <div class="modal-header">
+        <h2 class="modal-title">Đánh giá trải nghiệm</h2>
+        <div class="rating-booking-info">
+          <span class="rating-booking-name">{{ selectedRatingBooking()?.roomName }}</span>
+          <span class="rating-booking-id">#{{ formatBookingId(selectedRatingBooking()?.id || 0) }}</span>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="rating-section">
+          <h3 class="rating-title">Đánh giá tổng thể</h3>
+          <div class="star-rating">
+            <button
+              *ngFor="let star of [1,2,3,4,5]; let i = index"
+              class="star-btn"
+              [class.active]="i < selectedRating()"
+              [class.hover]="i < hoverRating()"
+              (click)="setRating(i + 1)"
+              (mouseenter)="setHoverRating(i + 1)"
+              (mouseleave)="setHoverRating(0)">
+              <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="rating-text">
+            <span class="rating-description">{{ getRatingDescription() }}</span>
+          </div>
+        </div>
+
+        <div class="comment-section">
+          <h3 class="comment-title">Nhận xét (không bắt buộc)</h3>
+          <textarea
+            class="comment-textarea"
+            [ngModel]="ratingComment()"
+            (ngModelChange)="ratingComment.set($event)"
+            placeholder="Chia sẻ trải nghiệm của bạn về phòng nghỉ, dịch vụ, nhân viên...">
+          </textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeRatingModal()">Hủy</button>
+
+        <!-- Nếu đã có đánh giá: hiển thị Cập nhật + Xóa -->
+        <ng-container *ngIf="selectedRatingBooking()?.feedback; else submitNewFeedback">
+          <button class="btn btn-danger"
+                  (click)="deleteFeedback(selectedRatingBooking()?.feedback?.id || 0)"
+                  [disabled]="isSubmittingRating()">
+            Xóa đánh giá
+          </button>
+
+          <button class="btn btn-primary"
+                  (click)="submitRating()"
+                  [disabled]="selectedRating() === 0 || isSubmittingRating()">
+            {{ isSubmittingRating() ? 'Đang cập nhật...' : 'Cập nhật đánh giá' }}
+          </button>
+        </ng-container>
+
+        <!-- Nếu chưa có đánh giá -->
+        <ng-template #submitNewFeedback>
+          <button class="btn btn-primary"
+                  (click)="submitRating()"
+                  [disabled]="selectedRating() === 0 || isSubmittingRating()">
+            {{ isSubmittingRating() ? 'Đang gửi...' : 'Gửi đánh giá' }}
+          </button>
+        </ng-template>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Navigation Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showNavigationModal()" (click)="cancelNavigation()">
+    <div class="modal-content confirmation-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Xác nhận</h3>
+      </div>
+
+      <div class="modal-body">
+        <p class="confirmation-text">{{ getNavigationMessage() }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cancelNavigation()">Hủy</button>
+        <button class="btn btn-primary" (click)="confirmNavigation()">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+</div>

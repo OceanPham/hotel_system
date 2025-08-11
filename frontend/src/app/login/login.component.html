@@ -1,0 +1,81 @@
+<div class="login-container">
+  <!-- Left side - Hotel image -->
+  <div class="image-section">
+    <img
+      src="https://cdn.glitch.global/479735bf-175b-4738-ad16-8a3bbe343e47/iconhotel?v=1750150331474"
+      alt="SUN Hotel Building"
+      class="hotel-image"
+    />
+  </div>
+
+  <!-- Right side - Login form -->
+  <div class="form-section">
+    <div class="login-form">
+      <h1 class="welcome-title">Welcome to Azure Hotel</h1>
+
+      <!-- Error message -->
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <!-- Username -->
+        <div class="form-group">
+          <label for="username" class="form-label">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            class="form-input"
+            placeholder="Enter username"
+            [(ngModel)]="username"
+            required
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-input"
+            placeholder="••••••••••••"
+            [(ngModel)]="password"
+            required
+          />
+          <div class="forgot-password">
+            <a routerLink="/changepassword">Forgot password?</a>
+          </div>
+        </div>
+
+        <!-- Remember Me -->
+        <div class="checkbox-group">
+          <input
+            type="checkbox"
+            id="remember"
+            name="remember"
+            [(ngModel)]="rememberMe"
+          />
+          <label for="remember" class="checkbox-label">Remember me</label>
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="login-btn"
+          [disabled]="!loginForm.form.valid"
+        >
+          LOG IN
+        </button>
+
+        <!-- Signup link -->
+        <div class="signup-link">
+          No account yet?
+          <a routerLink="/signup">SIGN UP</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

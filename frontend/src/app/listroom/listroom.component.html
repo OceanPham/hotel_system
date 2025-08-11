@@ -1,0 +1,605 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>Azure Hotel.</h2>
+    </div>
+
+    <nav class="navigation">
+      <ul>
+        <li class="nav-item">
+          <a routerLink="/dashboard" class="nav-link">
+            <i class="icon dashboard-icon"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item active">
+          <a routerLink="/listroom" class="nav-link">
+            <i class="icon room-icon"></i>
+            <span>Phòng</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/listbooking" class="nav-link">
+            <i class="icon booking-icon"></i>
+            <span>Đơn đặt phòng</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/listservice" class="nav-link">
+            <i class="icon service-icon"></i>
+            <span>Dịch vụ</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/message" class="nav-link">
+            <i class="icon message-icon"></i>
+            <span>Message</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/helps" class="nav-link">
+            <i class="icon help-icon"></i>
+            <span>Help</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/setting" class="nav-link">
+            <i class="icon setting-icon"></i>
+            <span>Setting</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1>Admin Dashboard</h1>
+      </div>
+
+      <div class="header-right">
+        <div class="search-container">
+          <input
+            type="text"
+            placeholder="Search"
+            class="search-input"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)">
+          <i class="search-icon"></i>
+        </div>
+
+        <div class="header-actions">
+          <button class="notification-btn" title="Thông báo">
+            <i class="notification-icon"></i>
+            <span class="notification-badge">3</span>
+          </button>
+
+          <!-- User Profile with Dropdown -->
+          <div class="user-profile-container" [class.open]="showUserDropdown()">
+            <div class="user-profile" (click)="toggleUserDropdown($event)">
+              <img
+                [src]="userInfo().avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face&auto=format'"
+                alt="User"
+                class="user-avatar"
+              >
+
+              <div class="user-info">
+                <span class="user-name">{{ userInfo().fullName }}</span>
+                <span class="user-role">Người dùng</span> <!-- hoặc dynamic nếu có -->
+              </div>
+              <button class="dropdown-btn" type="button" title="Menu">
+                <i class="dropdown-icon" [class.rotated]="showUserDropdown()"></i>
+              </button>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="user-dropdown" *ngIf="showUserDropdown()" (click)="$event.stopPropagation()">
+              <div class="dropdown-content">
+                <button class="dropdown-item" type="button" (click)="goToProfile()">
+                  <i class="profile-menu-icon"></i>
+                  <span>Profile</span>
+                </button>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout" (click)="logout()"href="javascript:void(0)">
+                  <i class="logout-icon"></i>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Filter Section -->
+    <section class="filter-section">
+      <div class="filter-controls">
+        <div class="filter-group">
+          <label for="roomStatus">Trạng thái</label>
+          <select
+            id="roomStatus"
+            class="filter-select"
+            [ngModel]="selectedStatus()"
+            (ngModelChange)="selectedStatus.set($event)">
+            <option value="">Tất cả</option>
+            <option value="Vacant">Trống</option>
+            <option value="Booked">Đã đặt</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="roomType">Loại phòng</label>
+          <select
+            id="roomType"
+            class="filter-select"
+            [ngModel]="selectedRoomType()"
+            (ngModelChange)="selectedRoomType.set($event)">
+            <option value="">Tất cả</option>
+            <option value="Standard">Standard</option>
+            <option value="Deluxe">Deluxe</option>
+            <option value="Suite">Suite</option>
+          </select>
+        </div>
+
+        <button class="refresh-btn" (click)="fetchRooms()" title="Làm mới">
+          <i class="refresh-icon"></i>
+        </button>
+
+        <button class="add-room-btn" (click)="addNewRoom()">
+          <i class="add-icon"></i>
+          Thêm phòng
+        </button>
+      </div>
+    </section>
+
+    <!-- Room List -->
+    <section class="room-list-section">
+      <div class="section-header">
+        <h2>Danh sách phòng</h2>
+      </div>
+
+      <!-- Room Table -->
+      <div class="table-container">
+        <table class="room-table">
+          <thead>
+          <tr>
+            <th>Hình ảnh</th>
+            <th>Mã phòng</th>
+            <th>Tên phòng</th>
+            <th>Loại phòng</th>
+            <th>Giá/đêm (VNĐ)</th>
+            <th>Tình trạng</th>
+            <th>Mô tả</th>
+            <th>Thao tác</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let room of paginatedRooms()" class="room-row">
+            <td>
+              <img
+                *ngIf="getRoomMainImage(room)"
+                [src]="getRoomMainImage(room)"
+                alt="Ảnh phòng"
+                class="room-thumbnail"
+                style="width: 80px; height: 60px; object-fit: cover; border-radius: 4px;"
+              />
+              <span *ngIf="!getRoomMainImage(room)">Không có ảnh</span>
+            </td>
+            <td>{{ room.roomNumber }}</td>
+            <td>{{ room.roomName }}</td>
+            <td>{{ room.roomType }}</td>
+            <td>{{ formatPrice(room.basePrice) }}</td>
+            <td>{{ room.status }}</td>
+            <td>{{ room.description }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" (click)="showEditRoom(room)" title="Chỉnh sửa">
+                  <i class="edit-icon"></i>
+                </button>
+                <button class="action-btn delete-btn" (click)="deleteRoom(room)" title="Xóa">
+                  <i class="delete-icon"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+  <span class="pagination-info">
+  Hiển thị {{(currentPage() - 1) * itemsPerPage() + 1}} -
+    {{math.min(currentPage() * itemsPerPage(), filteredRooms().length)}}
+    của {{filteredRooms().length}} phòng
+</span>
+
+        <div class="pagination-controls">
+          <button class="pagination-btn" [disabled]="currentPage() === 1" (click)="currentPage.set(currentPage() - 1)">
+            <i class="arrow-left"></i>
+          </button>
+          <span class="page-numbers">
+        <button *ngFor="let page of getPageRange()" class="page-btn"
+                [class.active]="page === currentPage()"
+                (click)="currentPage.set(page)">
+          {{page}}
+        </button>
+      </span>
+          <button class="pagination-btn" [disabled]="currentPage() === totalPages()"
+                  (click)="currentPage.set(currentPage() + 1)">
+            <i class="arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+<!-- Add Room Modal -->
+<div class="modal-overlay" *ngIf="showAddRoomModal()" (click)="showAddRoomModal.set(false)">
+  <div class="modal-container modern-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header modern-header">
+      <h2>Thêm phòng mới</h2>
+      <button class="close-btn modern-close" (click)="showAddRoomModal.set(false)">
+        ×
+      </button>
+    </div>
+
+    <div class="modal-content modern-content">
+      <!-- Image Upload Section -->
+      <div class="image-upload-section">
+        <div class="upload-placeholder">
+          <div class="upload-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21,15 16,10 5,21"/>
+            </svg>
+          </div>
+          <p>Chọn thêm ảnh</p>
+          <input type="file" multiple accept="image/*" class="hidden-file-input" (change)="handleMultipleFiles($event)">
+        </div>
+
+        <div class="image-preview-grid" *ngIf="newRoom().images.length > 0">
+          <div *ngFor="let img of newRoom().images; let i = index" class="image-preview-item">
+            <img [src]="img.imageUrl" alt="Preview">
+            <button class="remove-preview" (click)="removeImageField(i)">×</button>
+            <label class="main-checkbox">
+              <input type="radio" [name]="'main-image-new'" [checked]="img.isMain" (change)="setMainImage(i)">
+              <span>Chính</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Room Info Section -->
+      <div class="room-info-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Room Name:</label>
+            <input type="text" [(ngModel)]="newRoom().roomName" placeholder="Room name">
+          </div>
+          <div class="form-group">
+            <label>RoomType</label>
+            <select [(ngModel)]="newRoom().roomType">
+              <option value="Standard">Standard</option>
+              <option value="Deluxe">Deluxe</option>
+              <option value="Suite">Suite</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Room Type Icons -->
+<!-- Sửa lỗi room type icons -->
+<div class="room-type-icons">
+  <div class="icon-item" [class.active]="newRoom().roomType === 'Standard'" (click)="setNewRoomType('Standard')">
+    <div class="bed-icon">🛏️</div>
+    <span>2 Bedrooms</span>
+  </div>
+  <div class="icon-item" [class.active]="newRoom().roomType === 'Deluxe'" (click)="setNewRoomType('Deluxe')">
+    <div class="bed-icon">🛁</div>
+    <span>1 Bathroom</span>
+  </div>
+  <div class="icon-item" [class.active]="newRoom().roomType === 'Suite'" (click)="setNewRoomType('Suite')">
+    <div class="bed-icon">🌿</div>
+    <span>0 Pets Allowed</span>
+  </div>
+</div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label>Mô tả</label>
+          <textarea [(ngModel)]="newRoom().description" placeholder=""></textarea>
+        </div>
+
+        <!-- Price and Status -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Giá/đêm</label>
+            <div class="price-input-wrapper">
+              <input type="number" [(ngModel)]="newRoom().basePrice" placeholder="0">
+              <span class="currency">VND</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Trạng thái</label>
+<div class="status-options">
+  <label class="status-option">
+    <input type="radio" name="status" value="Vacant" [checked]="newRoom().status === 'Vacant'" (change)="setNewRoomStatus('Vacant')">
+    <span>Phòng trống</span>
+  </label>
+  <label class="status-option">
+    <input type="radio" name="status" value="Booked" [checked]="newRoom().status === 'Booked'" (change)="setNewRoomStatus('Booked')">
+    <span>Đã được thuê</span>
+  </label>
+</div>
+          </div>
+        </div>
+
+        <!-- Services -->
+        <div class="services-section">
+          <label>Dịch vụ trong phòng</label>
+          <div class="services-grid">
+            <div class="service-item">
+              <div class="service-icon">🍽️</div>
+              <span>Kitchen</span>
+            </div>
+            <div class="service-item">
+              <div class="service-icon">❄️</div>
+              <span>Air Conditioner</span>
+            </div>
+            <div class="service-item">
+              <div class="service-icon">🧺</div>
+              <span>Washer</span>
+            </div>
+            <div class="service-item">
+              <div class="service-icon">📺</div>
+              <span>Television with Netflix</span>
+            </div>
+            <div class="service-item">
+              <div class="service-icon">📶</div>
+              <span>Free Wireless Internet</span>
+            </div>
+            <div class="service-item">
+              <div class="service-icon">🏢</div>
+              <span>Balcony or Patio</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer modern-footer">
+      <button class="cancel-btn" (click)="showLogoutModal.set(false)">Hủy</button>
+      <button class="btn-confirm" (click)="showAddConfirmation()">Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+
+   <!-- Edit Room Modal -->
+<div class="modal-overlay" *ngIf="showEditRoomModal()" (click)="showEditRoomModal.set(false)">
+  <div class="modal-container edit-modal-container" (click)="$event.stopPropagation()">
+    <!-- Header with blue background -->
+    <div class="edit-modal-header">
+      <h2>Sửa thông tin phòng</h2>
+      <button class="edit-close-btn" (click)="showEditRoomModal.set(false)">×</button>
+    </div>
+
+    <div class="edit-modal-body">
+      <!-- Current room image or upload area -->
+      <div class="edit-image-section">
+        <div class="edit-image-display" *ngIf="editingRoom()?.images?.length; else noImage">
+          <img [src]="getRoomMainImage(editingRoom()!)" alt="Room image" class="edit-room-image">
+          <div class="edit-image-overlay">
+            <span>Chọn thêm ảnh</span>
+            <input type="file" class="hidden-file-input" accept="image/*" (change)="handleEditImageUpload($event)">
+          </div>
+        </div>
+        <ng-template #noImage>
+          <div class="edit-upload-placeholder">
+            <div class="edit-upload-icon">📷</div>
+            <span>Chọn thêm ảnh</span>
+            <input type="file" class="hidden-file-input" accept="image/*" (change)="handleEditImageUpload($event)">
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Room Name with edit icon -->
+      <div class="edit-form-group">
+        <label>Room Name:</label>
+        <div class="edit-input-wrapper">
+          <input type="text" [(ngModel)]="editingRoom()!.roomName" class="edit-room-input">
+          <span class="edit-input-icon">✏️</span>
+        </div>
+      </div>
+
+      <!-- Room Type Icons -->
+      <div class="edit-room-types">
+        <div class="edit-type-item"
+             [class.active]="editingRoom()?.roomType === 'Standard'"
+             (click)="setEditRoomType('Standard')">
+          <div class="edit-type-icon">🛏️</div>
+          <span>2 Bedrooms</span>
+        </div>
+        <div class="edit-type-item"
+             [class.active]="editingRoom()?.roomType === 'Deluxe'"
+             (click)="setEditRoomType('Deluxe')">
+          <div class="edit-type-icon">🛁</div>
+          <span>1 Bathroom</span>
+        </div>
+        <div class="edit-type-item"
+             [class.active]="editingRoom()?.roomType === 'Suite'"
+             (click)="setEditRoomType('Suite')">
+          <div class="edit-type-icon">🌿</div>
+          <span>0 Pets Allowed</span>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="edit-form-group">
+        <label>Mô tả</label>
+        <div class="edit-input-wrapper">
+          <textarea [(ngModel)]="editingRoom()!.description" class="edit-textarea"
+                    placeholder="Lorem ipsum dolor sit amet..."></textarea>
+          <span class="edit-input-icon">✏️</span>
+        </div>
+      </div>
+
+      <!-- Price Section -->
+      <div class="edit-price-section">
+        <div class="edit-price-input">
+          <span class="price-dots">...</span>
+          <input type="number" [(ngModel)]="editingRoom()!.basePrice" class="price-field">
+          <span class="price-currency">VND</span>
+          <span class="price-edit-icon">✏️</span>
+        </div>
+      </div>
+
+      <!-- Pricing Options -->
+      <div class="edit-pricing-options">
+        <label class="pricing-option">
+          <input type="radio" name="pricingType" value="night" checked>
+          <span>Một đêm:</span>
+          <span class="option-price">VND</span>
+        </label>
+        <label class="pricing-option">
+          <input type="radio" name="pricingType" value="day">
+          <span>Một ngày:</span>
+          <span class="option-price">VND</span>
+        </label>
+      </div>
+
+      <!-- Services -->
+      <div class="edit-services">
+        <label>Dịch vụ trong phòng</label>
+        <div class="edit-services-grid">
+          <div class="edit-service-item">
+            <span class="service-icon">🍽️</span>
+            <span>Kitchen</span>
+          </div>
+          <div class="edit-service-item">
+            <span class="service-icon">❄️</span>
+            <span>Air Conditioner</span>
+          </div>
+          <div class="edit-service-item">
+            <span class="service-icon">🧺</span>
+            <span>Washer</span>
+          </div>
+          <div class="edit-service-item">
+            <span class="service-icon">📺</span>
+            <span>Television with Netflix</span>
+          </div>
+          <div class="edit-service-item">
+            <span class="service-icon">📶</span>
+            <span>Free Wireless Internet</span>
+          </div>
+          <div class="edit-service-item">
+            <span class="service-icon">🏢</span>
+            <span>Balcony or Patio</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer with 3 buttons -->
+    <div class="edit-modal-footer">
+      <button class="edit-btn-delete" (click)="deleteRoom(editingRoom()!)">Tắt phòng</button>
+      <div class="edit-action-buttons">
+        <button class="edit-btn-confirm" (click)="showEditConfirmation()">Xác nhận</button>
+        <button class="edit-btn-cancel" (click)="showEditRoomModal.set(false)">Hủy</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" *ngIf="showConfirmationModal()" (click)="cancelConfirmation()">
+      <div class="modal-container confirmation-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{confirmationData()?.title}}</h2>
+          <button class="close-btn" (click)="cancelConfirmation()">
+            <i class="close-icon"></i>
+          </button>
+        </div>
+
+        <div class="modal-content">
+          <div class="confirmation-icon" [ngClass]="{
+            'add-confirmation-icon': confirmationData()?.type === 'add',
+            'edit-confirmation-icon': confirmationData()?.type === 'edit',
+            'delete-confirmation-icon': confirmationData()?.type === 'delete'
+          }">
+            <i [ngClass]="{
+              'add-icon': confirmationData()?.type === 'add',
+              'edit-icon': confirmationData()?.type === 'edit',
+              'delete-icon': confirmationData()?.type === 'delete'
+            }"></i>
+          </div>
+          <p>{{confirmationData()?.message}}</p>
+        </div>
+
+        <div class="modal-footer">
+          <button class="cancel-btn" (click)="cancelConfirmation()">{{confirmationData()?.cancelText}}</button>
+          <button class="confirm-btn"
+                  [ngClass]="{
+                    'delete-confirm': confirmationData()?.type === 'delete'
+                  }"
+                  (click)="executeConfirmation()">
+            {{confirmationData()?.confirmText}}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal-overlay" *ngIf="showLogoutModal()" (click)="showLogoutModal.set(false)">
+      <div class="modal-container logout-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Xác nhận đăng xuất</h2>
+          <button class="close-btn" (click)="showLogoutModal.set(false)">
+            <i class="close-icon"></i>
+          </button>
+        </div>
+
+        <div class="modal-content">
+          <div class="logout-icon-large">
+            <i class="logout-large-icon"></i>
+          </div>
+          <p>Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?</p>
+          <p class="logout-note">Bạn sẽ cần đăng nhập lại để sử dụng hệ thống.</p>
+        </div>
+
+        <div class="modal-footer">
+          <button class="cancel-btn" (click)="showLogoutModal.set(false)">Hủy</button>
+          <button class="confirm-btn logout-confirm" (click)="confirmLogout()">Đăng xuất</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" *ngIf="showToast()">
+      <div class="toast" [ngClass]="'toast-' + toastType()">
+        <div class="toast-icon">
+          <i [ngClass]="{
+            'success-icon': toastType() === 'success',
+            'error-icon': toastType() === 'error',
+            'warning-icon': toastType() === 'warning',
+            'info-icon': toastType() === 'info'
+          }"></i>
+        </div>
+        <div class="toast-content">
+          <div class="toast-title">{{toastTitle()}}</div>
+          <div class="toast-message">{{toastMessage()}}</div>
+        </div>
+        <button class="toast-close" (click)="showToast.set(false)">
+          <i class="close-icon"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

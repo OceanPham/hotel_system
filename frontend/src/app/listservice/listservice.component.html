@@ -1,0 +1,369 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>Azure Hotel.</h2>
+    </div>
+
+    <nav class="navigation">
+      <ul>
+        <li class="nav-item">
+          <a routerLink="/dashboard" class="nav-link">
+            <i class="icon dashboard-icon"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a routerLink="/listroom" class="nav-link">
+            <i class="icon room-icon"></i>
+            <span>Phòng</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/listbooking" class="nav-link">
+            <i class="icon booking-icon"></i>
+            <span>Đơn đặt phòng</span>
+          </a>
+        </li>
+
+        <li class="nav-item active">
+          <a routerLink="/listservice" class="nav-link">
+            <i class="icon service-icon"></i>
+            <span>Dịch vụ</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/message" class="nav-link">
+            <i class="icon message-icon"></i>
+            <span>Message</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/helps" class="nav-link">
+            <i class="icon help-icon"></i>
+            <span>Help</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/setting" class="nav-link">
+            <i class="icon setting-icon"></i>
+            <span>Setting</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1>Quản lý dịch vụ</h1>
+      </div>
+
+      <div class="header-right">
+        <div class="search-container">
+          <input
+            type="text"
+            placeholder="Search"
+            class="search-input"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)">
+          <i class="search-icon"></i>
+        </div>
+
+        <div class="header-actions">
+          <button class="notification-btn" title="Thông báo">
+            <i class="notification-icon"></i>
+            <span class="notification-badge">3</span>
+          </button>
+
+          <!-- User Profile with Dropdown -->
+          <div class="user-profile-container" [class.open]="showUserDropdown()">
+            <div class="user-profile" (click)="toggleUserDropdown($event)">
+              <img [src]="'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face&auto=format'"  class="user-avatar">
+
+              <div class="user-info">
+                <span class="user-name">{{ userInfo().fullName }}</span>
+                <span class="user-role">Người dùng</span> <!-- hoặc dynamic nếu có -->
+              </div>
+              <button class="dropdown-btn" type="button" title="Menu">
+                <i class="dropdown-icon" [class.rotated]="showUserDropdown()"></i>
+              </button>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="user-dropdown" *ngIf="showUserDropdown()" (click)="$event.stopPropagation()">
+              <div class="dropdown-content">
+                <button class="dropdown-item" type="button" (click)="goToProfile()">
+                  <i class="profile-menu-icon"></i>
+                  <span>Profile</span>
+                </button>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout" (click)="logout()"href="javascript:void(0)">
+                  <i class="logout-icon"></i>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Control Section -->
+<!-- Filter Section -->
+<section class="filter-section">
+  <div class="filter-header">
+    <h3>Danh sách dịch vụ</h3>
+  </div>
+
+  <div class="filter-controls">
+    <div class="filter-group">
+      <label for="search">Tìm kiếm</label>
+      <input
+        id="search"
+        type="text"
+        placeholder="Tìm theo tên dịch vụ"
+        class="filter-select"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+        (input)="onFilterChange()">
+    </div>
+
+    <div class="filter-group">
+      <label for="priceRange">Khoảng giá</label>
+      <select
+        id="priceRange"
+        class="filter-select"
+        [ngModel]="selectedPriceRange()"
+        (ngModelChange)="selectedPriceRange.set($event)"
+        (change)="onFilterChange()">
+        <option value="">Tất cả</option>
+        <option value="under-100k">Dưới 100,000đ</option>
+        <option value="100k-500k">100,000đ - 500,000đ</option>
+        <option value="500k-1m">500,000đ - 1,000,000đ</option>
+        <option value="over-1m">Trên 1,000,000đ</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="serviceType">Loại dịch vụ</label>
+      <select
+        id="serviceType"
+        class="filter-select"
+        [ngModel]="selectedServiceType()"
+        (ngModelChange)="selectedServiceType.set($event)"
+        (change)="onFilterChange()">
+        <option value="">Tất cả loại</option>
+        <option value="food">Ăn uống</option>
+        <option value="spa">Spa & Massage</option>
+        <option value="transport">Vận chuyển</option>
+        <option value="entertainment">Giải trí</option>
+        <option value="other">Khác</option>
+      </select>
+    </div>
+
+    <button class="refresh-btn" (click)="refreshData()" title="Làm mới">
+      <i class="refresh-icon"></i>
+    </button>
+  </div>
+</section>
+
+<!-- Control Section for Add Button -->
+<section class="control-section">
+  <div class="control-left"></div>
+  <div class="control-right">
+    <button class="add-service-btn" (click)="openAddModal()">
+      <i class="add-icon"></i>
+      Thêm dịch vụ
+    </button>
+  </div>
+</section>
+
+    <!-- Service Table -->
+    <section class="service-table-section">
+      <div class="table-container">
+        <table class="service-table">
+          <thead>
+          <tr>
+            <th>STT</th>
+            <th>Tên dịch vụ</th>
+            <th>Ảnh</th>
+            <th>Giá</th>
+            <th>Mô tả</th>
+            <th>Hành động</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let service of paginatedServices(); let i = index" class="service-row">
+            <td>{{ (currentPage() - 1) * itemsPerPage() + i + 1 }}</td>
+            <td>{{ service.name }}</td>
+            <td>
+              <img
+                *ngIf="service.imageUrl"
+                [src]="'http://localhost:8080' + service.imageUrl"
+                alt="Ảnh dịch vụ"
+                style="width: 60px; height: auto; border-radius: 4px;" />
+
+              <ng-template #noImage>
+                <span style="color: gray; font-style: italic;">Không có ảnh</span>
+              </ng-template>
+            </td>
+            <td>{{ formatPrice(service.price) }}</td>
+            <td>{{ service.description || '—' }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn edit-btn" (click)="openEditModal(service)" title="Chỉnh sửa">
+                  <i class="edit-icon"></i>
+                </button>
+                <button class="action-btn delete-btn" (click)="confirmDelete(service)" title="Xóa">
+                  <i class="delete-icon"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+    <span class="pagination-info">
+      Hiển thị {{ (currentPage() - 1) * itemsPerPage() + 1 }} -
+      {{ currentPage() * itemsPerPage() > filteredServices().length ? filteredServices().length : currentPage() * itemsPerPage() }}
+      của {{ filteredServices().length }} dịch vụ
+    </span>
+        <div class="pagination-controls">
+          <button class="pagination-btn" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
+            <i class="arrow-left"></i>
+          </button>
+          <span class="page-numbers">
+        <button
+          *ngFor="let page of getPageNumbers()"
+          class="page-btn"
+          [class.active]="page === currentPage()"
+          (click)="goToPage(page)">
+          {{ page }}
+        </button>
+      </span>
+          <button class="pagination-btn" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
+            <i class="arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Add Service Modal -->
+    <div class="modal-overlay" *ngIf="showAddServiceModal()" (click)="showAddServiceModal.set(false)">
+      <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Thêm dịch vụ mới</h2>
+          <button class="close-btn" (click)="showAddServiceModal.set(false)">
+            <i class="close-icon"></i>
+          </button>
+        </div>
+
+        <div class="modal-content">
+          <div class="form-group">
+            <label>Tên dịch vụ:</label>
+            <input type="text" class="form-input" placeholder="Nhập tên dịch vụ" [(ngModel)]="newService().name" />
+          </div>
+
+          <div class="form-group">
+            <label>Giá dịch vụ (VND):</label>
+            <input type="number" class="form-input" placeholder="0" [(ngModel)]="newService().price" />
+          </div>
+
+          <div class="form-group">
+            <label>Mô tả:</label>
+            <textarea class="form-textarea" placeholder="Mô tả về dịch vụ..." [(ngModel)]="newService().description"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Ảnh dịch vụ:</label>
+            <input type="file" class="form-input" accept="image/*" (change)="onFileSelected($event, 'new')" />
+            <div *ngIf="newService().imageFile" style="margin-top: 8px;">
+              <span style="font-style: italic;">Đã chọn: {{ newService().imageFile?.name }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="cancel-btn" (click)="showAddServiceModal.set(false)">Hủy</button>
+          <button class="confirm-btn" (click)="createService()">Xác nhận</button>
+        </div>
+      </div>
+    </div>
+    <!-- Edit Service Modal -->
+    <div class="modal-overlay" *ngIf="showEditServiceModal()" (click)="showEditServiceModal.set(false)">
+      <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Chỉnh sửa dịch vụ</h2>
+          <button class="close-btn" (click)="showEditServiceModal.set(false)">
+            <i class="close-icon"></i>
+          </button>
+        </div>
+
+        <div class="modal-content">
+          <div class="form-group">
+            <label>Tên dịch vụ:</label>
+            <input type="text" class="form-input" placeholder="Nhập tên dịch vụ" [(ngModel)]="editingService().name" />
+          </div>
+
+          <div class="form-group">
+            <label>Giá dịch vụ (VND):</label>
+            <input type="number" class="form-input" placeholder="0" [(ngModel)]="editingService().price" />
+          </div>
+
+          <div class="form-group">
+            <label>Mô tả:</label>
+            <textarea class="form-textarea" placeholder="Mô tả về dịch vụ..." [(ngModel)]="editingService().description"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Ảnh dịch vụ:</label>
+            <input type="file" class="form-input" accept="image/*" (change)="onFileSelected($event, 'edit')" />
+            <div *ngIf="editingService().imageFile">
+              <span style="font-style: italic;">Đã chọn: {{ editingService().imageFile?.name }}</span>
+            </div>
+            <div *ngIf="editingService().imageUrl" style="margin-top: 8px;">
+              <img [src]="editingService().imageUrl" alt="Ảnh hiện tại" style="max-width: 100px; border-radius: 4px;" />
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="cancel-btn" (click)="showEditServiceModal.set(false)">Hủy</button>
+          <button class="confirm-btn" (click)="updateService()">Cập nhật</button>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Confirmation Modal -->
+    <div class="confirmation-overlay" *ngIf="showConfirmationModal()">
+      <div class="confirmation-container">
+        <div class="confirmation-header">
+          <div class="confirmation-icon warning">
+            <i class="icon warning-icon"></i>
+          </div>
+          <h3>Xác nhận hành động</h3>
+        </div>
+
+        <div class="confirmation-content">
+          <p>Bạn có chắc chắn muốn thực hiện hành động này?</p>
+        </div>
+
+        <div class="confirmation-footer">
+          <button class="confirmation-cancel-btn" (click)="cancelConfirmation()">Hủy</button>
+          <button class="confirmation-confirm-btn warning" (click)="executePending()">Xác nhận</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+</div>
