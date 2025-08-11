@@ -1,9 +1,17 @@
-import {Component, signal, computed, OnInit, HostListener, inject} from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  OnInit,
+  HostListener,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../services/auth.service';
+import { API_URL } from '../../constants';
 
 interface BookingHistory {
   id: number;
@@ -41,7 +49,7 @@ interface Feedback {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './bookinghistory.component.html',
-  styleUrls: ['./bookinghistory.component.css']
+  styleUrls: ['./bookinghistory.component.css'],
 })
 export class BookinghistoryComponent implements OnInit {
   // Signals for reactive state management
@@ -78,7 +86,9 @@ export class BookinghistoryComponent implements OnInit {
 
   // Notification system
   notificationMessage = signal<string>('');
-  notificationType = signal<'success' | 'error' | 'warning' | 'info' | 'confirm'>('info');
+  notificationType = signal<
+    'success' | 'error' | 'warning' | 'info' | 'confirm'
+  >('info');
   showNotification = signal(false);
 
   // Confirmation system
@@ -87,19 +97,24 @@ export class BookinghistoryComponent implements OnInit {
 
   // Computed values
   hasBookings = computed(() => this.bookings().length > 0);
-  confirmedBookings = computed(() =>
-    this.bookings().filter(booking => booking.status === 'Confirmed').length
+  confirmedBookings = computed(
+    () =>
+      this.bookings().filter((booking) => booking.status === 'Confirmed').length
   );
-  completedBookings = computed(() =>
-    this.bookings().filter(booking => booking.status === 'Completed').length
+  completedBookings = computed(
+    () =>
+      this.bookings().filter((booking) => booking.status === 'Completed').length
   );
   authService = inject(AuthService);
 
   // ===== API ENDPOINTS =====
-  private baseApiUrl = 'http://localhost:8080/api';
+  private baseApiUrl = `${API_URL}/api`;
   private readonly BOOKING_API_URL = `${this.baseApiUrl}/bookings/my`;
   private readonly CANCEL_API_URL = `${this.baseApiUrl}/bookings`; // + /{id}/cancel
-  private readonly FEEDBACK_API_URL = `${this.baseApiUrl.replace('/api', '/api/v1')}/feedbacks`;
+  private readonly FEEDBACK_API_URL = `${this.baseApiUrl.replace(
+    '/api',
+    '/api/v1'
+  )}/feedbacks`;
 
   constructor(private router: Router, private http: HttpClient) {}
 
@@ -110,7 +125,11 @@ export class BookinghistoryComponent implements OnInit {
 
   @HostListener('window:scroll', ['$event'])
   onWindowScroll(): void {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    const scrollTop =
+      window.pageYOffset ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      0;
     this.isScrolled.set(scrollTop > 50);
   }
 
@@ -176,41 +195,48 @@ export class BookinghistoryComponent implements OnInit {
     const token = localStorage.getItem('token');
     if (!token) {
       console.error('Không tìm thấy token, vui lòng đăng nhập lại');
-      this.showNotificationMessage('Không tìm thấy token, vui lòng đăng nhập lại', 'error');
+      this.showNotificationMessage(
+        'Không tìm thấy token, vui lòng đăng nhập lại',
+        'error'
+      );
       this.isLoading.set(false);
       return;
     }
 
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
 
-    this.http.get<{ status: string; data: BookingHistory[]; total?: number }>(
-      this.BOOKING_API_URL, { headers }
-    ).subscribe({
-      next: (res) => {
-        const data = res.data.map(b => ({
-          ...b,
-          roomImage: this.getFullImageUrl(b.roomType)
-        }));
-        this.bookings.set(data);
-        this.isLoading.set(false);
-        data.forEach(b => {
-          if (b.status === 'Completed') {
-            this.getMyFeedbackForBooking(b.id);
-          }
-        });
-      },
+    this.http
+      .get<{ status: string; data: BookingHistory[]; total?: number }>(
+        this.BOOKING_API_URL,
+        { headers }
+      )
+      .subscribe({
+        next: (res) => {
+          const data = res.data.map((b) => ({
+            ...b,
+            roomImage: this.getFullImageUrl(b.roomType),
+          }));
+          this.bookings.set(data);
+          this.isLoading.set(false);
+          data.forEach((b) => {
+            if (b.status === 'Completed') {
+              this.getMyFeedbackForBooking(b.id);
+            }
+          });
+        },
 
-      error: (err) => {
-        console.error('Lỗi khi tải lịch sử đặt phòng:', err);
-        this.showNotificationMessage('Lỗi khi tải lịch sử đặt phòng', 'error');
-        this.bookings.set([]);
-        this.isLoading.set(false);
-      }
-    });
-
-
+        error: (err) => {
+          console.error('Lỗi khi tải lịch sử đặt phòng:', err);
+          this.showNotificationMessage(
+            'Lỗi khi tải lịch sử đặt phòng',
+            'error'
+          );
+          this.bookings.set([]);
+          this.isLoading.set(false);
+        },
+      });
   }
   logout(): void {
     this.authService.logout(); // gọi hàm đã có trong auth.service.ts
@@ -218,7 +244,7 @@ export class BookinghistoryComponent implements OnInit {
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
-      currency: 'VND'
+      currency: 'VND',
     }).format(amount);
   }
 
@@ -236,7 +262,7 @@ export class BookinghistoryComponent implements OnInit {
     return date.toLocaleDateString('vi-VN', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
     });
   }
 
@@ -303,11 +329,11 @@ export class BookinghistoryComponent implements OnInit {
 
   // UI interaction methods
   toggleUserMenu(): void {
-    this.userMenuOpen.update(value => !value);
+    this.userMenuOpen.update((value) => !value);
   }
 
   toggleMobileMenu(): void {
-    this.mobileMenuOpen.update(value => !value);
+    this.mobileMenuOpen.update((value) => !value);
   }
 
   // Booking actions
@@ -325,10 +351,14 @@ export class BookinghistoryComponent implements OnInit {
   }
 
   cancelBooking(bookingId: number): void {
-    const booking = this.bookings().find(b => b.id === bookingId);
+    const booking = this.bookings().find((b) => b.id === bookingId);
     if (!booking) return;
 
-    const confirmMessage = `Bạn có chắc chắn muốn hủy đặt phòng "${booking.roomName}" không?\n\nMã đặt phòng: #${this.formatBookingId(bookingId)}\nLưu ý: Phí hủy có thể áp dụng theo chính sách khách sạn.`;
+    const confirmMessage = `Bạn có chắc chắn muốn hủy đặt phòng "${
+      booking.roomName
+    }" không?\n\nMã đặt phòng: #${this.formatBookingId(
+      bookingId
+    )}\nLưu ý: Phí hủy có thể áp dụng theo chính sách khách sạn.`;
 
     this.showConfirmation(confirmMessage, () => {
       this.performCancelBooking(bookingId);
@@ -340,7 +370,7 @@ export class BookinghistoryComponent implements OnInit {
 
     setTimeout(() => {
       const currentBookings = this.bookings();
-      const updatedBookings = currentBookings.map(booking =>
+      const updatedBookings = currentBookings.map((booking) =>
         booking.id === bookingId
           ? { ...booking, status: 'Cancelled' as const }
           : booking
@@ -385,31 +415,35 @@ export class BookinghistoryComponent implements OnInit {
     this.isCancelling.set(true);
 
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
 
-    this.http.put(`${this.CANCEL_API_URL}/${booking.id}/cancel`, {}, { headers })
+    this.http
+      .put(`${this.CANCEL_API_URL}/${booking.id}/cancel`, {}, { headers })
       .subscribe({
         next: () => {
-          const updatedBookings = this.bookings().map(b =>
+          const updatedBookings = this.bookings().map((b) =>
             b.id === booking.id ? { ...b, status: 'Cancelled' as const } : b
           );
           this.bookings.set(updatedBookings);
           this.isCancelling.set(false);
           this.closeCancelModal();
-          this.showNotificationMessage('Đặt phòng đã được hủy thành công!', 'success');
+          this.showNotificationMessage(
+            'Đặt phòng đã được hủy thành công!',
+            'success'
+          );
         },
         error: (err) => {
           console.error('Lỗi khi hủy đặt phòng:', err);
           this.isCancelling.set(false);
           this.showNotificationMessage('Hủy đặt phòng thất bại!', 'error');
-        }
+        },
       });
   }
 
   // Rating methods
   rateBooking(bookingId: number): void {
-    const booking = this.bookings().find(b => b.id === bookingId);
+    const booking = this.bookings().find((b) => b.id === bookingId);
     if (!booking) return;
 
     this.selectedRatingBooking.set(booking);
@@ -425,7 +459,6 @@ export class BookinghistoryComponent implements OnInit {
     this.showRatingModal.set(true);
     document.body.style.overflow = 'hidden';
   }
-
 
   closeRatingModal(): void {
     this.showRatingModal.set(false);
@@ -447,12 +480,18 @@ export class BookinghistoryComponent implements OnInit {
   getRatingDescription(): string {
     const rating = this.hoverRating() || this.selectedRating();
     switch (rating) {
-      case 1: return 'Rất tệ';
-      case 2: return 'Tệ';
-      case 3: return 'Bình thường';
-      case 4: return 'Tốt';
-      case 5: return 'Tuyệt vời';
-      default: return 'Chọn số sao để đánh giá';
+      case 1:
+        return 'Rất tệ';
+      case 2:
+        return 'Tệ';
+      case 3:
+        return 'Bình thường';
+      case 4:
+        return 'Tốt';
+      case 5:
+        return 'Tuyệt vời';
+      default:
+        return 'Chọn số sao để đánh giá';
     }
   }
 
@@ -462,7 +501,10 @@ export class BookinghistoryComponent implements OnInit {
     const comment = this.ratingComment().trim();
 
     if (!booking || rating === 0) {
-      this.showNotificationMessage('Vui lòng chọn số sao và nhập nhận xét!', 'warning');
+      this.showNotificationMessage(
+        'Vui lòng chọn số sao và nhập nhận xét!',
+        'warning'
+      );
       return;
     }
 
@@ -474,14 +516,18 @@ export class BookinghistoryComponent implements OnInit {
 
     this.isSubmittingRating.set(true);
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     });
 
     const feedbackData = { bookingId: booking.id, rating, comment };
 
     const request = booking.feedback
-      ? this.http.put(`${this.FEEDBACK_API_URL}/${booking.feedback.id}`, { ...feedbackData, id: booking.feedback.id }, { headers })
+      ? this.http.put(
+          `${this.FEEDBACK_API_URL}/${booking.feedback.id}`,
+          { ...feedbackData, id: booking.feedback.id },
+          { headers }
+        )
       : this.http.post(this.FEEDBACK_API_URL, feedbackData, { headers });
 
     request.subscribe({
@@ -495,12 +541,11 @@ export class BookinghistoryComponent implements OnInit {
 
         this.getMyFeedbackForBooking(booking.id); // reload lại feedback
       },
-      error: err => {
+      error: (err) => {
         console.error('Lỗi gửi đánh giá:', err);
         this.isSubmittingRating.set(false);
         this.showNotificationMessage('Gửi đánh giá thất bại!', 'error');
-
-      }
+      },
     });
   }
 
@@ -509,23 +554,26 @@ export class BookinghistoryComponent implements OnInit {
     if (!token) return;
 
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
 
-    this.http.get<{ status: string; data: any }>(
-      `${this.FEEDBACK_API_URL}/booking/${bookingId}`, { headers }
-    ).subscribe({
-      next: res => {
-        const feedback = res.data;
-        const updated = this.bookings().map(b =>
-          b.id === bookingId ? { ...b, feedback } : b
-        );
-        this.bookings.set(updated);
-      },
-      error: err => {
-        console.error('Lỗi khi tải đánh giá:', err);
-      }
-    });
+    this.http
+      .get<{ status: string; data: any }>(
+        `${this.FEEDBACK_API_URL}/booking/${bookingId}`,
+        { headers }
+      )
+      .subscribe({
+        next: (res) => {
+          const feedback = res.data;
+          const updated = this.bookings().map((b) =>
+            b.id === bookingId ? { ...b, feedback } : b
+          );
+          this.bookings.set(updated);
+        },
+        error: (err) => {
+          console.error('Lỗi khi tải đánh giá:', err);
+        },
+      });
   }
   editFeedback(booking: BookingHistory): void {
     this.selectedRatingBooking.set(booking);
@@ -545,21 +593,25 @@ export class BookinghistoryComponent implements OnInit {
     if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này không?')) return;
 
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
 
-    this.http.delete(`${this.FEEDBACK_API_URL}/${feedbackId}`, { headers })
+    this.http
+      .delete(`${this.FEEDBACK_API_URL}/${feedbackId}`, { headers })
       .subscribe({
         next: () => {
           this.isSubmittingRating.set(false);
           this.closeRatingModal();
-          this.showNotificationMessage('Đánh giá đã được xóa thành công.', 'success');
+          this.showNotificationMessage(
+            'Đánh giá đã được xóa thành công.',
+            'success'
+          );
         },
         error: (err) => {
           console.error('Lỗi khi xóa đánh giá:', err);
           this.isSubmittingRating.set(false);
           this.showNotificationMessage('Xóa đánh giá thất bại!', 'error');
-        }
+        },
       });
   }
 
@@ -593,7 +645,9 @@ export class BookinghistoryComponent implements OnInit {
 
   getDirections(): void {
     const hotelLocation = 'Azure Hotel, Đà Nẵng, Vietnam';
-    const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(hotelLocation)}`;
+    const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+      hotelLocation
+    )}`;
     window.open(directionsUrl, '_blank');
   }
 
@@ -602,18 +656,31 @@ export class BookinghistoryComponent implements OnInit {
     const shareText = `Vị trí Azure Hotel: ${hotelLocation}`;
 
     if (navigator.share) {
-      navigator.share({
-        title: 'Vị trí Azure Hotel',
-        text: shareText,
-        url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotelLocation)}`
-      }).catch(err => console.log('Error sharing:', err));
+      navigator
+        .share({
+          title: 'Vị trí Azure Hotel',
+          text: shareText,
+          url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+            hotelLocation
+          )}`,
+        })
+        .catch((err) => console.log('Error sharing:', err));
     } else {
       // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(shareText).then(() => {
-        this.showNotificationMessage('Đã sao chép vị trí khách sạn vào clipboard!', 'success');
-      }).catch(() => {
-        this.showNotificationMessage('Không thể sao chép. Vui lòng thử lại.', 'error');
-      });
+      navigator.clipboard
+        .writeText(shareText)
+        .then(() => {
+          this.showNotificationMessage(
+            'Đã sao chép vị trí khách sạn vào clipboard!',
+            'success'
+          );
+        })
+        .catch(() => {
+          this.showNotificationMessage(
+            'Không thể sao chép. Vui lòng thử lại.',
+            'error'
+          );
+        });
     }
   }
 
@@ -623,7 +690,7 @@ export class BookinghistoryComponent implements OnInit {
     this.loadBookingHistory();
   }
 
-// Image error handling
+  // Image error handling
   randomFallbackImages: string[] = [
     '7cba9c26-1dfd-4500-be4d-4d05a5761ca5.jpg',
     '8ba96b50-96e4-4a91-a1d0-b83b0e008c08.jpg',
@@ -634,21 +701,28 @@ export class BookinghistoryComponent implements OnInit {
 
   onImageError(event: any): void {
     setTimeout(() => {
-      const fallback = this.randomFallbackImages[
-        Math.floor(Math.random() * this.randomFallbackImages.length)
+      const fallback =
+        this.randomFallbackImages[
+          Math.floor(Math.random() * this.randomFallbackImages.length)
         ];
-      event.target.src = `http://localhost:8080/uploads/${fallback}`;
+      event.target.src = `${API_URL}/uploads/${fallback}`;
     });
   }
 
   openExternalMap(): void {
     const hotelLocation = 'Azure Hotel, Đà Nẵng, Vietnam';
-    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotelLocation)}`;
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+      hotelLocation
+    )}`;
     window.open(googleMapsUrl, '_blank');
   }
 
   // Notification methods
-  showNotificationMessage(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration: number = 5000) {
+  showNotificationMessage(
+    message: string,
+    type: 'success' | 'error' | 'warning' | 'info' = 'info',
+    duration: number = 5000
+  ) {
     this.notificationMessage.set(message);
     this.notificationType.set(type);
     this.showNotification.set(true);
@@ -690,15 +764,15 @@ export class BookinghistoryComponent implements OnInit {
   getFullImageUrl(path: string | null | undefined): string {
     if (!path || typeof path !== 'string') {
       // Trả về một ảnh mặc định duy nhất, không random ở đây
-      return `http://localhost:8080/uploads/default.jpg`;
+      return `${API_URL}/uploads/default.jpg`;
     }
 
     if (path.startsWith('http')) {
       return path;
     } else if (path.startsWith('/uploads/')) {
-      return `http://localhost:8080${path}`;
+      return `${API_URL}${path}`;
     } else {
-      return `http://localhost:8080/uploads/${path}`;
+      return `${API_URL}/uploads/${path}`;
     }
   }
 }

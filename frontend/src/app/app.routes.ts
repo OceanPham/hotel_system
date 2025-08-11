@@ -8,7 +8,7 @@ import { ListserviceComponent } from './listservice/listservice.component';
 import { ListbookingComponent } from './listbooking/listbooking.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MessageComponent } from './message/message.component';
-import { HelpsComponent } from './helps/helps.component'; 
+import { HelpsComponent } from './helps/helps.component';
 import { SettingComponent } from './setting/setting.component';
 import { ProfileComponent } from './profile/profile.component';
 import { DetailroomComponent } from './detailroom/detailroom.component';
@@ -16,7 +16,6 @@ import { BookinghistoryComponent } from './bookinghistory/bookinghistory.compone
 import { BookingpaymentComponent } from './bookingpayment/bookingpayment.component';
 import { ThongkeComponent } from './thongke/thongke.component';
 import { QuanlyhoadonComponent } from './quanlyhoadon/quanlyhoadon.component';
-
 
 export const routes: Routes = [
   { path: '', component: HomePageComponent },
@@ -28,7 +27,7 @@ export const routes: Routes = [
   { path: 'listbooking', component: ListbookingComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'message', component: MessageComponent },
-  { path: 'helps', component: HelpsComponent }, 
+  { path: 'helps', component: HelpsComponent },
   { path: 'setting', component: SettingComponent },
   { path: 'profile', component: ProfileComponent },
   { path: 'detailroom', component: DetailroomComponent },
@@ -36,7 +35,8 @@ export const routes: Routes = [
   { path: 'bookingpayment', component: BookingpaymentComponent },
   { path: 'thongke', component: ThongkeComponent },
   { path: 'quanlyhoadon', component: QuanlyhoadonComponent },
-  { path: 'detailroom/:id', component: DetailroomComponent },
-
-  
+  {
+    path: 'detailroom/:id',
+    component: DetailroomComponent,
+  },
 ];

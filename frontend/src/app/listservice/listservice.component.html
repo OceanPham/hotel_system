@@ -65,11 +65,7 @@
 
       <div class="header-right">
         <div class="search-container">
-          <input
-            type="text"
-            placeholder="Search"
-            class="search-input"
-            [ngModel]="searchQuery()"
+          <input type="text" placeholder="Search" class="search-input" [ngModel]="searchQuery()"
             (ngModelChange)="searchQuery.set($event)">
           <i class="search-icon"></i>
         </div>
@@ -83,7 +79,9 @@
           <!-- User Profile with Dropdown -->
           <div class="user-profile-container" [class.open]="showUserDropdown()">
             <div class="user-profile" (click)="toggleUserDropdown($event)">
-              <img [src]="'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face&auto=format'"  class="user-avatar">
+              <img
+                [src]="'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face&auto=format'"
+                class="user-avatar">
 
               <div class="user-info">
                 <span class="user-name">{{ userInfo().fullName }}</span>
@@ -102,7 +100,7 @@
                   <span>Profile</span>
                 </button>
                 <div class="dropdown-divider"></div>
-                <button class="dropdown-item logout" (click)="logout()"href="javascript:void(0)">
+                <button class="dropdown-item logout" (click)="logout()" href="javascript:void(0)">
                   <i class="logout-icon"></i>
                   <span>Logout</span>
                 </button>
@@ -114,142 +112,124 @@
     </header>
 
     <!-- Control Section -->
-<!-- Filter Section -->
-<section class="filter-section">
-  <div class="filter-header">
-    <h3>Danh sách dịch vụ</h3>
-  </div>
+    <!-- Filter Section -->
+    <section class="filter-section">
+      <div class="filter-header">
+        <h3>Danh sách dịch vụ</h3>
+      </div>
 
-  <div class="filter-controls">
-    <div class="filter-group">
-      <label for="search">Tìm kiếm</label>
-      <input
-        id="search"
-        type="text"
-        placeholder="Tìm theo tên dịch vụ"
-        class="filter-select"
-        [ngModel]="searchQuery()"
-        (ngModelChange)="searchQuery.set($event)"
-        (input)="onFilterChange()">
-    </div>
+      <div class="filter-controls">
+        <div class="filter-group">
+          <label for="search">Tìm kiếm</label>
+          <input id="search" type="text" placeholder="Tìm theo tên dịch vụ" class="filter-select"
+            [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" (input)="onFilterChange()">
+        </div>
 
-    <div class="filter-group">
-      <label for="priceRange">Khoảng giá</label>
-      <select
-        id="priceRange"
-        class="filter-select"
-        [ngModel]="selectedPriceRange()"
-        (ngModelChange)="selectedPriceRange.set($event)"
-        (change)="onFilterChange()">
-        <option value="">Tất cả</option>
-        <option value="under-100k">Dưới 100,000đ</option>
-        <option value="100k-500k">100,000đ - 500,000đ</option>
-        <option value="500k-1m">500,000đ - 1,000,000đ</option>
-        <option value="over-1m">Trên 1,000,000đ</option>
-      </select>
-    </div>
+        <div class="filter-group">
+          <label for="priceRange">Khoảng giá</label>
+          <select id="priceRange" class="filter-select" [ngModel]="selectedPriceRange()"
+            (ngModelChange)="selectedPriceRange.set($event)" (change)="onFilterChange()">
+            <option value="">Tất cả</option>
+            <option value="under-100k">Dưới 100,000đ</option>
+            <option value="100k-500k">100,000đ - 500,000đ</option>
+            <option value="500k-1m">500,000đ - 1,000,000đ</option>
+            <option value="over-1m">Trên 1,000,000đ</option>
+          </select>
+        </div>
 
-    <div class="filter-group">
-      <label for="serviceType">Loại dịch vụ</label>
-      <select
-        id="serviceType"
-        class="filter-select"
-        [ngModel]="selectedServiceType()"
-        (ngModelChange)="selectedServiceType.set($event)"
-        (change)="onFilterChange()">
-        <option value="">Tất cả loại</option>
-        <option value="food">Ăn uống</option>
-        <option value="spa">Spa & Massage</option>
-        <option value="transport">Vận chuyển</option>
-        <option value="entertainment">Giải trí</option>
-        <option value="other">Khác</option>
-      </select>
-    </div>
+        <div class="filter-group">
+          <label for="serviceType">Loại dịch vụ</label>
+          <select id="serviceType" class="filter-select" [ngModel]="selectedServiceType()"
+            (ngModelChange)="selectedServiceType.set($event)" (change)="onFilterChange()">
+            <option value="">Tất cả loại</option>
+            <option value="food">Ăn uống</option>
+            <option value="spa">Spa & Massage</option>
+            <option value="transport">Vận chuyển</option>
+            <option value="entertainment">Giải trí</option>
+            <option value="other">Khác</option>
+          </select>
+        </div>
 
-    <button class="refresh-btn" (click)="refreshData()" title="Làm mới">
-      <i class="refresh-icon"></i>
-    </button>
-  </div>
-</section>
+        <button class="refresh-btn" (click)="refreshData()" title="Làm mới">
+          <i class="refresh-icon"></i>
+        </button>
+      </div>
+    </section>
 
-<!-- Control Section for Add Button -->
-<section class="control-section">
-  <div class="control-left"></div>
-  <div class="control-right">
-    <button class="add-service-btn" (click)="openAddModal()">
-      <i class="add-icon"></i>
-      Thêm dịch vụ
-    </button>
-  </div>
-</section>
+    <!-- Control Section for Add Button -->
+    <section class="control-section">
+      <div class="control-left"></div>
+      <div class="control-right">
+        <button class="add-service-btn" (click)="openAddModal()">
+          <i class="add-icon"></i>
+          Thêm dịch vụ
+        </button>
+      </div>
+    </section>
 
     <!-- Service Table -->
     <section class="service-table-section">
       <div class="table-container">
         <table class="service-table">
           <thead>
-          <tr>
-            <th>STT</th>
-            <th>Tên dịch vụ</th>
-            <th>Ảnh</th>
-            <th>Giá</th>
-            <th>Mô tả</th>
-            <th>Hành động</th>
-          </tr>
+            <tr>
+              <th>STT</th>
+              <th>Tên dịch vụ</th>
+              <th>Ảnh</th>
+              <th>Giá</th>
+              <th>Mô tả</th>
+              <th>Hành động</th>
+            </tr>
           </thead>
           <tbody>
-          <tr *ngFor="let service of paginatedServices(); let i = index" class="service-row">
-            <td>{{ (currentPage() - 1) * itemsPerPage() + i + 1 }}</td>
-            <td>{{ service.name }}</td>
-            <td>
-              <img
-                *ngIf="service.imageUrl"
-                [src]="'http://localhost:8080' + service.imageUrl"
-                alt="Ảnh dịch vụ"
-                style="width: 60px; height: auto; border-radius: 4px;" />
+            <tr *ngFor="let service of paginatedServices(); let i = index" class="service-row">
+              <td>{{ (currentPage() - 1) * itemsPerPage() + i + 1 }}</td>
+              <td>{{ service.name }}</td>
+              <td>
+                <img *ngIf="service.imageUrl" [src]="'${API_URL}' + service.imageUrl" alt="Ảnh dịch vụ"
+                  style="width: 60px; height: auto; border-radius: 4px;" />
 
-              <ng-template #noImage>
-                <span style="color: gray; font-style: italic;">Không có ảnh</span>
-              </ng-template>
-            </td>
-            <td>{{ formatPrice(service.price) }}</td>
-            <td>{{ service.description || '—' }}</td>
-            <td>
-              <div class="action-buttons">
-                <button class="action-btn edit-btn" (click)="openEditModal(service)" title="Chỉnh sửa">
-                  <i class="edit-icon"></i>
-                </button>
-                <button class="action-btn delete-btn" (click)="confirmDelete(service)" title="Xóa">
-                  <i class="delete-icon"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
+                <ng-template #noImage>
+                  <span style="color: gray; font-style: italic;">Không có ảnh</span>
+                </ng-template>
+              </td>
+              <td>{{ formatPrice(service.price) }}</td>
+              <td>{{ service.description || '—' }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="action-btn edit-btn" (click)="openEditModal(service)" title="Chỉnh sửa">
+                    <i class="edit-icon"></i>
+                  </button>
+                  <button class="action-btn delete-btn" (click)="confirmDelete(service)" title="Xóa">
+                    <i class="delete-icon"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
 
       <!-- Pagination -->
       <div class="pagination">
-    <span class="pagination-info">
-      Hiển thị {{ (currentPage() - 1) * itemsPerPage() + 1 }} -
-      {{ currentPage() * itemsPerPage() > filteredServices().length ? filteredServices().length : currentPage() * itemsPerPage() }}
-      của {{ filteredServices().length }} dịch vụ
-    </span>
+        <span class="pagination-info">
+          Hiển thị {{ (currentPage() - 1) * itemsPerPage() + 1 }} -
+          {{ currentPage() * itemsPerPage() > filteredServices().length ? filteredServices().length : currentPage() *
+          itemsPerPage() }}
+          của {{ filteredServices().length }} dịch vụ
+        </span>
         <div class="pagination-controls">
           <button class="pagination-btn" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
             <i class="arrow-left"></i>
           </button>
           <span class="page-numbers">
-        <button
-          *ngFor="let page of getPageNumbers()"
-          class="page-btn"
-          [class.active]="page === currentPage()"
-          (click)="goToPage(page)">
-          {{ page }}
-        </button>
-      </span>
-          <button class="pagination-btn" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
+            <button *ngFor="let page of getPageNumbers()" class="page-btn" [class.active]="page === currentPage()"
+              (click)="goToPage(page)">
+              {{ page }}
+            </button>
+          </span>
+          <button class="pagination-btn" [disabled]="currentPage() === totalPages()"
+            (click)="goToPage(currentPage() + 1)">
             <i class="arrow-right"></i>
           </button>
         </div>
@@ -279,7 +259,8 @@
 
           <div class="form-group">
             <label>Mô tả:</label>
-            <textarea class="form-textarea" placeholder="Mô tả về dịch vụ..." [(ngModel)]="newService().description"></textarea>
+            <textarea class="form-textarea" placeholder="Mô tả về dịch vụ..."
+              [(ngModel)]="newService().description"></textarea>
           </div>
 
           <div class="form-group">
@@ -320,7 +301,8 @@
 
           <div class="form-group">
             <label>Mô tả:</label>
-            <textarea class="form-textarea" placeholder="Mô tả về dịch vụ..." [(ngModel)]="editingService().description"></textarea>
+            <textarea class="form-textarea" placeholder="Mô tả về dịch vụ..."
+              [(ngModel)]="editingService().description"></textarea>
           </div>
 
           <div class="form-group">

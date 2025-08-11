@@ -7,13 +7,14 @@ import {
   signal,
   OnDestroy,
   HostListener,
-  inject
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import {AuthService} from '../services/auth.service';
+import { AuthService } from '../services/auth.service';
+import { API_URL } from '../../constants';
 
 interface DashboardData {
   totalRooms: number;
@@ -46,10 +47,9 @@ interface Invoice {
   totalAmount: number;
   createdAt: string;
   status: string;
-  fullName: string;     // 👈 Trực tiếp từ DTO
-  roomNumber: string;   // 👈 Trực tiếp từ DTO
+  fullName: string; // 👈 Trực tiếp từ DTO
+  roomNumber: string; // 👈 Trực tiếp từ DTO
 }
-
 
 interface LoggedInUser {
   fullName: string;
@@ -62,7 +62,7 @@ function isBrowser(): boolean {
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('pieChart') pieChartRef!: ElementRef<HTMLCanvasElement>;
@@ -86,7 +86,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     totalServices: 0,
     popularServiceCount: 0,
     totalInvoices: 0,
-    totalRevenue: 0
+    totalRevenue: 0,
   });
 
   dashboardDataForChart = signal<DashboardData>({
@@ -96,23 +96,76 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     totalServices: 0,
     popularServiceCount: 0,
     totalInvoices: 0,
-    totalRevenue: 0
+    totalRevenue: 0,
   });
   invoices = signal<Invoice[]>([]);
 
   services = signal<Service[]>([
-    { id: 1, name: 'Ăn nhanh', usage: 12, percentage: 85, type: 'food', emoji: '🍽️' },
-    { id: 2, name: 'Dọn phòng', usage: 9, percentage: 75, type: 'cleaning', emoji: '🧹' },
-    { id: 3, name: 'Giặt ủi', usage: 6, percentage: 50, type: 'laundry', emoji: '👕' },
-    { id: 4, name: 'Spa & Massage', usage: 4, percentage: 35, type: 'spa', emoji: '💆' }
+    {
+      id: 1,
+      name: 'Ăn nhanh',
+      usage: 12,
+      percentage: 85,
+      type: 'food',
+      emoji: '🍽️',
+    },
+    {
+      id: 2,
+      name: 'Dọn phòng',
+      usage: 9,
+      percentage: 75,
+      type: 'cleaning',
+      emoji: '🧹',
+    },
+    {
+      id: 3,
+      name: 'Giặt ủi',
+      usage: 6,
+      percentage: 50,
+      type: 'laundry',
+      emoji: '👕',
+    },
+    {
+      id: 4,
+      name: 'Spa & Massage',
+      usage: 4,
+      percentage: 35,
+      type: 'spa',
+      emoji: '💆',
+    },
   ]);
 
   activities = signal<Activity[]>([
-    { id: 1, text: 'Khách hàng check-in phòng 203', time: '3 phút trước', emoji: '👤' },
-    { id: 2, text: 'Đặt dịch vụ ăn nhanh - phòng 107', time: '12 phút trước', emoji: '🛎️' },
-    { id: 3, text: 'Hoàn thành dọn phòng 305', time: '25 phút trước', emoji: '🧹' },
-    { id: 4, text: 'Khách hàng check-out phòng 152', time: '45 phút trước', emoji: '📤' },
-    { id: 5, text: 'Thanh toán hóa đơn #HD-2024-156', time: '1 giờ trước', emoji: '💳' }
+    {
+      id: 1,
+      text: 'Khách hàng check-in phòng 203',
+      time: '3 phút trước',
+      emoji: '👤',
+    },
+    {
+      id: 2,
+      text: 'Đặt dịch vụ ăn nhanh - phòng 107',
+      time: '12 phút trước',
+      emoji: '🛎️',
+    },
+    {
+      id: 3,
+      text: 'Hoàn thành dọn phòng 305',
+      time: '25 phút trước',
+      emoji: '🧹',
+    },
+    {
+      id: 4,
+      text: 'Khách hàng check-out phòng 152',
+      time: '45 phút trước',
+      emoji: '📤',
+    },
+    {
+      id: 5,
+      text: 'Thanh toán hóa đơn #HD-2024-156',
+      time: '1 giờ trước',
+      emoji: '💳',
+    },
   ]);
 
   constructor(private router: Router) {
@@ -126,40 +179,52 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       if (local) {
         const parsed = JSON.parse(local);
         this.userInfo.set({
-          fullName: parsed.fullName || ''
+          fullName: parsed.fullName || '',
         });
       }
     }
   }
 
   userInfo = signal<LoggedInUser>({
-    fullName: ''
+    fullName: '',
   });
   ngAfterViewInit(): void {}
 
   ngOnDestroy(): void {}
 
   private fetchDashboardCounts(): void {
-    const rooms$ = this.http.get<any>('http://localhost:8080/api/v1/rooms');
-    const services$ = this.http.get<any>('http://localhost:8080/api/v1/hotel-services');
-    const includeds$ = this.http.get<any>('http://localhost:8080/api/v1/includeds');
-    const invoices$ = this.http.get<any>('http://localhost:8080/api/v1/payment-invoices/with-booking');
-    const bookings$ = this.http.get<any>('http://localhost:8080/api/bookings');
+    const rooms$ = this.http.get<any>(`${API_URL}/api/v1/rooms`);
+    const services$ = this.http.get<any>(`${API_URL}/api/v1/hotel-services`);
+    const includeds$ = this.http.get<any>(`${API_URL}/api/v1/includeds`);
+    const invoices$ = this.http.get<any>(
+      `${API_URL}/api/v1/payment-invoices/with-booking`
+    );
+    const bookings$ = this.http.get<any>(`${API_URL}/api/bookings`);
 
     rooms$.subscribe((res) => {
       const rooms = res.data ?? [];
-      const totalRooms = rooms.filter((r: any) => r.status !== 'Inactive').length;
-      const occupiedRooms = rooms.filter((r: any) => r.status === 'Booked').length;
-      const availableRooms = rooms.filter((r: any) => r.status === 'Vacant').length;
-      this.dashboardData.update(data => ({
-        ...data, totalRooms, occupiedRooms, availableRooms
+      const totalRooms = rooms.filter(
+        (r: any) => r.status !== 'Inactive'
+      ).length;
+      const occupiedRooms = rooms.filter(
+        (r: any) => r.status === 'Booked'
+      ).length;
+      const availableRooms = rooms.filter(
+        (r: any) => r.status === 'Vacant'
+      ).length;
+      this.dashboardData.update((data) => ({
+        ...data,
+        totalRooms,
+        occupiedRooms,
+        availableRooms,
       }));
     });
 
     services$.subscribe((res) => {
       const totalServices = res.data?.length ?? 0;
-      this.dashboardData.update(data => ({
-        ...data, totalServices
+      this.dashboardData.update((data) => ({
+        ...data,
+        totalServices,
       }));
     });
 
@@ -170,8 +235,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         usageMap.set(i.serviceId, (usageMap.get(i.serviceId) ?? 0) + 1);
       });
       const mostUsedCount = Math.max(...Array.from(usageMap.values()), 0);
-      this.dashboardData.update(data => ({
-        ...data, popularServiceCount: mostUsedCount
+      this.dashboardData.update((data) => ({
+        ...data,
+        popularServiceCount: mostUsedCount,
       }));
     });
 
@@ -179,14 +245,16 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       const invoices = res.data ?? [];
       this.invoices.set(invoices);
 
-      const totalRevenue = invoices.reduce((sum: number, inv: any) => sum + inv.totalAmount, 0);
-      this.dashboardData.update(data => ({
+      const totalRevenue = invoices.reduce(
+        (sum: number, inv: any) => sum + inv.totalAmount,
+        0
+      );
+      this.dashboardData.update((data) => ({
         ...data,
         totalInvoices: invoices.length,
-        totalRevenue
+        totalRevenue,
       }));
     });
-
 
     bookings$.subscribe((res) => {
       const bookings = res.data ?? [];
@@ -197,10 +265,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
       const occupiedRooms = activeRoomIds.size;
-      this.dashboardData.update(data => ({
+      this.dashboardData.update((data) => ({
         ...data,
         occupiedRooms,
-        availableRooms: data.totalRooms - occupiedRooms
+        availableRooms: data.totalRooms - occupiedRooms,
       }));
 
       // Khởi tạo dữ liệu cho biểu đồ
@@ -241,7 +309,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showToastMessage({
       type: 'success',
       title: 'Đăng xuất thành công',
-      message: 'Bạn đã đăng xuất khỏi hệ thống'
+      message: 'Bạn đã đăng xuất khỏi hệ thống',
     });
     setTimeout(() => {
       this.router.navigate(['/login']);
@@ -254,11 +322,16 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showToastMessage({
       type: 'info',
       title: 'Chuyển hướng',
-      message: 'Đang chuyển đến trang profile...'
+      message: 'Đang chuyển đến trang profile...',
     });
   }
 
-  showToastMessage(config: { type: 'success' | 'error' | 'warning' | 'info'; title: string; message: string; duration?: number }): void {
+  showToastMessage(config: {
+    type: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+    duration?: number;
+  }): void {
     this.toastType.set(config.type);
     this.toastTitle.set(config.title);
     this.toastMessage.set(config.message);
@@ -277,7 +350,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       success: 'toast-success-icon',
       error: 'toast-error-icon',
       warning: 'toast-warning-icon',
-      info: 'toast-info-icon'
+      info: 'toast-info-icon',
     };
     return icons[this.toastType()] || icons.info;
   }
@@ -299,11 +372,23 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const base = this.dashboardData();
     switch (period) {
       case 'today':
-        return { ...base, occupiedRooms: 8, availableRooms: base.totalRooms - 8 };
+        return {
+          ...base,
+          occupiedRooms: 8,
+          availableRooms: base.totalRooms - 8,
+        };
       case 'week':
-        return { ...base, occupiedRooms: 9, availableRooms: base.totalRooms - 9 };
+        return {
+          ...base,
+          occupiedRooms: 9,
+          availableRooms: base.totalRooms - 9,
+        };
       case 'month':
-        return { ...base, occupiedRooms: 10, availableRooms: base.totalRooms - 10 };
+        return {
+          ...base,
+          occupiedRooms: 10,
+          availableRooms: base.totalRooms - 10,
+        };
       default:
         return base;
     }
@@ -329,7 +414,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const data = this.dashboardDataForChart();
     const chartData = [
       { label: 'Phòng đã đặt', value: data.occupiedRooms, color: '#4f46e5' },
-      { label: 'Phòng trống', value: data.availableRooms, color: '#94a3b8' }
+      { label: 'Phòng trống', value: data.availableRooms, color: '#94a3b8' },
     ];
 
     const total = chartData.reduce((sum, item) => sum + item.value, 0);
@@ -348,13 +433,32 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     let currentAngle = -Math.PI / 2;
-    chartData.forEach(item => {
+    chartData.forEach((item) => {
       const sliceAngle = (item.value / total) * 2 * Math.PI;
       ctx.beginPath();
-      ctx.moveTo(centerX + Math.cos(currentAngle) * innerRadius, centerY + Math.sin(currentAngle) * innerRadius);
-      ctx.arc(centerX, centerY, outerRadius, currentAngle, currentAngle + sliceAngle);
-      ctx.lineTo(centerX + Math.cos(currentAngle + sliceAngle) * innerRadius, centerY + Math.sin(currentAngle + sliceAngle) * innerRadius);
-      ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
+      ctx.moveTo(
+        centerX + Math.cos(currentAngle) * innerRadius,
+        centerY + Math.sin(currentAngle) * innerRadius
+      );
+      ctx.arc(
+        centerX,
+        centerY,
+        outerRadius,
+        currentAngle,
+        currentAngle + sliceAngle
+      );
+      ctx.lineTo(
+        centerX + Math.cos(currentAngle + sliceAngle) * innerRadius,
+        centerY + Math.sin(currentAngle + sliceAngle) * innerRadius
+      );
+      ctx.arc(
+        centerX,
+        centerY,
+        innerRadius,
+        currentAngle + sliceAngle,
+        currentAngle,
+        true
+      );
       ctx.closePath();
       ctx.fillStyle = item.color;
       ctx.fill();
@@ -374,27 +478,36 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND',
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(amount);
   }
 
-
-
   getPageTitle(): string {
     switch (this.currentRoute()) {
-      case '/dashboard': return 'Dashboard';
-      case '/listroom': return 'Quản lý Phòng';
-      case '/listbooking': return 'Đơn đặt phòng';
-      case '/listservice': return 'Dịch vụ';
-      case '/message': return 'Tin nhắn';
-      case '/help': return 'Trợ giúp';
-      case '/setting': return 'Cài đặt';
-      default: return 'Dashboard';
+      case '/dashboard':
+        return 'Dashboard';
+      case '/listroom':
+        return 'Quản lý Phòng';
+      case '/listbooking':
+        return 'Đơn đặt phòng';
+      case '/listservice':
+        return 'Dịch vụ';
+      case '/message':
+        return 'Tin nhắn';
+      case '/help':
+        return 'Trợ giúp';
+      case '/setting':
+        return 'Cài đặt';
+      default:
+        return 'Dashboard';
     }
   }
 
   isActiveRoute(route: string): boolean {
-    return this.currentRoute() === route || (route === '/dashboard' && this.currentRoute() === '/');
+    return (
+      this.currentRoute() === route ||
+      (route === '/dashboard' && this.currentRoute() === '/')
+    );
   }
 
   setActiveRoute(route: string): void {
@@ -415,7 +528,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   }
 
@@ -427,7 +540,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       '/listservice': '🛎️',
       '/message': '💬',
       '/help': '❓',
-      '/setting': '⚙️'
+      '/setting': '⚙️',
     } as const;
 
     type RouteKey = keyof typeof map;
@@ -437,26 +550,36 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   private mapStatus(status: string): 'paid' | 'pending' | 'cancelled' {
     switch (status.toLowerCase()) {
-      case 'paid': return 'paid';
-      case 'unpaid': return 'pending'; // Hoặc 'cancelled' nếu bạn muốn
-      default: return 'pending';
+      case 'paid':
+        return 'paid';
+      case 'unpaid':
+        return 'pending'; // Hoặc 'cancelled' nếu bạn muốn
+      default:
+        return 'pending';
     }
   }
   exportInvoices(): void {
     try {
-      const headers = ['Mã hóa đơn', 'Tên khách hàng', 'Số phòng', 'Số tiền', 'Ngày tạo', 'Trạng thái'];
+      const headers = [
+        'Mã hóa đơn',
+        'Tên khách hàng',
+        'Số phòng',
+        'Số tiền',
+        'Ngày tạo',
+        'Trạng thái',
+      ];
 
-      const rows = this.invoices().map(invoice => [
+      const rows = this.invoices().map((invoice) => [
         invoice.id,
-        invoice.fullName ?? 'Không rõ',      // ✅ Trực tiếp từ DTO
-        invoice.roomNumber ?? 'Không rõ',    // ✅ Trực tiếp từ DTO
+        invoice.fullName ?? 'Không rõ', // ✅ Trực tiếp từ DTO
+        invoice.roomNumber ?? 'Không rõ', // ✅ Trực tiếp từ DTO
         this.formatCurrency(invoice.totalAmount),
         new Date(invoice.createdAt).toLocaleDateString('vi-VN'),
-        this.getStatusText(this.mapStatus(invoice.status)) // ✅ status có thể là "Paid"/"Unpaid"
+        this.getStatusText(this.mapStatus(invoice.status)), // ✅ status có thể là "Paid"/"Unpaid"
       ]);
 
       const content = [headers, ...rows]
-        .map(row => row.map(c => `"${c}"`).join(','))
+        .map((row) => row.map((c) => `"${c}"`).join(','))
         .join('\n');
 
       this.downloadCSV('\uFEFF' + content, 'tong-so-hoa-don.csv');
@@ -464,14 +587,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showToastMessage({
         type: 'success',
         title: 'Xuất thành công',
-        message: 'Đã xuất tổng số hóa đơn!'
+        message: 'Đã xuất tổng số hóa đơn!',
       });
     } catch (error) {
       console.error(error);
       this.showToastMessage({
         type: 'error',
         title: 'Lỗi',
-        message: 'Không thể xuất hóa đơn!'
+        message: 'Không thể xuất hóa đơn!',
       });
     }
   }
@@ -487,14 +610,28 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         ['Tổng dịch vụ', data.totalServices.toString(), 'Dịch vụ cung cấp'],
         ['Tổng hóa đơn', data.totalInvoices.toString(), 'Hóa đơn đã xuất'],
         ['Doanh thu', this.formatCurrency(data.totalRevenue), 'Tổng thu nhập'],
-        ['Tỷ lệ lấp đầy', `${this.getOccupancyPercentage()}%`, 'Biểu đồ hiện tại'],
-        ['Ngày xuất', new Date().toLocaleString('vi-VN'), 'Thời gian hệ thống']
+        [
+          'Tỷ lệ lấp đầy',
+          `${this.getOccupancyPercentage()}%`,
+          'Biểu đồ hiện tại',
+        ],
+        ['Ngày xuất', new Date().toLocaleString('vi-VN'), 'Thời gian hệ thống'],
       ];
-      const content = [headers, ...rows].map(row => row.map(c => `"${c}"`).join(',')).join('\n');
+      const content = [headers, ...rows]
+        .map((row) => row.map((c) => `"${c}"`).join(','))
+        .join('\n');
       this.downloadCSV('\uFEFF' + content, 'dashboard.csv');
-      this.showToastMessage({ type: 'success', title: 'Xuất thành công', message: 'Đã xuất file thống kê!' });
+      this.showToastMessage({
+        type: 'success',
+        title: 'Xuất thành công',
+        message: 'Đã xuất file thống kê!',
+      });
     } catch {
-      this.showToastMessage({ type: 'error', title: 'Lỗi', message: 'Không thể xuất thống kê!' });
+      this.showToastMessage({
+        type: 'error',
+        title: 'Lỗi',
+        message: 'Không thể xuất thống kê!',
+      });
     }
   }
 
@@ -512,9 +649,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const map = {
       paid: 'Đã thanh toán',
       pending: 'Đang xử lý',
-      cancelled: 'Đã hủy'
+      cancelled: 'Đã hủy',
     };
     return map[status] || 'Không xác định';
   }
-
 }

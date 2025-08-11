@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { API_URL } from '../../constants';
 
 @Component({
   selector: 'app-changepassword',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './changepassword.component.html',
-  styleUrl: './changepassword.component.css'
+  styleUrl: './changepassword.component.css',
 })
 export class ChangePasswordComponent {
   username = '';
@@ -20,7 +21,7 @@ export class ChangePasswordComponent {
   message = '';
   messageType: 'success' | 'error' | '' = '';
 
-  readonly apiBaseUrl = 'http://localhost:8080/api/users';
+  readonly apiBaseUrl = `${API_URL}/api/users`;
 
   constructor(private http: HttpClient, private router: Router) {
     // ✅ Lấy username từ localStorage sau khi đăng nhập
@@ -43,17 +44,21 @@ export class ChangePasswordComponent {
 
     const payload = {
       oldPassword: this.oldPassword,
-      newPassword: this.newPassword
+      newPassword: this.newPassword,
     };
 
-    this.http.put(`${this.apiBaseUrl}/${this.username}/change-password`, payload)
+    this.http
+      .put(`${this.apiBaseUrl}/${this.username}/change-password`, payload)
       .subscribe({
         next: (res: any) => {
           if (res.status === 'SUCCESS') {
             this.showMessage('✅ Đổi mật khẩu thành công', 'success');
             setTimeout(() => this.router.navigate(['/profile']), 2000);
           } else {
-            this.showMessage(res.message || '❌ Đổi mật khẩu thất bại', 'error');
+            this.showMessage(
+              res.message || '❌ Đổi mật khẩu thất bại',
+              'error'
+            );
           }
         },
         error: (err: HttpErrorResponse) => {
@@ -64,7 +69,7 @@ export class ChangePasswordComponent {
           } else {
             this.showMessage('❌ Lỗi hệ thống, vui lòng thử lại', 'error');
           }
-        }
+        },
       });
   }
 

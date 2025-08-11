@@ -22,6 +22,7 @@ import { HostListener } from '@angular/core';
 import type { ChartConfiguration, ChartType, TooltipItem } from 'chart.js';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { API_URL } from '../../constants';
 
 interface ThongkeData {
   totalInvoices: number;
@@ -125,7 +126,7 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   userInfo = signal<LoggedInUser>({
     fullName: '',
-    role: ''
+    role: '',
   });
 
   // Trend data
@@ -147,7 +148,7 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
         const parsed = JSON.parse(local);
         this.userInfo.set({
           fullName: parsed.fullName || '',
-          role: parsed.role || ''
+          role: parsed.role || '',
         });
       }
     }
@@ -164,14 +165,23 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   fetchThongkeDataFromApi(): void {
-    this.http.get<any>('http://localhost:8080/api/v1/payment-invoices').subscribe({
+    this.http.get<any>(`${API_URL}/api/v1/payment-invoices`).subscribe({
       next: (res) => {
         const data = res.data ?? [];
 
         const totalInvoices = data.length;
-        const totalRoomCost = data.reduce((sum: number, i: any) => sum + (i.roomAmount || 0), 0);
-        const totalServiceCost = data.reduce((sum: number, i: any) => sum + (i.serviceAmount || 0), 0);
-        const totalRevenue = data.reduce((sum: number, i: any) => sum + (i.totalAmount || 0), 0);
+        const totalRoomCost = data.reduce(
+          (sum: number, i: any) => sum + (i.roomAmount || 0),
+          0
+        );
+        const totalServiceCost = data.reduce(
+          (sum: number, i: any) => sum + (i.serviceAmount || 0),
+          0
+        );
+        const totalRevenue = data.reduce(
+          (sum: number, i: any) => sum + (i.totalAmount || 0),
+          0
+        );
 
         this.thongkeData.set({
           totalInvoices,
@@ -182,7 +192,11 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
 
         // Tính toán chi phí hôm nay
         const today = new Date();
-        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const todayStart = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate()
+        );
         const todayExpenseValue = data
           .filter((item: any) => {
             const itemDate = new Date(item.createdAt);
@@ -199,26 +213,32 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
           byMonth.set(key, (byMonth.get(key) || 0) + item.totalAmount);
         }
 
-        const monthly: MonthlyExpense[] = Array.from(byMonth.entries()).map(([month, amount]) => ({
-          month,
-          amount,
-          date: new Date(`2025-${month.substring(1)}-01`),
-        }));
+        const monthly: MonthlyExpense[] = Array.from(byMonth.entries()).map(
+          ([month, amount]) => ({
+            month,
+            amount,
+            date: new Date(`2025-${month.substring(1)}-01`),
+          })
+        );
 
-        this.monthlyExpenses.set(monthly.sort((a, b) => a.date.getTime() - b.date.getTime()));
+        this.monthlyExpenses.set(
+          monthly.sort((a, b) => a.date.getTime() - b.date.getTime())
+        );
         this.updateChart();
 
         // Gọi lấy dữ liệu kỳ trước sau khi có dữ liệu hiện tại
         this.fetchPreviousPeriodData();
 
         // Cập nhật notifications
-        this.notifications.set([{
-          id: 2,
-          message: `Đã tải thành công ${totalInvoices} hóa đơn từ hệ thống`,
-          time: new Date(),
-          read: false,
-          type: 'success',
-        }]);
+        this.notifications.set([
+          {
+            id: 2,
+            message: `Đã tải thành công ${totalInvoices} hóa đơn từ hệ thống`,
+            time: new Date(),
+            read: false,
+            type: 'success',
+          },
+        ]);
       },
       error: () => {
         this.showToastMessage({
@@ -236,30 +256,57 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
     const lastMonth = new Date();
     lastMonth.setMonth(lastMonth.getMonth() - 1);
 
-    this.http.get<any>(`http://localhost:8080/api/v1/payment-invoices?month=${lastMonth.getMonth() + 1}&year=${lastMonth.getFullYear()}`).subscribe({
-      next: (res) => {
-        const previousData = res.data ?? [];
-        const prevTotalInvoices = previousData.length;
-        const prevTotalRoomCost = previousData.reduce((sum: number, i: any) => sum + (i.roomAmount || 0), 0);
-        const prevTotalServiceCost = previousData.reduce((sum: number, i: any) => sum + (i.serviceAmount || 0), 0);
-        const prevTotalRevenue = previousData.reduce((sum: number, i: any) => sum + (i.totalAmount || 0), 0);
+    this.http
+      .get<any>(
+        `${API_URL}/api/v1/payment-invoices?month=${
+          lastMonth.getMonth() + 1
+        }&year=${lastMonth.getFullYear()}`
+      )
+      .subscribe({
+        next: (res) => {
+          const previousData = res.data ?? [];
+          const prevTotalInvoices = previousData.length;
+          const prevTotalRoomCost = previousData.reduce(
+            (sum: number, i: any) => sum + (i.roomAmount || 0),
+            0
+          );
+          const prevTotalServiceCost = previousData.reduce(
+            (sum: number, i: any) => sum + (i.serviceAmount || 0),
+            0
+          );
+          const prevTotalRevenue = previousData.reduce(
+            (sum: number, i: any) => sum + (i.totalAmount || 0),
+            0
+          );
 
-        // Cập nhật trend data với dữ liệu thực của kỳ trước
-        const currentData = this.thongkeData();
-        this.trendData = {
-          invoice: { current: currentData.totalInvoices, previous: prevTotalInvoices },
-          room: { current: currentData.totalRoomCost, previous: prevTotalRoomCost },
-          service: { current: currentData.totalServiceCost, previous: prevTotalServiceCost },
-          revenue: { current: currentData.totalRevenue, previous: prevTotalRevenue },
-        };
+          // Cập nhật trend data với dữ liệu thực của kỳ trước
+          const currentData = this.thongkeData();
+          this.trendData = {
+            invoice: {
+              current: currentData.totalInvoices,
+              previous: prevTotalInvoices,
+            },
+            room: {
+              current: currentData.totalRoomCost,
+              previous: prevTotalRoomCost,
+            },
+            service: {
+              current: currentData.totalServiceCost,
+              previous: prevTotalServiceCost,
+            },
+            revenue: {
+              current: currentData.totalRevenue,
+              previous: prevTotalRevenue,
+            },
+          };
 
-        console.log('Updated trend data:', this.trendData);
-      },
-      error: (err) => {
-        console.error('Lỗi khi lấy dữ liệu kỳ trước:', err);
-        // Giữ nguyên trend data mặc định nếu lỗi
-      }
-    });
+          console.log('Updated trend data:', this.trendData);
+        },
+        error: (err) => {
+          console.error('Lỗi khi lấy dữ liệu kỳ trước:', err);
+          // Giữ nguyên trend data mặc định nếu lỗi
+        },
+      });
   }
 
   updateChart(): void {
@@ -274,7 +321,12 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chart = new Chart(ctx, {
       type: this.chartType(),
       data: {
-        labels: ['Số hóa đơn', 'Chi phí phòng', 'Chi phí dịch vụ', 'Tổng doanh thu'],
+        labels: [
+          'Số hóa đơn',
+          'Chi phí phòng',
+          'Chi phí dịch vụ',
+          'Tổng doanh thu',
+        ],
         datasets: [
           {
             label: 'Thống kê',
@@ -326,7 +378,7 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showToastMessage({
       type: 'info',
       title: 'Chuyển hướng',
-      message: 'Đang chuyển đến trang hồ sơ cá nhân...'
+      message: 'Đang chuyển đến trang hồ sơ cá nhân...',
     });
   }
 
@@ -335,7 +387,7 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showToastMessage({
       type: 'info',
       title: 'Thay đổi giao diện',
-      message: 'Tính năng đang được phát triển...'
+      message: 'Tính năng đang được phát triển...',
     });
   }
   logout(): void {
@@ -351,7 +403,7 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showToastMessage({
       type: 'success',
       title: 'Đăng xuất thành công',
-      message: 'Bạn đã đăng xuất khỏi hệ thống'
+      message: 'Bạn đã đăng xuất khỏi hệ thống',
     });
 
     setTimeout(() => {
@@ -377,7 +429,7 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   markAsRead(notificationId: number): void {
     const notifications = this.notifications();
-    const updated = notifications.map(n =>
+    const updated = notifications.map((n) =>
       n.id === notificationId ? { ...n, read: true } : n
     );
     this.notifications.set(updated);
@@ -389,13 +441,15 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showToastMessage({
       type: 'success',
       title: 'Đã xóa',
-      message: 'Đã xóa tất cả thông báo'
+      message: 'Đã xóa tất cả thông báo',
     });
   }
 
   closeNotificationsIfClickOutside(event: MouseEvent): void {
     const target = event.target as HTMLElement;
-    const isInside = target.closest('.notification-btn, .notifications-dropdown');
+    const isInside = target.closest(
+      '.notification-btn, .notifications-dropdown'
+    );
     if (!isInside) {
       this.showNotifications.set(false);
     }
@@ -413,7 +467,6 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     }
   }
-
 
   // Export methods
   showExportConfirmation(): void {
@@ -444,7 +497,7 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
         unit: 'mm',
         format: 'a4',
         putOnlyUsedFonts: true,
-        floatPrecision: 16
+        floatPrecision: 16,
       });
 
       const pageWidth = pdf.internal.pageSize.getWidth();
@@ -454,13 +507,17 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
       // Header
       pdf.setFontSize(20);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('BAO CAO HOA DON NGUOI DUNG', pageWidth / 2, yPosition, { align: 'center' });
+      pdf.text('BAO CAO HOA DON NGUOI DUNG', pageWidth / 2, yPosition, {
+        align: 'center',
+      });
 
       yPosition += 10;
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'normal');
       const currentDate = new Date().toLocaleDateString('vi-VN');
-      pdf.text(`Ngay xuat: ${currentDate}`, pageWidth / 2, yPosition, { align: 'center' });
+      pdf.text(`Ngay xuat: ${currentDate}`, pageWidth / 2, yPosition, {
+        align: 'center',
+      });
 
       yPosition += 15;
 
@@ -477,8 +534,11 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
       const summaryData = [
         ['Tong so hoa don:', data.totalInvoices.toString()],
         ['Tong tien phong:', this.formatCurrencyForPDF(data.totalRoomCost)],
-        ['Tong tien dich vu:', this.formatCurrencyForPDF(data.totalServiceCost)],
-        ['Tong doanh thu:', this.formatCurrencyForPDF(data.totalRevenue)]
+        [
+          'Tong tien dich vu:',
+          this.formatCurrencyForPDF(data.totalServiceCost),
+        ],
+        ['Tong doanh thu:', this.formatCurrencyForPDF(data.totalRevenue)],
       ];
 
       summaryData.forEach(([label, value]) => {
@@ -495,11 +555,17 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
       // Footer
       pdf.setFontSize(8);
       pdf.setFont('helvetica', 'italic');
-      pdf.text('Bao cao duoc tao tu dong boi he thong quan ly khach san',
-        pageWidth / 2, pageHeight - 10, { align: 'center' });
+      pdf.text(
+        'Bao cao duoc tao tu dong boi he thong quan ly khach san',
+        pageWidth / 2,
+        pageHeight - 10,
+        { align: 'center' }
+      );
 
       // Lưu file
-      const fileName = this.reportName || `Bao_cao_hoa_don_${currentDate.replace(/\//g, '_')}.pdf`;
+      const fileName =
+        this.reportName ||
+        `Bao_cao_hoa_don_${currentDate.replace(/\//g, '_')}.pdf`;
       pdf.save(fileName);
 
       this.isExporting.set(false);
@@ -518,7 +584,6 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
           });
         }, 1000);
       }
-
     } catch (error) {
       console.error('Lỗi khi xuất PDF:', error);
       this.isExporting.set(false);
@@ -530,10 +595,17 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  async addInvoiceListToPDF(pdf: jsPDF, startY: number, pageWidth: number, pageHeight: number): Promise<void> {
+  async addInvoiceListToPDF(
+    pdf: jsPDF,
+    startY: number,
+    pageWidth: number,
+    pageHeight: number
+  ): Promise<void> {
     try {
       // Lấy danh sách hóa đơn từ API
-      const invoiceResponse = await this.http.get<any>('http://localhost:8080/api/v1/payment-invoices').toPromise();
+      const invoiceResponse = await this.http
+        .get<any>(`${API_URL}/api/v1/payment-invoices`)
+        .toPromise();
       const invoices: Invoice[] = invoiceResponse?.data || [];
 
       let yPosition = startY;
@@ -554,11 +626,11 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
         { text: 'Ngay tao', x: 60, width: 30 },
         { text: 'Tien phong', x: 90, width: 30 },
         { text: 'Tien DV', x: 120, width: 30 },
-        { text: 'Tong tien', x: 150, width: 30 }
+        { text: 'Tong tien', x: 150, width: 30 },
       ];
 
       // Vẽ header
-      tableHeaders.forEach(header => {
+      tableHeaders.forEach((header) => {
         pdf.text(header.text, header.x, yPosition);
       });
 
@@ -579,7 +651,7 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
 
           // Vẽ lại header cho trang mới
           pdf.setFont('helvetica', 'bold');
-          tableHeaders.forEach(header => {
+          tableHeaders.forEach((header) => {
             pdf.text(header.text, header.x, yPosition);
           });
           pdf.line(20, yPosition + 2, 180, yPosition + 2);
@@ -593,11 +665,14 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
           { text: invoice.id?.toString() || 'N/A', x: 35 },
           { text: this.formatDateForPDF(invoice.createdAt), x: 60 },
           { text: this.formatCurrencyForPDF(invoice.roomAmount || 0), x: 90 },
-          { text: this.formatCurrencyForPDF(invoice.serviceAmount || 0), x: 120 },
-          { text: this.formatCurrencyForPDF(invoice.totalAmount || 0), x: 150 }
+          {
+            text: this.formatCurrencyForPDF(invoice.serviceAmount || 0),
+            x: 120,
+          },
+          { text: this.formatCurrencyForPDF(invoice.totalAmount || 0), x: 150 },
         ];
 
-        rowData.forEach(cell => {
+        rowData.forEach((cell) => {
           pdf.text(cell.text, cell.x, yPosition);
         });
 
@@ -613,9 +688,15 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
       pdf.text(`Tong so hoa don: ${invoices.length}`, 20, yPosition);
       yPosition += 7;
 
-      const totalRevenue = invoices.reduce((sum: number, inv: Invoice) => sum + (inv.totalAmount || 0), 0);
-      pdf.text(`Tong doanh thu: ${this.formatCurrencyForPDF(totalRevenue)}`, 20, yPosition);
-
+      const totalRevenue = invoices.reduce(
+        (sum: number, inv: Invoice) => sum + (inv.totalAmount || 0),
+        0
+      );
+      pdf.text(
+        `Tong doanh thu: ${this.formatCurrencyForPDF(totalRevenue)}`,
+        20,
+        yPosition
+      );
     } catch (error) {
       console.error('Lỗi khi thêm danh sách hóa đơn:', error);
 
@@ -669,7 +750,9 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.showToastMessage({
         type: 'success',
         title: 'Lưu thành công',
-        message: `Báo cáo "${this.reportName}" đã được lưu dưới định dạng ${this.reportFormat.toUpperCase()}`,
+        message: `Báo cáo "${
+          this.reportName
+        }" đã được lưu dưới định dạng ${this.reportFormat.toUpperCase()}`,
       });
 
       if (this.autoEmail) {
@@ -692,12 +775,18 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getTimeRangeText(): string {
     switch (this.selectedTimeFilter) {
-      case 'today': return 'hôm nay';
-      case 'week': return 'tuần này';
-      case 'month': return '5 tháng gần đây';
-      case 'quarter': return 'quý này';
-      case 'year': return 'năm này';
-      default: return '5 tháng gần đây';
+      case 'today':
+        return 'hôm nay';
+      case 'week':
+        return 'tuần này';
+      case 'month':
+        return '5 tháng gần đây';
+      case 'quarter':
+        return 'quý này';
+      case 'year':
+        return 'năm này';
+      default:
+        return '5 tháng gần đây';
     }
   }
 
@@ -766,85 +855,88 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
     const config: ChartConfiguration = {
       type: this.chartType(),
       data: {
-        labels: expenses.map(item => item.month),
-        datasets: [{
-          label: 'Chi phí (tỷ đồng)',
-          data: expenses.map(item => item.amount / 1000000000),
-          backgroundColor: this.chartType() === 'bar' ?
-            ['#6366f1', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b'] :
-            'rgba(99, 102, 241, 0.2)',
-          borderColor: '#4f46e5',
-          borderWidth: 2,
-          borderRadius: this.chartType() === 'bar' ? 8 : 0,
-          borderSkipped: false,
-          fill: this.chartType() === 'line',
-          tension: this.chartType() === 'line' ? 0.4 : 0
-        }]
+        labels: expenses.map((item) => item.month),
+        datasets: [
+          {
+            label: 'Chi phí (tỷ đồng)',
+            data: expenses.map((item) => item.amount / 1000000000),
+            backgroundColor:
+              this.chartType() === 'bar'
+                ? ['#6366f1', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b']
+                : 'rgba(99, 102, 241, 0.2)',
+            borderColor: '#4f46e5',
+            borderWidth: 2,
+            borderRadius: this.chartType() === 'bar' ? 8 : 0,
+            borderSkipped: false,
+            fill: this.chartType() === 'line',
+            tension: this.chartType() === 'line' ? 0.4 : 0,
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            display: false
+            display: false,
           },
           title: {
-            display: false
+            display: false,
           },
           tooltip: {
             callbacks: {
-              label: function(context) {
+              label: function (context) {
                 return `Chi phí: ${context.parsed.y.toFixed(1)} tỷ đ`;
-              }
-            }
-          }
+              },
+            },
+          },
         },
         scales: {
           y: {
             beginAtZero: true,
             grid: {
-              color: '#f1f5f9'
+              color: '#f1f5f9',
             },
             ticks: {
-              callback: function(value) {
+              callback: function (value) {
                 return value + ' tỷ';
               },
               color: '#64748b',
               font: {
-                size: 12
-              }
-            }
+                size: 12,
+              },
+            },
           },
           x: {
             grid: {
-              display: false
+              display: false,
             },
             ticks: {
               color: '#64748b',
               font: {
                 size: 12,
-                weight: 500
-              }
-            }
-          }
+                weight: 500,
+              },
+            },
+          },
         },
         elements: {
           bar: {
-            borderRadius: 8
+            borderRadius: 8,
           },
           point: {
             radius: this.chartType() === 'line' ? 6 : 0,
             hoverRadius: 8,
             backgroundColor: '#4f46e5',
             borderColor: '#ffffff',
-            borderWidth: 2
-          }
+            borderWidth: 2,
+          },
         },
         interaction: {
           intersect: false,
-          mode: 'index'
-        }
-      }
+          mode: 'index',
+        },
+      },
     };
 
     try {
@@ -866,7 +958,7 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
         style: 'currency',
         currency: 'VND',
         minimumFractionDigits: 0,
-        maximumFractionDigits: 0
+        maximumFractionDigits: 0,
       }).format(amount);
     }
   }
@@ -904,27 +996,27 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   maxExpense(): number {
     const expenses = this.monthlyExpenses();
-    return expenses.length > 0 ? Math.max(...expenses.map(e => e.amount)) : 0;
+    return expenses.length > 0 ? Math.max(...expenses.map((e) => e.amount)) : 0;
   }
 
   maxExpenseDate(): string {
     const expenses = this.monthlyExpenses();
     if (expenses.length === 0) return '';
     const max = this.maxExpense();
-    const item = expenses.find(e => e.amount === max);
+    const item = expenses.find((e) => e.amount === max);
     return item ? item.month : '';
   }
 
   minExpense(): number {
     const expenses = this.monthlyExpenses();
-    return expenses.length > 0 ? Math.min(...expenses.map(e => e.amount)) : 0;
+    return expenses.length > 0 ? Math.min(...expenses.map((e) => e.amount)) : 0;
   }
 
   minExpenseDate(): string {
     const expenses = this.monthlyExpenses();
     if (expenses.length === 0) return '';
     const min = this.minExpense();
-    const item = expenses.find(e => e.amount === min);
+    const item = expenses.find((e) => e.amount === min);
     return item ? item.month : '';
   }
 
@@ -944,7 +1036,11 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Toast methods
-  showToastMessage(config: { type: 'success' | 'error' | 'warning' | 'info'; title: string; message: string; }): void {
+  showToastMessage(config: {
+    type: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+  }): void {
     this.toastType.set(config.type);
     this.toastTitle.set(config.title);
     this.toastMessage.set(config.message);
@@ -965,7 +1061,7 @@ export class ThongkeComponent implements OnInit, AfterViewInit, OnDestroy {
       success: 'toast-success-icon',
       error: 'toast-error-icon',
       warning: 'toast-warning-icon',
-      info: 'toast-info-icon'
+      info: 'toast-info-icon',
     };
     return icons[type] || icons.info;
   }

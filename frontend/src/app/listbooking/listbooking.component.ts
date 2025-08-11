@@ -5,6 +5,7 @@ import { RouterModule, Router } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { API_URL } from '../../constants';
 
 // ==== INTERFACES ====
 
@@ -48,7 +49,7 @@ interface ApiResponse<T> {
 // ==== SERVICE ====
 
 class BookingService {
-  private apiUrl = 'http://localhost:8080/api/bookings';
+  private apiUrl = `${API_URL}/api/bookings`;
 
   constructor(private http: HttpClient) {}
 
@@ -89,7 +90,7 @@ export class ListbookingComponent implements OnInit {
   currentRoute = signal<string>('/dashboard');
   showUserDropdown = signal(false);
   userInfo = signal<LoggedInUser>({
-    fullName: ''
+    fullName: '',
   });
   authService = inject(AuthService);
 
@@ -100,7 +101,7 @@ export class ListbookingComponent implements OnInit {
     const roomType = this.selectedRoomType();
     const date = this.selectedDate();
 
-    return this.bookings().filter(booking => {
+    return this.bookings().filter((booking) => {
       const matchesQuery =
         !query ||
         booking.fullName.toLowerCase().includes(query) ||
@@ -137,7 +138,7 @@ export class ListbookingComponent implements OnInit {
       if (local) {
         const parsed = JSON.parse(local);
         this.userInfo.set({
-          fullName: parsed.fullName || ''
+          fullName: parsed.fullName || '',
         });
       }
     }
@@ -173,24 +174,29 @@ export class ListbookingComponent implements OnInit {
             if (booking.mainImageUrl.startsWith('http')) {
               mainImageUrl = booking.mainImageUrl;
             } else if (booking.mainImageUrl.startsWith('/uploads/')) {
-              mainImageUrl = `http://localhost:8080${booking.mainImageUrl}`;
+              mainImageUrl = `${API_URL}${booking.mainImageUrl}`;
             } else {
-              mainImageUrl = `http://localhost:8080/uploads/${booking.mainImageUrl}`;
+              mainImageUrl = `${API_URL}/uploads/${booking.mainImageUrl}`;
             }
           }
 
           let totalAmount = 0;
           try {
-            const result: any = await this.getTotalAmountByBookingId(booking.id).toPromise();
+            const result: any = await this.getTotalAmountByBookingId(
+              booking.id
+            ).toPromise();
             totalAmount = result?.data ?? 0;
           } catch (e) {
-            console.warn(`Không lấy được tổng tiền cho booking ID ${booking.id}`, e);
+            console.warn(
+              `Không lấy được tổng tiền cho booking ID ${booking.id}`,
+              e
+            );
           }
 
           return {
             ...booking,
             mainImageUrl,
-            totalAmount
+            totalAmount,
           };
         });
 
@@ -202,12 +208,14 @@ export class ListbookingComponent implements OnInit {
       error: () => {
         this.isLoading.set(false);
         console.error('Lỗi khi tải danh sách booking');
-      }
+      },
     });
   }
 
   getTotalAmountByBookingId(bookingId: number): Observable<number> {
-    return this.http.get<any>(`http://localhost:8080/api/v1/payment-invoices/total-by-booking/${bookingId}`);
+    return this.http.get<any>(
+      `${API_URL}/api/v1/payment-invoices/total-by-booking/${bookingId}`
+    );
   }
 
   viewBooking(booking: Booking): void {
@@ -218,7 +226,6 @@ export class ListbookingComponent implements OnInit {
   closeViewModal(): void {
     this.showViewModal.set(false);
   }
-
 
   previousPage(): void {
     if (this.currentPage() > 1) this.currentPage.set(this.currentPage() - 1);
@@ -312,11 +319,16 @@ export class ListbookingComponent implements OnInit {
     this.showToastMessage({
       type: 'info',
       title: 'Chuyển hướng',
-      message: 'Đang chuyển đến trang profile...'
+      message: 'Đang chuyển đến trang profile...',
     });
   }
 
-  showToastMessage(config: { type: 'success' | 'error' | 'warning' | 'info'; title: string; message: string; duration?: number }): void {
+  showToastMessage(config: {
+    type: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+    duration?: number;
+  }): void {
     this.toastType.set(config.type);
     this.toastTitle.set(config.title);
     this.toastMessage.set(config.message);
@@ -352,48 +364,45 @@ export class ListbookingComponent implements OnInit {
     this.onFilterChange();
   }
 
-
   showDeleteConfirm = signal(false);
-pendingDeleteBooking = signal<Booking | null>(null);
+  pendingDeleteBooking = signal<Booking | null>(null);
 
-deleteBooking(booking: Booking): void {
-  this.pendingDeleteBooking.set(booking);
-  this.showDeleteConfirm.set(true);
-}
-
-confirmDelete(): void {
-  const booking = this.pendingDeleteBooking();
-  if (booking) {
-    this.isLoading.set(true);
-    this.bookingService.deleteBooking(booking.id).subscribe({
-      next: () => {
-        this.bookings.set(this.bookings().filter(b => b.id !== booking.id));
-        this.isLoading.set(false);
-        this.showSuccess('Xóa đơn đặt phòng thành công');
-        this.showDeleteConfirm.set(false);
-        this.pendingDeleteBooking.set(null);
-      },
-      error: (err) => {
-        console.error('Error deleting booking:', err);
-        this.isLoading.set(false);
-        this.showError('Có lỗi xảy ra khi xóa đơn đặt phòng');
-      }
-    });
+  deleteBooking(booking: Booking): void {
+    this.pendingDeleteBooking.set(booking);
+    this.showDeleteConfirm.set(true);
   }
-}
 
-cancelDelete(): void {
-  this.showDeleteConfirm.set(false);
-  this.pendingDeleteBooking.set(null);
-}
+  confirmDelete(): void {
+    const booking = this.pendingDeleteBooking();
+    if (booking) {
+      this.isLoading.set(true);
+      this.bookingService.deleteBooking(booking.id).subscribe({
+        next: () => {
+          this.bookings.set(this.bookings().filter((b) => b.id !== booking.id));
+          this.isLoading.set(false);
+          this.showSuccess('Xóa đơn đặt phòng thành công');
+          this.showDeleteConfirm.set(false);
+          this.pendingDeleteBooking.set(null);
+        },
+        error: (err) => {
+          console.error('Error deleting booking:', err);
+          this.isLoading.set(false);
+          this.showError('Có lỗi xảy ra khi xóa đơn đặt phòng');
+        },
+      });
+    }
+  }
 
-showError(msg: string): void {
-  this.toastType.set('error');
-  this.toastTitle.set('Lỗi');
-  this.toastMessage.set(msg);
-  this.showToast.set(true);
-  setTimeout(() => this.showToast.set(false), 5000);
-}
+  cancelDelete(): void {
+    this.showDeleteConfirm.set(false);
+    this.pendingDeleteBooking.set(null);
+  }
 
-
+  showError(msg: string): void {
+    this.toastType.set('error');
+    this.toastTitle.set('Lỗi');
+    this.toastMessage.set(msg);
+    this.showToast.set(true);
+    setTimeout(() => this.showToast.set(false), 5000);
+  }
 }

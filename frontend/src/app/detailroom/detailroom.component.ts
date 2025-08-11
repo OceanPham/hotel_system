@@ -1,9 +1,18 @@
-import { Component, signal, computed, OnInit, HostListener, inject, OnDestroy } from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  OnInit,
+  HostListener,
+  inject,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import axios from 'axios';
 import { AxiosResponse } from 'axios';
+import { API_URL } from '../../constants';
 
 interface Room {
   id: number;
@@ -175,17 +184,17 @@ interface BookingPaymentData {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './detailroom.component.html',
-  styleUrl: './detailroom.component.css'
+  styleUrl: './detailroom.component.css',
 })
 export class DetailroomComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
   // ===== API ENDPOINTS - CẬP NHẬT CHO HOTEL-SERVICES =====
-  private baseApiUrl = 'http://localhost:8080/api/v1';
-  private getRoomByIdApi = 'http://localhost:8080/api/v1/rooms';
-  private getServicesApi = 'http://localhost:8080/api/v1/hotel-services';
-  private getServiceByIdApi = 'http://localhost:8080/api/v1/hotel-services';
+  private baseApiUrl = `${API_URL}/api/v1`;
+  private getRoomByIdApi = `${API_URL}/api/v1/rooms`;
+  private getServicesApi = `${API_URL}/api/v1/hotel-services`;
+  private getServiceByIdApi = `${API_URL}/api/v1/hotel-services`;
 
   // ===== LOCAL STORAGE KEYS - CẬP NHẬT CHO HOTEL-SERVICES =====
   private readonly STORAGE_KEYS = {
@@ -196,22 +205,23 @@ export class DetailroomComponent implements OnInit, OnDestroy {
     SERVICES_CACHE: 'hotel_services_cache',
     SELECTED_SERVICES: 'hotel_selected_services',
     BOOKING_DATA: 'hotel_booking_data',
-    BOOKING_PAYMENT_DATA: 'hotel_booking_payment_data'
+    BOOKING_PAYMENT_DATA: 'hotel_booking_payment_data',
   };
 
   // ===== AUTH TOKEN METHOD =====
   private getAuthToken(): string | null {
     try {
-      const token = localStorage.getItem('token') || 
-                   localStorage.getItem('authToken') || 
-                   localStorage.getItem('accessToken') ||
-                   localStorage.getItem('jwt_token');
-      
+      const token =
+        localStorage.getItem('token') ||
+        localStorage.getItem('authToken') ||
+        localStorage.getItem('accessToken') ||
+        localStorage.getItem('jwt_token');
+
       if (token) {
         console.log('🔑 Found auth token in localStorage');
         return token;
       }
-      
+
       const userData = localStorage.getItem('user');
       if (userData) {
         const user = JSON.parse(userData);
@@ -219,7 +229,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
           return user.token || user.accessToken;
         }
       }
-      
+
       console.warn('⚠️ No auth token found');
       return null;
     } catch (error) {
@@ -231,68 +241,69 @@ export class DetailroomComponent implements OnInit, OnDestroy {
   // ===== TEST API METHODS =====
   testHotelServicesDirectly() {
     console.log('🧪 ===== TEST HOTEL-SERVICES API TRỰC TIẾP =====');
-    
-    const testUrl = 'http://localhost:8080/api/v1/hotel-services';
+
+    const testUrl = `${API_URL}/api/v1/hotel-services`;
     console.log('🧪 Test URL:', testUrl);
-    
+
     const token = this.getAuthToken();
     console.log('🧪 Token:', token ? 'Có token' : 'Không có token');
-    
+
     fetch(testUrl, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     })
-    .then(response => {
-      console.log('🧪 Fetch Response Status:', response.status);
-      console.log('🧪 Fetch Response OK:', response.ok);
-      console.log('🧪 Fetch Response Headers:', response.headers);
-      return response.json();
-    })
-    .then(data => {
-      console.log('🧪 ===== FETCH RESPONSE DATA =====');
-      console.log('🧪 Fetch Response Data:', data);
-      console.log('🧪 Data Type:', typeof data);
-      console.log('🧪 Data Keys:', Object.keys(data));
-      
-      if (data.data) {
-        console.log('🧪 Services Array:', data.data);
-        console.log('🧪 Services Count:', data.data.length);
-      }
-    })
-    .catch(error => {
-      console.error('🧪 ===== FETCH ERROR =====');
-      console.error('🧪 Fetch Error:', error);
-    });
+      .then((response) => {
+        console.log('🧪 Fetch Response Status:', response.status);
+        console.log('🧪 Fetch Response OK:', response.ok);
+        console.log('🧪 Fetch Response Headers:', response.headers);
+        return response.json();
+      })
+      .then((data) => {
+        console.log('🧪 ===== FETCH RESPONSE DATA =====');
+        console.log('🧪 Fetch Response Data:', data);
+        console.log('🧪 Data Type:', typeof data);
+        console.log('🧪 Data Keys:', Object.keys(data));
+
+        if (data.data) {
+          console.log('🧪 Services Array:', data.data);
+          console.log('🧪 Services Count:', data.data.length);
+        }
+      })
+      .catch((error) => {
+        console.error('🧪 ===== FETCH ERROR =====');
+        console.error('🧪 Fetch Error:', error);
+      });
   }
 
   testAxiosDirectly() {
     console.log('🧪 === AXIOS TEST TRỰC TIẾP ===');
-    
-    const url = 'http://localhost:8080/api/v1/hotel-services';
+
+    const url = `${API_URL}/api/v1/hotel-services`;
     const token = this.getAuthToken();
-    
+
     console.log('🧪 URL:', url);
     console.log('🧪 Token:', token ? 'Có' : 'Không');
-    
-    axios.get(url, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(response => {
-      console.log('🧪 === AXIOS SUCCESS ===');
-      console.log('🧪 Response:', response);
-      console.log('🧪 Data:', response.data);
-    })
-    .catch(error => {
-      console.log('🧪 === AXIOS ERROR ===');
-      console.log('🧪 Error:', error);
-      console.log('🧪 Response:', error.response);
-    });
+
+    axios
+      .get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+      .then((response) => {
+        console.log('🧪 === AXIOS SUCCESS ===');
+        console.log('🧪 Response:', response);
+        console.log('🧪 Data:', response.data);
+      })
+      .catch((error) => {
+        console.log('🧪 === AXIOS ERROR ===');
+        console.log('🧪 Error:', error);
+        console.log('🧪 Response:', error.response);
+      });
   }
 
   // ===== FIX 403 METHODS =====
@@ -301,10 +312,10 @@ export class DetailroomComponent implements OnInit, OnDestroy {
     try {
       localStorage.removeItem(this.STORAGE_KEYS.SERVICES_CACHE);
       console.log('🗑️ Đã xóa services cache');
-      
+
       this.allServices.set([]);
       console.log('🗑️ Đã clear allServices signal');
-      
+
       this.forceMockServices();
     } catch (error) {
       console.error('❌ Lỗi khi clear cache:', error);
@@ -314,14 +325,16 @@ export class DetailroomComponent implements OnInit, OnDestroy {
   forceMockServices() {
     console.log('🔧 === FORCE LOADING MOCK SERVICES ===');
     console.log('🔧 Mock data có:', this.mockHotelServicesData.length, 'items');
-    
-    const transformedMockServices = this.transformServicesData(this.mockHotelServicesData);
+
+    const transformedMockServices = this.transformServicesData(
+      this.mockHotelServicesData
+    );
     console.log('🔧 Transformed mock services:', transformedMockServices);
-    
+
     this.allServices.set(transformedMockServices);
     this.saveServicesToCache(transformedMockServices);
     this.servicesLoading.set(false);
-    
+
     console.log('✅ Đã force load mock services thành công!');
     console.log('✅ Current allServices count:', this.allServices().length);
   }
@@ -331,14 +344,12 @@ export class DetailroomComponent implements OnInit, OnDestroy {
     console.log('🔧 Current allServices:', this.allServices());
     console.log('🔧 servicesLoading:', this.servicesLoading());
     console.log('🔧 servicesError:', this.servicesError());
-    
+
     // Clear everything
     this.clearServicesCache();
-    
+
     console.log('🔧 === ĐÃ CLEAR CACHE, SẼ LOAD MOCK DATA ===');
   }
-
-
 
   // ===== SIGNALS =====
   mobileMenuOpen = signal(false);
@@ -371,17 +382,17 @@ export class DetailroomComponent implements OnInit, OnDestroy {
     checkInTime: '14:00',
     checkOutTime: '12:00',
     guestCount: '2',
-    specialRequests: ''
+    specialRequests: '',
   };
 
   // ===== SERVICE CATEGORIES - CẬP NHẬT CHO HOTEL-SERVICES =====
   serviceCategories = [
     { value: 'all', label: 'Tất cả dịch vụ' },
     { value: 'food', label: 'Ăn uống' },
-    { value: 'spa', label: 'Spa & Wellness' }, 
+    { value: 'spa', label: 'Spa & Wellness' },
     { value: 'transport', label: 'Vận chuyển' },
     { value: 'laundry', label: 'Giặt là' },
-    { value: 'other', label: 'Dịch vụ khác' }
+    { value: 'other', label: 'Dịch vụ khác' },
   ];
 
   // ===== MOCK DATA =====
@@ -394,20 +405,23 @@ export class DetailroomComponent implements OnInit, OnDestroy {
     price: 5000000,
     minPrice: 4000000,
     maxPrice: 6000000,
-    image: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image:
+      'https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     gallery: [
       'https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
       'https://images.unsplash.com/photo-1629140727571-9b5c6f6267b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     ],
     featured: true,
     isFavorite: false,
     bedCount: 2,
     category: 'suite',
-    description: 'Phòng Garden Villa là sự kết hợp hoàn hảo giữa thiên nhiên và sang trọng với tầm nhìn tuyệt đẹp ra khu vườn xanh mát.',
-    detailDescription: 'Suite Garden Villa rộng rãi với không gian sinh hoạt riêng biệt, phòng khách và phòng ngủ được thiết kế sang trọng.',
+    description:
+      'Phòng Garden Villa là sự kết hợp hoàn hảo giữa thiên nhiên và sang trọng với tầm nhìn tuyệt đẹp ra khu vườn xanh mát.',
+    detailDescription:
+      'Suite Garden Villa rộng rãi với không gian sinh hoạt riêng biệt, phòng khách và phòng ngủ được thiết kế sang trọng.',
     amenities: [
       'Wi-Fi miễn phí tốc độ cao',
       'Điều hòa không khí thông minh',
@@ -418,7 +432,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
       'Minibar premium',
       'Két sắt điện tử',
       'Máy pha cà phê Nespresso',
-      'Áo choàng tắm cao cấp'
+      'Áo choàng tắm cao cấp',
     ],
     area: 65,
     view: 'Hướng vườn',
@@ -453,13 +467,13 @@ export class DetailroomComponent implements OnInit, OnDestroy {
         'Bãi biển Nha Trang - 500m',
         'Trung tâm mua sắm - 1km',
         'Chợ đêm - 800m',
-        'Vinpearland - 2km'
-      ]
+        'Vinpearland - 2km',
+      ],
     },
     availability: {
       available: true,
       nextAvailableDate: '',
-      bookedDates: []
+      bookedDates: [],
     },
     pricing: {
       basePrice: 5000000,
@@ -469,7 +483,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
       currency: 'VND',
       pricePerNight: 5000000,
       weekendSurcharge: 1000000,
-      holidaySurcharge: 1500000
+      holidaySurcharge: 1500000,
     },
     facilities: [
       'Hồ bơi ngoài trời',
@@ -482,7 +496,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
       'Dịch vụ giặt là',
       'Đưa đón sân bay',
       'Bãi đậu xe',
-      'Concierge'
+      'Concierge',
     ],
     policies: [
       'Check-in: 14:00 - 00:00',
@@ -492,7 +506,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
       'Không cho phép thú cưng',
       'Trẻ em dưới 12 tuổi được miễn phí',
       'Yêu cầu đặt cọc bằng thẻ tín dụng',
-      'Xuất trình CMND/Passport khi check-in'
+      'Xuất trình CMND/Passport khi check-in',
     ],
     reviews: [
       {
@@ -500,8 +514,9 @@ export class DetailroomComponent implements OnInit, OnDestroy {
         userName: 'Nguyễn Minh Anh',
         avatar: 'https://i.pravatar.cc/150?img=1',
         rating: 5,
-        comment: 'Phòng Garden Villa thật sự tuyệt vời! Không gian rộng rãi, sạch sẽ và view vườn rất đẹp.',
-        createdAt: '2 ngày trước'
+        comment:
+          'Phòng Garden Villa thật sự tuyệt vời! Không gian rộng rãi, sạch sẽ và view vườn rất đẹp.',
+        createdAt: '2 ngày trước',
       },
       {
         id: 2,
@@ -509,52 +524,113 @@ export class DetailroomComponent implements OnInit, OnDestroy {
         avatar: 'https://i.pravatar.cc/150?img=2',
         rating: 5,
         comment: 'Phòng đẹp, tiện nghi đầy đủ. Jacuzzi rất thích, bồn tắm lớn.',
-        createdAt: '1 tuần trước'
-      }
-    ]
+        createdAt: '1 tuần trước',
+      },
+    ],
   };
 
   // ===== MOCK HOTEL SERVICES DATA =====
   private mockHotelServicesData = [
-    { id: 1, name: 'Bữa sáng', price: 100000, description: 'Buffet sáng tại nhà hàng', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-    { id: 2, name: 'Giặt ủi', price: 50000, description: 'Dịch vụ giặt là chuyên nghiệp', image: 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-    { id: 3, name: 'Spa', price: 300000, description: 'Thư giãn cơ thể toàn diện', image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-    { id: 4, name: 'Xe đưa đón', price: 200000, description: 'Đưa đón sân bay 2 chiều', image: 'https://images.unsplash.com/photo-1583301284852-f72f359cd88b?w=600&q=80' },
-    { id: 5, name: 'Bữa tối', price: 150000, description: 'Set menu buổi tối cao cấp', image: 'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=600&q=80' },
-    { id: 6, name: 'Trà chiều', price: 90000, description: 'Trà chiều theo phong cách Anh', image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=80' },
-    { id: 7, name: 'Thuê xe đạp', price: 30000, description: 'Xe đạp tham quan khuôn viên', image: 'https://images.unsplash.com/photo-1532274402917-5aadf881bdf8?w=600&q=80' }
+    {
+      id: 1,
+      name: 'Bữa sáng',
+      price: 100000,
+      description: 'Buffet sáng tại nhà hàng',
+      image:
+        'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+    },
+    {
+      id: 2,
+      name: 'Giặt ủi',
+      price: 50000,
+      description: 'Dịch vụ giặt là chuyên nghiệp',
+      image:
+        'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+    },
+    {
+      id: 3,
+      name: 'Spa',
+      price: 300000,
+      description: 'Thư giãn cơ thể toàn diện',
+      image:
+        'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+    },
+    {
+      id: 4,
+      name: 'Xe đưa đón',
+      price: 200000,
+      description: 'Đưa đón sân bay 2 chiều',
+      image:
+        'https://images.unsplash.com/photo-1583301284852-f72f359cd88b?w=600&q=80',
+    },
+    {
+      id: 5,
+      name: 'Bữa tối',
+      price: 150000,
+      description: 'Set menu buổi tối cao cấp',
+      image:
+        'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=600&q=80',
+    },
+    {
+      id: 6,
+      name: 'Trà chiều',
+      price: 90000,
+      description: 'Trà chiều theo phong cách Anh',
+      image:
+        'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=80',
+    },
+    {
+      id: 7,
+      name: 'Thuê xe đạp',
+      price: 30000,
+      description: 'Xe đạp tham quan khuôn viên',
+      image:
+        'https://images.unsplash.com/photo-1532274402917-5aadf881bdf8?w=600&q=80',
+    },
   ];
 
   // ===== SERVICE IMAGE MAP =====
   private serviceImageMap: { [key: string]: string[] } = {
-    'food': [
+    food: [
       'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
       'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
     ],
-    'spa': [
+    spa: [
       'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'https://images.unsplash.com/photo-1515377905703-c4788e51af15?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      'https://images.unsplash.com/photo-1515377905703-c4788e51af15?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
     ],
-    'transport': [
+    transport: [
       'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
     ],
-    'laundry': [
+    laundry: [
       'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      'https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
     ],
-    'other': [
+    other: [
       'https://images.unsplash.com/photo-1586201375761-83865001e31c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-    ]
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+    ],
   };
 
   hotelImages: HotelImage[] = [
-    { url: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', name: 'Phòng ngủ chính' },
-    { url: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', name: 'Phòng tắm' },
-    { url: 'https://images.unsplash.com/photo-1629140727571-9b5c6f6267b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', name: 'Ban công' },
-    { url: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', name: 'Phòng khách' }
+    {
+      url: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      name: 'Phòng ngủ chính',
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      name: 'Phòng tắm',
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1629140727571-9b5c6f6267b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      name: 'Ban công',
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      name: 'Phòng khách',
+    },
   ];
 
   // ===== COMPUTED PROPERTIES =====
@@ -562,11 +638,14 @@ export class DetailroomComponent implements OnInit, OnDestroy {
 
   filteredServices = computed(() => {
     const category = this.selectedCategory();
-    let services = category === 'all' ? this.allServices() : this.allServices().filter(service => service.category === category);
+    let services =
+      category === 'all'
+        ? this.allServices()
+        : this.allServices().filter((service) => service.category === category);
 
-    return services.map(service => ({
+    return services.map((service) => ({
       ...service,
-      image: this.getRandomServiceImage(service.category)
+      image: this.getRandomServiceImage(service.category),
     }));
   });
 
@@ -579,7 +658,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
     axios.interceptors.request.use(
       (config) => {
         console.log('🌐 DETAIL - Đang gọi API:', config.url);
-        
+
         const token = this.getAuthToken();
         if (token) {
           config.headers['Authorization'] = `Bearer ${token}`;
@@ -587,7 +666,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
         } else {
           console.warn('⚠️ DETAIL - Không có token để authenticate');
         }
-        
+
         return config;
       },
       (error) => {
@@ -606,7 +685,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
         if (error.response) {
           console.error('Mã lỗi:', error.response.status);
           console.error('Dữ liệu lỗi:', error.response.data);
-          
+
           if (error.response.status === 401 || error.response.status === 403) {
             console.error('🚫 Token không hợp lệ hoặc hết hạn');
           }
@@ -619,24 +698,24 @@ export class DetailroomComponent implements OnInit, OnDestroy {
   // ===== LIFECYCLE METHODS =====
   ngOnInit() {
     console.log('🚀 ===== DETAIL COMPONENT NGONINIT BẮT ĐẦU =====');
-    
+
     this.loadFavoriteRoomsFromStorage();
     this.loadSelectedServicesFromStorage();
-    
+
     console.log('🧪 === SẮP TEST API HOTEL-SERVICES ===');
     setTimeout(() => {
       this.testHotelServicesDirectly();
     }, 1000);
-    
+
     console.log('🛎️ === SẮP FORCE LOAD SERVICES ===');
     setTimeout(() => {
       console.log('🛎️ ĐANG THỰC THI loadServices()...');
       this.loadServices();
     }, 2000);
-    
+
     this.loadRoomData();
     this.loadUserFromStorage();
-    
+
     console.log('🚀 ===== NGONINIT KẾT THÚC =====');
   }
 
@@ -658,32 +737,32 @@ export class DetailroomComponent implements OnInit, OnDestroy {
     }
   }
 
-
   // ===== FEEDBACK METHODS =====
   private getFeedbackByRoomId(roomId: number) {
-    const apiUrl = `http://localhost:8080/api/v1/feedbacks/room/${roomId}`;
-    axios.get(apiUrl)
-      .then(response => {
+    const apiUrl = `${API_URL}/api/v1/feedbacks/room/${roomId}`;
+    axios
+      .get(apiUrl)
+      .then((response) => {
         const feedbacks = response.data?.data || [];
         const reviews: Review[] = feedbacks.map((fb: any) => ({
           id: fb.id,
           userName: fb.userName,
           rating: fb.rating,
           comment: fb.comment,
-          createdAt: new Date(fb.createdAt).toLocaleDateString('vi-VN')
+          createdAt: new Date(fb.createdAt).toLocaleDateString('vi-VN'),
         }));
         const room = this.currentRoom();
         room.reviews = reviews;
-        this.currentRoom.set({...room});
+        this.currentRoom.set({ ...room });
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('❌ Lỗi khi lấy feedback:', error);
       });
   }
 
   // ===== ROOM DATA METHODS =====
   private loadRoomData() {
-    this.route.params.subscribe(params => {
+    this.route.params.subscribe((params) => {
       const id = params['id'];
       if (id) {
         const roomId = parseInt(id, 10);
@@ -710,12 +789,20 @@ export class DetailroomComponent implements OnInit, OnDestroy {
 
   private getRoomFromStorage(roomId: number): Room | null {
     try {
-      const storedRoomsById = localStorage.getItem(this.STORAGE_KEYS.ROOMS_BY_ID);
+      const storedRoomsById = localStorage.getItem(
+        this.STORAGE_KEYS.ROOMS_BY_ID
+      );
       if (storedRoomsById) {
         const roomsById = JSON.parse(storedRoomsById);
         const room = roomsById[roomId];
         if (room) {
-          console.log('✅ Tìm thấy room ID', roomId, 'trong', this.STORAGE_KEYS.ROOMS_BY_ID + ':', room);
+          console.log(
+            '✅ Tìm thấy room ID',
+            roomId,
+            'trong',
+            this.STORAGE_KEYS.ROOMS_BY_ID + ':',
+            room
+          );
           return room;
         }
       }
@@ -731,7 +818,8 @@ export class DetailroomComponent implements OnInit, OnDestroy {
 
     const apiUrl = `${this.getRoomByIdApi}/${id}`;
 
-    axios.get(apiUrl)
+    axios
+      .get(apiUrl)
       .then((response) => {
         if (response.data && response.data.data) {
           const roomData = this.transformRoomData(response.data.data);
@@ -758,16 +846,23 @@ export class DetailroomComponent implements OnInit, OnDestroy {
 
   private saveRoomToStorage(room: Room) {
     try {
-      localStorage.setItem(this.STORAGE_KEYS.SELECTED_ROOM, JSON.stringify(room));
+      localStorage.setItem(
+        this.STORAGE_KEYS.SELECTED_ROOM,
+        JSON.stringify(room)
+      );
 
-      const storedRoomsById = localStorage.getItem(this.STORAGE_KEYS.ROOMS_BY_ID);
+      const storedRoomsById = localStorage.getItem(
+        this.STORAGE_KEYS.ROOMS_BY_ID
+      );
       let roomsById: { [key: number]: Room } = {};
       if (storedRoomsById) {
         roomsById = JSON.parse(storedRoomsById);
       }
       roomsById[room.id] = room;
-      localStorage.setItem(this.STORAGE_KEYS.ROOMS_BY_ID, JSON.stringify(roomsById));
-
+      localStorage.setItem(
+        this.STORAGE_KEYS.ROOMS_BY_ID,
+        JSON.stringify(roomsById)
+      );
     } catch (error) {
       console.error('❌ Lỗi khi lưu room vào localStorage:', error);
     }
@@ -831,86 +926,117 @@ export class DetailroomComponent implements OnInit, OnDestroy {
         currency: 'VND',
         pricePerNight: apiRoom.basePrice || 0,
         weekendSurcharge: (apiRoom.basePrice || 0) * 0.2,
-        holidaySurcharge: (apiRoom.basePrice || 0) * 0.3
-      }
+        holidaySurcharge: (apiRoom.basePrice || 0) * 0.3,
+      },
     };
   }
 
   // ===== SERVICES METHODS - FIXED FOR 403 =====
   private loadServices() {
-    console.log('🛎️ ==================== BẮT ĐẦU LOAD SERVICES ====================');
+    console.log(
+      '🛎️ ==================== BẮT ĐẦU LOAD SERVICES ===================='
+    );
     console.log('🛎️ getServicesApi URL:', this.getServicesApi);
-    
+
     this.servicesLoading.set(true);
     this.servicesError.set(null);
 
     console.log('🛎️ === KIỂM TRA CACHE ===');
     const cachedServices = this.getServicesFromCache();
     console.log('🛎️ Cached services count:', cachedServices.length);
-    
+
     // Kiểm tra cache có hợp lệ không (phải có name và price)
-    const validCache = cachedServices.length > 0 && 
-                      cachedServices.every(s => s.name && s.price);
-    
+    const validCache =
+      cachedServices.length > 0 &&
+      cachedServices.every((s) => s.name && s.price);
+
     if (validCache) {
       console.log('💾 SỬ DỤNG CACHE SERVICES HỢP LỆ:', cachedServices);
       this.allServices.set(cachedServices);
       this.servicesLoading.set(false);
       return;
     } else if (cachedServices.length > 0) {
-      console.log('⚠️ CACHE KHÔNG HỢP LỆ (thiếu name/price), clear và dùng mock');
+      console.log(
+        '⚠️ CACHE KHÔNG HỢP LỆ (thiếu name/price), clear và dùng mock'
+      );
       this.clearServicesCache();
       return;
     }
 
     console.log('🛎️ === KHÔNG CÓ CACHE HỢP LỆ, THỬ GỌI API ===');
-    
+
     // Try API, nếu 403 thì dùng mock ngay
-    this.fetchServicesFromApi()
-      .catch(() => {
-        console.log('🛎️ === API FAILED, DÙNG MOCK DATA ===');
-        this.forceMockServices();
-      });
-    
-    console.log('🛎️ ==================== KẾT THÚC LOAD SERVICES ====================');
+    this.fetchServicesFromApi().catch(() => {
+      console.log('🛎️ === API FAILED, DÙNG MOCK DATA ===');
+      this.forceMockServices();
+    });
+
+    console.log(
+      '🛎️ ==================== KẾT THÚC LOAD SERVICES ===================='
+    );
   }
 
   private fetchServicesFromApi(): Promise<void> {
     const apiUrl = `${this.getServicesApi}?pageSize=100&pageNo=1`;
-    
+
     console.log('🌐 ===== BẮT ĐẦU GỌI HOTEL-SERVICES API =====');
     console.log('🌐 DETAIL - Đang gọi API hotel-services:', apiUrl);
 
-    return axios.get(apiUrl)
+    return axios
+      .get(apiUrl)
       .then((response) => {
         console.log('✅ ===== HOTEL-SERVICES API THÀNH CÔNG =====');
         console.log('✅ DETAIL - Hotel Services API thành công:', apiUrl);
         console.log('📊 DETAIL - Full Response:', response);
         console.log('📊 DETAIL - Response Data:', response.data);
         console.log('📊 DETAIL - Response Status:', response.status);
-        
+
         let servicesData = null;
-        
+
         if (response.data && Array.isArray(response.data)) {
           servicesData = response.data;
-          console.log('📊 DETAIL - Services data từ response.data (array):', servicesData);
-        } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
+          console.log(
+            '📊 DETAIL - Services data từ response.data (array):',
+            servicesData
+          );
+        } else if (
+          response.data &&
+          response.data.data &&
+          Array.isArray(response.data.data)
+        ) {
           servicesData = response.data.data;
-          console.log('📊 DETAIL - Services data từ response.data.data:', servicesData);
-        } else if (response.data && response.data.content && Array.isArray(response.data.content)) {
+          console.log(
+            '📊 DETAIL - Services data từ response.data.data:',
+            servicesData
+          );
+        } else if (
+          response.data &&
+          response.data.content &&
+          Array.isArray(response.data.content)
+        ) {
           servicesData = response.data.content;
-          console.log('📊 DETAIL - Services data từ response.data.content:', servicesData);
+          console.log(
+            '📊 DETAIL - Services data từ response.data.content:',
+            servicesData
+          );
         }
-        
+
         if (servicesData && servicesData.length > 0) {
-          console.log('🛎️ Tìm thấy services data:', servicesData.length, 'items');
+          console.log(
+            '🛎️ Tìm thấy services data:',
+            servicesData.length,
+            'items'
+          );
           console.log('🛎️ First service:', servicesData[0]);
-          
+
           const transformedServices = this.transformServicesData(servicesData);
           this.allServices.set(transformedServices);
           this.saveServicesToCache(transformedServices);
           console.log('🛎️ ===== ĐÃ SET SERVICES THÀNH CÔNG =====');
-          console.log('🛎️ Transformed services count:', transformedServices.length);
+          console.log(
+            '🛎️ Transformed services count:',
+            transformedServices.length
+          );
           console.log('🛎️ Final services:', transformedServices);
         } else {
           console.warn('⚠️ ===== RESPONSE STRUCTURE KHÔNG ĐÚNG =====');
@@ -925,22 +1051,26 @@ export class DetailroomComponent implements OnInit, OnDestroy {
         console.error('❌ DETAIL - Error response:', error.response);
         console.error('❌ DETAIL - Error status:', error.response?.status);
         console.error('❌ DETAIL - Error data:', error.response?.data);
-        
+
         if (error.response?.status === 403) {
           console.error('🚫 403 FORBIDDEN - SẼ DÙNG MOCK DATA');
-          this.servicesError.set('API bị từ chối truy cập. Sử dụng dữ liệu mẫu.');
-          
+          this.servicesError.set(
+            'API bị từ chối truy cập. Sử dụng dữ liệu mẫu.'
+          );
+
           // Throw để trigger catch trong loadServices
           throw new Error('403 Forbidden');
         } else if (error.response?.status === 401) {
           this.servicesError.set('Token hết hạn. Vui lòng đăng nhập lại.');
-          console.error('🚫 401 Unauthorized - Token không hợp lệ cho hotel-services');
+          console.error(
+            '🚫 401 Unauthorized - Token không hợp lệ cho hotel-services'
+          );
           throw error;
         } else {
           this.servicesError.set('Không thể tải danh sách dịch vụ khách sạn');
           throw error;
         }
-        
+
         this.allServices.set([]);
       })
       .finally(() => {
@@ -952,23 +1082,34 @@ export class DetailroomComponent implements OnInit, OnDestroy {
   private transformServicesData(apiServices: any[]): Service[] {
     console.log('🔄 Raw API services (hotel-services):', apiServices);
 
-    return apiServices.map(apiService => {
+    return apiServices.map((apiService) => {
       console.log('🔄 Processing service:', apiService);
       console.log('🔄 Service properties:', Object.keys(apiService));
 
-      const name = apiService.name || apiService.serviceName || apiService.title || 'Unnamed Service';
-      const price = apiService.price || apiService.cost || apiService.amount || 0;
+      const name =
+        apiService.name ||
+        apiService.serviceName ||
+        apiService.title ||
+        'Unnamed Service';
+      const price =
+        apiService.price || apiService.cost || apiService.amount || 0;
       const description = apiService.description || apiService.desc || '';
-      const image = apiService.image || apiService.imageUrl || apiService.photo || '';
+      const image =
+        apiService.image || apiService.imageUrl || apiService.photo || '';
 
       let category = 'other';
-      
+
       if (apiService.category || apiService.serviceType || apiService.type) {
-        category = this.mapServiceCategory(apiService.category || apiService.serviceType || apiService.type || 'general');
+        category = this.mapServiceCategory(
+          apiService.category ||
+            apiService.serviceType ||
+            apiService.type ||
+            'general'
+        );
       } else {
         category = this.autoDetectServiceCategory(name);
       }
-      
+
       console.log('🔄 Transformed:', { name, price, category, description });
 
       return {
@@ -978,23 +1119,23 @@ export class DetailroomComponent implements OnInit, OnDestroy {
         description: description,
         image: image || this.getRandomServiceImage(category),
         category: category,
-        quantity: 0
+        quantity: 0,
       };
     });
   }
 
   private mapServiceCategory(apiCategory: string): string {
     const categoryMap: { [key: string]: string } = {
-      'FOOD': 'food',
-      'SPA': 'spa',
-      'TRANSPORT': 'transport',
-      'LAUNDRY': 'laundry',
-      'ROOM_SERVICE': 'room-service',
-      'MINIBAR': 'minibar',
-      'MASSAGE': 'massage',
-      'ENTERTAINMENT': 'entertainment',
-      'BUSINESS': 'business',
-      'OTHER': 'other'
+      FOOD: 'food',
+      SPA: 'spa',
+      TRANSPORT: 'transport',
+      LAUNDRY: 'laundry',
+      ROOM_SERVICE: 'room-service',
+      MINIBAR: 'minibar',
+      MASSAGE: 'massage',
+      ENTERTAINMENT: 'entertainment',
+      BUSINESS: 'business',
+      OTHER: 'other',
     };
 
     return categoryMap[apiCategory.toUpperCase()] || 'other';
@@ -1002,8 +1143,13 @@ export class DetailroomComponent implements OnInit, OnDestroy {
 
   private autoDetectServiceCategory(serviceName: string): string {
     const name = serviceName.toLowerCase();
-    
-    if (name.includes('bữa sáng') || name.includes('buffet') || name.includes('bữa tối') || name.includes('trà chiều')) {
+
+    if (
+      name.includes('bữa sáng') ||
+      name.includes('buffet') ||
+      name.includes('bữa tối') ||
+      name.includes('trà chiều')
+    ) {
       return 'food';
     }
     if (name.includes('giặt') || name.includes('ủi')) {
@@ -1012,15 +1158,20 @@ export class DetailroomComponent implements OnInit, OnDestroy {
     if (name.includes('spa') || name.includes('massage')) {
       return 'spa';
     }
-    if (name.includes('xe') || name.includes('đưa đón') || name.includes('thuê xe')) {
+    if (
+      name.includes('xe') ||
+      name.includes('đưa đón') ||
+      name.includes('thuê xe')
+    ) {
       return 'transport';
     }
-    
+
     return 'other';
   }
 
   private getRandomServiceImage(category: string): string {
-    const images = this.serviceImageMap[category] || this.serviceImageMap['other'];
+    const images =
+      this.serviceImageMap[category] || this.serviceImageMap['other'];
     return images[Math.floor(Math.random() * images.length)];
   }
 
@@ -1040,7 +1191,10 @@ export class DetailroomComponent implements OnInit, OnDestroy {
 
   private saveServicesToCache(services: Service[]) {
     try {
-      localStorage.setItem(this.STORAGE_KEYS.SERVICES_CACHE, JSON.stringify(services));
+      localStorage.setItem(
+        this.STORAGE_KEYS.SERVICES_CACHE,
+        JSON.stringify(services)
+      );
       console.log('💾 Đã lưu services vào localStorage');
     } catch (error) {
       console.error('❌ Lỗi khi lưu services vào cache:', error);
@@ -1050,7 +1204,9 @@ export class DetailroomComponent implements OnInit, OnDestroy {
   // ===== FAVORITES METHODS =====
   private loadFavoriteRoomsFromStorage() {
     try {
-      const favoriteRooms = localStorage.getItem(this.STORAGE_KEYS.FAVORITE_ROOMS);
+      const favoriteRooms = localStorage.getItem(
+        this.STORAGE_KEYS.FAVORITE_ROOMS
+      );
       if (favoriteRooms) {
         const favorites = JSON.parse(favoriteRooms);
         console.log('💾 Đã load favorite rooms:', favorites);
@@ -1062,7 +1218,9 @@ export class DetailroomComponent implements OnInit, OnDestroy {
 
   private isRoomFavorite(roomId: number): boolean {
     try {
-      const favoriteRooms = localStorage.getItem(this.STORAGE_KEYS.FAVORITE_ROOMS);
+      const favoriteRooms = localStorage.getItem(
+        this.STORAGE_KEYS.FAVORITE_ROOMS
+      );
       if (favoriteRooms) {
         const favorites = JSON.parse(favoriteRooms);
         return favorites.includes(roomId);
@@ -1082,10 +1240,10 @@ export class DetailroomComponent implements OnInit, OnDestroy {
 
   private mapRoomCategory(roomType: string): string {
     const categoryMap: { [key: string]: string } = {
-      'Standard': 'standard',
-      'Deluxe': 'deluxe',
-      'Suite': 'suite',
-      'Penthouse': 'penthouse'
+      Standard: 'standard',
+      Deluxe: 'deluxe',
+      Suite: 'suite',
+      Penthouse: 'penthouse',
     };
     return categoryMap[roomType] || 'standard';
   }
@@ -1095,7 +1253,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
       'https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1629140727571-9b5c6f6267b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1629140727571-9b5c6f6267b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     ];
     return roomImages[Math.floor(Math.random() * roomImages.length)];
   }
@@ -1107,9 +1265,6 @@ export class DetailroomComponent implements OnInit, OnDestroy {
     }
     return images;
   }
-
-
-
 
   // ===== EVENT HANDLERS =====
   toggleMobileMenu() {
@@ -1123,10 +1278,12 @@ export class DetailroomComponent implements OnInit, OnDestroy {
   toggleFavorite() {
     const room = this.currentRoom();
     room.isFavorite = !room.isFavorite;
-    this.currentRoom.set({...room});
+    this.currentRoom.set({ ...room });
 
     try {
-      const favoriteRooms = localStorage.getItem(this.STORAGE_KEYS.FAVORITE_ROOMS);
+      const favoriteRooms = localStorage.getItem(
+        this.STORAGE_KEYS.FAVORITE_ROOMS
+      );
       let favorites: number[] = favoriteRooms ? JSON.parse(favoriteRooms) : [];
 
       if (room.isFavorite) {
@@ -1134,10 +1291,13 @@ export class DetailroomComponent implements OnInit, OnDestroy {
           favorites.push(room.id);
         }
       } else {
-        favorites = favorites.filter(id => id !== room.id);
+        favorites = favorites.filter((id) => id !== room.id);
       }
 
-      localStorage.setItem(this.STORAGE_KEYS.FAVORITE_ROOMS, JSON.stringify(favorites));
+      localStorage.setItem(
+        this.STORAGE_KEYS.FAVORITE_ROOMS,
+        JSON.stringify(favorites)
+      );
     } catch (error) {
       console.error('❌ Lỗi khi update favorite:', error);
     }
@@ -1149,7 +1309,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
       navigator.share({
         title: room.name,
         text: room.description,
-        url: window.location.href
+        url: window.location.href,
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
@@ -1222,12 +1382,12 @@ export class DetailroomComponent implements OnInit, OnDestroy {
   // ===== SERVICE QUANTITY METHODS =====
   increaseServiceQuantity(service: Service) {
     const tempServices = this.tempServices();
-    const existingService = tempServices.find(s => s.id === service.id);
+    const existingService = tempServices.find((s) => s.id === service.id);
 
     if (existingService) {
       existingService.quantity = (existingService.quantity || 0) + 1;
     } else {
-      tempServices.push({...service, quantity: 1});
+      tempServices.push({ ...service, quantity: 1 });
     }
 
     this.tempServices.set([...tempServices]);
@@ -1235,12 +1395,16 @@ export class DetailroomComponent implements OnInit, OnDestroy {
 
   decreaseServiceQuantity(service: Service) {
     const tempServices = this.tempServices();
-    const existingService = tempServices.find(s => s.id === service.id);
+    const existingService = tempServices.find((s) => s.id === service.id);
 
-    if (existingService && existingService.quantity && existingService.quantity > 0) {
+    if (
+      existingService &&
+      existingService.quantity &&
+      existingService.quantity > 0
+    ) {
       existingService.quantity -= 1;
       if (existingService.quantity === 0) {
-        const index = tempServices.findIndex(s => s.id === service.id);
+        const index = tempServices.findIndex((s) => s.id === service.id);
         tempServices.splice(index, 1);
       }
     }
@@ -1249,7 +1413,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
   }
 
   getServiceQuantity(service: Service): number {
-    const tempService = this.tempServices().find(s => s.id === service.id);
+    const tempService = this.tempServices().find((s) => s.id === service.id);
     return tempService?.quantity || 0;
   }
 
@@ -1262,17 +1426,17 @@ export class DetailroomComponent implements OnInit, OnDestroy {
 
   updateServiceQuantity(service: Service, quantity: number) {
     const services = this.selectedServices();
-    const existingService = services.find(s => s.id === service.id);
+    const existingService = services.find((s) => s.id === service.id);
 
     if (existingService) {
       if (quantity > 0) {
         existingService.quantity = quantity;
       } else {
-        const index = services.findIndex(s => s.id === service.id);
+        const index = services.findIndex((s) => s.id === service.id);
         services.splice(index, 1);
       }
     } else if (quantity > 0) {
-      services.push({...service, quantity});
+      services.push({ ...service, quantity });
     }
 
     this.selectedServices.set([...services]);
@@ -1280,13 +1444,13 @@ export class DetailroomComponent implements OnInit, OnDestroy {
   }
 
   removeService(service: Service) {
-    const services = this.selectedServices().filter(s => s.id !== service.id);
+    const services = this.selectedServices().filter((s) => s.id !== service.id);
     this.selectedServices.set(services);
   }
 
   getTotalServicePrice(): number {
     return this.selectedServices().reduce((total, service) => {
-      return total + (service.price * (service.quantity || 0));
+      return total + service.price * (service.quantity || 0);
     }, 0);
   }
 
@@ -1306,7 +1470,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
   formatPrice(price: number): string {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
-      currency: 'VND'
+      currency: 'VND',
     }).format(price);
   }
 
@@ -1316,20 +1480,22 @@ export class DetailroomComponent implements OnInit, OnDestroy {
       form: this.bookingForm,
       services: this.selectedServices(),
       totalPrice: this.getTotalServicePrice() + (this.currentRoom().price || 0),
-      user: this.currentUser()
+      user: this.currentUser(),
     };
 
     console.log('📝 Booking data:', bookingData);
 
     try {
-      localStorage.setItem(this.STORAGE_KEYS.BOOKING_DATA, JSON.stringify(bookingData));
+      localStorage.setItem(
+        this.STORAGE_KEYS.BOOKING_DATA,
+        JSON.stringify(bookingData)
+      );
       console.log('💾 Đã lưu booking data');
 
       alert('Đặt phòng thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.');
 
       this.closeBookingModal();
       this.resetBookingForm();
-
     } catch (error) {
       console.error('❌ Lỗi khi lưu booking data:', error);
       alert('Có lỗi xảy ra. Vui lòng thử lại.');
@@ -1343,7 +1509,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
       checkInTime: '14:00',
       checkOutTime: '12:00',
       guestCount: '2',
-      specialRequests: ''
+      specialRequests: '',
     };
   }
 
@@ -1378,7 +1544,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
       subtotal,
       taxes,
       serviceFee,
-      totalPrice
+      totalPrice,
     };
   }
 
@@ -1402,7 +1568,7 @@ export class DetailroomComponent implements OnInit, OnDestroy {
         checkOutTime: room.checkOutTime || '12:00',
         roomSize: room.roomSize || '',
         bedType: room.bedType || '',
-        amenities: room.amenities || []
+        amenities: room.amenities || [],
       },
       selectedServices: services,
       bookingForm: {
@@ -1411,11 +1577,11 @@ export class DetailroomComponent implements OnInit, OnDestroy {
         checkInTime: this.bookingForm.checkInTime,
         checkOutTime: this.bookingForm.checkOutTime,
         guestCount: this.bookingForm.guestCount,
-        specialRequests: this.bookingForm.specialRequests
+        specialRequests: this.bookingForm.specialRequests,
       },
       pricing,
       userInfo: this.currentUser(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     console.log('📋 DETAIL - Final bookingPaymentData:', bookingPaymentData);
@@ -1423,13 +1589,13 @@ export class DetailroomComponent implements OnInit, OnDestroy {
   }
 
   proceedToPayment() {
-if (!this.bookingForm.checkInDate || !this.bookingForm.checkOutDate) {
-  this.showDateWarning.set(true);
-  setTimeout(() => {
-    this.showDateWarning.set(false);
-  }, 5000);
-  return;
-}
+    if (!this.bookingForm.checkInDate || !this.bookingForm.checkOutDate) {
+      this.showDateWarning.set(true);
+      setTimeout(() => {
+        this.showDateWarning.set(false);
+      }, 5000);
+      return;
+    }
 
     console.log('🔍 DETAIL - Current bookingForm:', this.bookingForm);
 
@@ -1447,7 +1613,6 @@ if (!this.bookingForm.checkInDate || !this.bookingForm.checkOutDate) {
 
       console.log('💾 Đã lưu booking payment data');
       this.router.navigate(['/bookingpayment']);
-
     } catch (error) {
       console.error('❌ Lỗi khi lưu booking payment data:', error);
       alert('Có lỗi xảy ra. Vui lòng thử lại.');
@@ -1546,9 +1711,12 @@ if (!this.bookingForm.checkInDate || !this.bookingForm.checkOutDate) {
   }
 
   getAvatar(name: string): string {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      name
+    )}&background=random`;
   }
-  closeDateWarning() {  // ← THÊM METHOD NÀY
-  this.showDateWarning.set(false);
-}
+  closeDateWarning() {
+    // ← THÊM METHOD NÀY
+    this.showDateWarning.set(false);
+  }
 }

@@ -5,6 +5,7 @@ import { RouterModule, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { catchError, finalize, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { API_URL } from '../../constants';
 
 interface Service {
   id: number;
@@ -24,9 +25,8 @@ function isBrowser(): boolean {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './listservice.component.html',
-  styleUrls: ['./listservice.component.css']
+  styleUrls: ['./listservice.component.css'],
 })
-
 export class ListserviceComponent {
   authService = inject(AuthService);
   private http = inject(HttpClient);
@@ -39,7 +39,7 @@ export class ListserviceComponent {
   newService = signal<Partial<Service> & { imageFile?: File }>({
     name: '',
     price: 0,
-    description: ''
+    description: '',
   });
 
   editingService = signal<Partial<Service> & { imageFile?: File }>({});
@@ -66,32 +66,37 @@ export class ListserviceComponent {
       if (local) {
         const parsed = JSON.parse(local);
         this.userInfo.set({
-          fullName: parsed.fullName || ''
+          fullName: parsed.fullName || '',
         });
       }
     }
   }
 
   userInfo = signal<LoggedInUser>({
-    fullName: ''
+    fullName: '',
   });
 
   fetchServices() {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.http.get<{ status: string; data: Service[] }>('http://localhost:8080/api/v1/hotel-services')
+    this.http
+      .get<{ status: string; data: Service[] }>(
+        `${API_URL}/api/v1/hotel-services`
+      )
       .pipe(
         finalize(() => this.isLoading.set(false)),
-        catchError(err => {
-          this.errorMessage.set('Không thể tải dữ liệu dịch vụ. Vui lòng thử lại sau.');
+        catchError((err) => {
+          this.errorMessage.set(
+            'Không thể tải dữ liệu dịch vụ. Vui lòng thử lại sau.'
+          );
           return of({ status: 'error', data: [] });
         })
       )
       .subscribe({
         next: (res) => {
           this.services.set(Array.isArray(res.data) ? res.data : []);
-        }
+        },
       });
   }
 
@@ -100,7 +105,11 @@ export class ListserviceComponent {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    if (!service.name || service.price === undefined || service.price === null) {
+    if (
+      !service.name ||
+      service.price === undefined ||
+      service.price === null
+    ) {
       this.errorMessage.set('Vui lòng điền đầy đủ thông tin bắt buộc.');
       return;
     }
@@ -110,7 +119,7 @@ export class ListserviceComponent {
     const dto = {
       name: service.name,
       price: service.price,
-      description: service.description || ''
+      description: service.description || '',
     };
 
     formData.append(
@@ -123,7 +132,8 @@ export class ListserviceComponent {
     }
 
     this.isLoading.set(true);
-    this.http.post('http://localhost:8080/api/v1/hotel-services', formData)
+    this.http
+      .post(`${API_URL}/api/v1/hotel-services`, formData)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
@@ -135,7 +145,7 @@ export class ListserviceComponent {
         error: (err) => {
           console.error('Create failed:', err);
           this.errorMessage.set('Thêm dịch vụ thất bại. Vui lòng thử lại.');
-        }
+        },
       });
   }
 
@@ -153,16 +163,20 @@ export class ListserviceComponent {
     const dto = {
       name: service.name,
       price: service.price ?? 0,
-      description: service.description ?? ''
+      description: service.description ?? '',
     };
-    formData.append('service', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
+    formData.append(
+      'service',
+      new Blob([JSON.stringify(dto)], { type: 'application/json' })
+    );
 
     if (service.imageFile instanceof File) {
       formData.append('image', service.imageFile);
     }
 
     this.isLoading.set(true);
-    this.http.put(`http://localhost:8080/api/v1/hotel-services/${service.id}`, formData)
+    this.http
+      .put(`${API_URL}/api/v1/hotel-services/${service.id}`, formData)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
@@ -174,13 +188,14 @@ export class ListserviceComponent {
         error: (err) => {
           console.error('Update failed:', err);
           this.errorMessage.set('Cập nhật dịch vụ thất bại. Vui lòng thử lại.');
-        }
+        },
       });
   }
 
   deleteService(id: number) {
     this.isLoading.set(true);
-    this.http.delete(`http://localhost:8080/api/v1/hotel-services/${id}`)
+    this.http
+      .delete(`${API_URL}/api/v1/hotel-services/${id}`)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
@@ -190,7 +205,7 @@ export class ListserviceComponent {
         },
         error: () => {
           this.errorMessage.set('Xóa dịch vụ thất bại. Vui lòng thử lại.');
-        }
+        },
       });
   }
 
@@ -201,9 +216,9 @@ export class ListserviceComponent {
     if (!file) return;
 
     if (type === 'new') {
-      this.newService.update(s => ({ ...s, imageFile: file }));
+      this.newService.update((s) => ({ ...s, imageFile: file }));
     } else {
-      this.editingService.update(s => ({ ...s, imageFile: file }));
+      this.editingService.update((s) => ({ ...s, imageFile: file }));
     }
   }
 
@@ -213,18 +228,27 @@ export class ListserviceComponent {
     const priceRange = this.selectedPriceRange();
     const serviceType = this.selectedServiceType();
 
-    return this.services().filter(service => {
-      const matchesSearch = service.name.toLowerCase().includes(q) ||
+    return this.services().filter((service) => {
+      const matchesSearch =
+        service.name.toLowerCase().includes(q) ||
         (service.description?.toLowerCase()?.includes(q) ?? false);
 
       let matchesPrice = true;
       if (priceRange) {
         const price = service.price;
         switch (priceRange) {
-          case 'under-100k': matchesPrice = price < 100000; break;
-          case '100k-500k': matchesPrice = price >= 100000 && price <= 500000; break;
-          case '500k-1m': matchesPrice = price >= 500000 && price <= 1000000; break;
-          case 'over-1m': matchesPrice = price > 1000000; break;
+          case 'under-100k':
+            matchesPrice = price < 100000;
+            break;
+          case '100k-500k':
+            matchesPrice = price >= 100000 && price <= 500000;
+            break;
+          case '500k-1m':
+            matchesPrice = price >= 500000 && price <= 1000000;
+            break;
+          case 'over-1m':
+            matchesPrice = price > 1000000;
+            break;
         }
       }
 
@@ -232,11 +256,24 @@ export class ListserviceComponent {
       if (serviceType) {
         const name = service.name.toLowerCase();
         switch (serviceType) {
-          case 'food': matchesType = name.includes('ăn') || name.includes('thức'); break;
-          case 'spa': matchesType = name.includes('spa') || name.includes('massage'); break;
-          case 'transport': matchesType = name.includes('xe') || name.includes('vận chuyển'); break;
-          case 'entertainment': matchesType = name.includes('giải trí'); break;
-          case 'other': matchesType = !name.includes('ăn') && !name.includes('spa') && !name.includes('xe'); break;
+          case 'food':
+            matchesType = name.includes('ăn') || name.includes('thức');
+            break;
+          case 'spa':
+            matchesType = name.includes('spa') || name.includes('massage');
+            break;
+          case 'transport':
+            matchesType = name.includes('xe') || name.includes('vận chuyển');
+            break;
+          case 'entertainment':
+            matchesType = name.includes('giải trí');
+            break;
+          case 'other':
+            matchesType =
+              !name.includes('ăn') &&
+              !name.includes('spa') &&
+              !name.includes('xe');
+            break;
         }
       }
 
@@ -259,7 +296,7 @@ export class ListserviceComponent {
       name: '',
       price: 0,
       description: '',
-      imageFile: undefined
+      imageFile: undefined,
     });
     this.errorMessage.set('');
     this.showAddServiceModal.set(true);
@@ -299,7 +336,7 @@ export class ListserviceComponent {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND',
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(price);
   }
 
@@ -352,7 +389,7 @@ export class ListserviceComponent {
     this.showToastMessage({
       type: 'info',
       title: 'Chuyển hướng',
-      message: 'Đang chuyển đến trang profile...'
+      message: 'Đang chuyển đến trang profile...',
     });
   }
 
@@ -361,7 +398,12 @@ export class ListserviceComponent {
     this.currentRoute.set(this.router.url || '/dashboard');
   }
 
-  showToastMessage(config: { type: 'success' | 'error' | 'warning' | 'info'; title: string; message: string; duration?: number }): void {
+  showToastMessage(config: {
+    type: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+    duration?: number;
+  }): void {
     this.toastType.set(config.type);
     this.toastTitle.set(config.title);
     this.toastMessage.set(config.message);

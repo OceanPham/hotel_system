@@ -1,10 +1,17 @@
-import { Component, signal, computed, HostListener, OnInit } from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  HostListener,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {Router, RouterModule} from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpClientModule, HttpParams } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
+import { API_URL } from '../../constants';
 interface RoomImage {
   id?: number;
   roomId?: number;
@@ -44,12 +51,12 @@ function isBrowser(): boolean {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, HttpClientModule],
   templateUrl: './listroom.component.html',
-  styleUrl: './listroom.component.css'
+  styleUrl: './listroom.component.css',
 })
 export class ListroomComponent implements OnInit {
   authService = inject(AuthService);
   private http = inject(HttpClient);
-  private apiBase = 'http://localhost:8080/api/v1/rooms';
+  private apiBase = `${API_URL}/api/v1/rooms`;
 
   searchQuery = signal('');
   selectedRoomType = signal('');
@@ -75,7 +82,7 @@ export class ListroomComponent implements OnInit {
     basePrice: 0,
     status: 'Vacant',
     description: '',
-    images: []
+    images: [],
   });
   editingRoom = signal<Room | null>(null);
   confirmationData = signal<ConfirmationData | null>(null);
@@ -90,7 +97,7 @@ export class ListroomComponent implements OnInit {
         const parsed = JSON.parse(local);
         this.userInfo.set({
           fullName: parsed.fullName || '',
-          avatar: parsed.avatar || ''
+          avatar: parsed.avatar || '',
         });
       }
     }
@@ -101,7 +108,7 @@ export class ListroomComponent implements OnInit {
     this.showToastMessage({
       type: 'info',
       title: 'Chuyển hướng',
-      message: 'Đang chuyển đến trang profile...'
+      message: 'Đang chuyển đến trang profile...',
     });
   }
   constructor(private router: Router) {
@@ -109,7 +116,12 @@ export class ListroomComponent implements OnInit {
     this.currentRoute.set(this.router.url || '/dashboard');
   }
 
-  showToastMessage(config: { type: 'success' | 'error' | 'warning' | 'info'; title: string; message: string; duration?: number }): void {
+  showToastMessage(config: {
+    type: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+    duration?: number;
+  }): void {
     this.toastType.set(config.type);
     this.toastTitle.set(config.title);
     this.toastMessage.set(config.message);
@@ -126,14 +138,17 @@ export class ListroomComponent implements OnInit {
   }
   userInfo = signal<LoggedInUser>({
     fullName: '',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face&auto=format',
+    avatar:
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face&auto=format',
   });
 
   fetchRooms(): void {
     let params = new HttpParams();
     if (this.searchQuery()) params = params.set('roomName', this.searchQuery());
-    if (this.selectedStatus()) params = params.set('status', this.selectedStatus());
-    if (this.selectedRoomType()) params = params.set('roomType', this.selectedRoomType());
+    if (this.selectedStatus())
+      params = params.set('status', this.selectedStatus());
+    if (this.selectedRoomType())
+      params = params.set('roomType', this.selectedRoomType());
 
     this.http.get<any>(this.apiBase, { params }).subscribe({
       next: (res) => {
@@ -143,7 +158,7 @@ export class ListroomComponent implements OnInit {
           this.showError(res.retMsg || 'Lỗi tải phòng');
         }
       },
-      error: () => this.showError('Không thể kết nối đến máy chủ')
+      error: () => this.showError('Không thể kết nối đến máy chủ'),
     });
   }
 
@@ -156,7 +171,7 @@ export class ListroomComponent implements OnInit {
       basePrice: 0,
       status: 'Vacant',
       description: '',
-      images: []
+      images: [],
     });
     this.showAddRoomModal.set(true);
   }
@@ -175,7 +190,9 @@ export class ListroomComponent implements OnInit {
       const images = [...room.images];
       images.push({ imageUrl, file, isMain: images.length === 0 });
       const updatedRoom = { ...room, images };
-      isEdit ? this.editingRoom.set(updatedRoom) : this.newRoom.set(updatedRoom);
+      isEdit
+        ? this.editingRoom.set(updatedRoom)
+        : this.newRoom.set(updatedRoom);
     };
     input.click();
   }
@@ -185,7 +202,7 @@ export class ListroomComponent implements OnInit {
     if (!room) return;
     const images = [...room.images];
     images.splice(index, 1);
-    if (!images.some(img => img.isMain) && images.length > 0) {
+    if (!images.some((img) => img.isMain) && images.length > 0) {
       images[0].isMain = true;
     }
     const updatedRoom = { ...room, images };
@@ -195,7 +212,10 @@ export class ListroomComponent implements OnInit {
   setMainImage(index: number, isEdit = false): void {
     const room = isEdit ? this.editingRoom() : this.newRoom();
     if (!room) return;
-    const images = room.images.map((img, i) => ({ ...img, isMain: i === index }));
+    const images = room.images.map((img, i) => ({
+      ...img,
+      isMain: i === index,
+    }));
     const updatedRoom = { ...room, images };
     isEdit ? this.editingRoom.set(updatedRoom) : this.newRoom.set(updatedRoom);
   }
@@ -211,7 +231,9 @@ export class ListroomComponent implements OnInit {
       if (!room || !room.images[index]) return;
       room.images[index].imageUrl = imageUrl;
       room.images[index].file = file;
-      isEdit ? this.editingRoom.set({ ...room }) : this.newRoom.set({ ...room });
+      isEdit
+        ? this.editingRoom.set({ ...room })
+        : this.newRoom.set({ ...room });
     };
     reader.readAsDataURL(file);
   }
@@ -222,9 +244,10 @@ export class ListroomComponent implements OnInit {
       this.showError('Vui lòng nhập đủ thông tin phòng');
       return;
     }
-    const duplicate = this.rooms().some(r =>
-      r.roomNumber.toLowerCase() === nr.roomNumber.toLowerCase() ||
-      r.roomName.toLowerCase() === nr.roomName.toLowerCase()
+    const duplicate = this.rooms().some(
+      (r) =>
+        r.roomNumber.toLowerCase() === nr.roomNumber.toLowerCase() ||
+        r.roomName.toLowerCase() === nr.roomName.toLowerCase()
     );
     if (duplicate) {
       this.showError('Phòng đã tồn tại');
@@ -236,7 +259,7 @@ export class ListroomComponent implements OnInit {
       title: 'Xác nhận thêm phòng',
       message: `Thêm "${nr.roomName}" với giá ${nr.basePrice}`,
       confirmText: 'Thêm',
-      cancelText: 'Hủy'
+      cancelText: 'Hủy',
     });
     this.pendingAction = () => {
       this.createRoomAPI(nr);
@@ -249,7 +272,7 @@ export class ListroomComponent implements OnInit {
     const formData = new FormData();
 
     // Chỉ lấy những ảnh có file (tức là sẽ upload)
-    const imagesToUpload = room.images.filter(img => img.file);
+    const imagesToUpload = room.images.filter((img) => img.file);
 
     // Tạo room JSON tương ứng với file upload
     const roomData = {
@@ -259,7 +282,7 @@ export class ListroomComponent implements OnInit {
       basePrice: room.basePrice,
       status: this.toRoomStatus(room.status),
       description: room.description,
-      images: imagesToUpload.map(i => ({ isMain: i.isMain }))
+      images: imagesToUpload.map((i) => ({ isMain: i.isMain })),
     };
 
     // Thêm phần JSON
@@ -275,14 +298,14 @@ export class ListroomComponent implements OnInit {
 
     this.http.post<any>(this.apiBase, formData).subscribe({
       next: (res) => {
-        res.status === 'Success' ? this.showSuccess(res.retMsg) : this.showError(res.retMsg);
+        res.status === 'Success'
+          ? this.showSuccess(res.retMsg)
+          : this.showError(res.retMsg);
         this.fetchRooms();
       },
-      error: () => this.showError('Không thể kết nối')
+      error: () => this.showError('Không thể kết nối'),
     });
   }
-
-
 
   showEditRoom(room: Room): void {
     this.editingRoom.set({ ...room });
@@ -293,10 +316,11 @@ export class ListroomComponent implements OnInit {
     const er = this.editingRoom();
     if (!er) return;
 
-    const duplicate = this.rooms().some(r =>
-      r.id !== er.id &&
-      (r.roomNumber.toLowerCase() === er.roomNumber.toLowerCase() ||
-        r.roomName.toLowerCase() === er.roomName.toLowerCase())
+    const duplicate = this.rooms().some(
+      (r) =>
+        r.id !== er.id &&
+        (r.roomNumber.toLowerCase() === er.roomNumber.toLowerCase() ||
+          r.roomName.toLowerCase() === er.roomName.toLowerCase())
     );
     if (duplicate) {
       this.showError('Phòng đã tồn tại');
@@ -308,7 +332,7 @@ export class ListroomComponent implements OnInit {
       title: 'Xác nhận cập nhật',
       message: `Cập nhật "${er.roomName}"`,
       confirmText: 'Cập nhật',
-      cancelText: 'Hủy'
+      cancelText: 'Hủy',
     });
     this.pendingAction = () => {
       this.updateRoomAPI(er.id, er);
@@ -328,13 +352,16 @@ export class ListroomComponent implements OnInit {
       basePrice: room.basePrice,
       status: this.toRoomStatus(room.status),
       description: room.description,
-      images: room.images.map(i => ({
+      images: room.images.map((i) => ({
         id: i.id,
-        isMain: i.isMain
-      }))
+        isMain: i.isMain,
+      })),
     };
 
-    formData.append('room', new Blob([JSON.stringify(roomData)], { type: 'application/json' }));
+    formData.append(
+      'room',
+      new Blob([JSON.stringify(roomData)], { type: 'application/json' })
+    );
 
     room.images.forEach((img, i) => {
       if (img.file) {
@@ -344,10 +371,12 @@ export class ListroomComponent implements OnInit {
 
     this.http.put<any>(`${this.apiBase}/${id}`, formData).subscribe({
       next: (res) => {
-        res.status === 'Success' ? this.showSuccess(res.retMsg) : this.showError(res.retMsg);
+        res.status === 'Success'
+          ? this.showSuccess(res.retMsg)
+          : this.showError(res.retMsg);
         this.fetchRooms();
       },
-      error: () => this.showError('Không thể kết nối')
+      error: () => this.showError('Không thể kết nối'),
     });
   }
 
@@ -357,7 +386,7 @@ export class ListroomComponent implements OnInit {
       title: 'Xác nhận xóa',
       message: `Xóa phòng "${room.roomName}"?`,
       confirmText: 'Xóa',
-      cancelText: 'Hủy'
+      cancelText: 'Hủy',
     });
     this.pendingAction = () => this.deleteRoomAPI(room.id);
     this.showConfirmationModal.set(true);
@@ -366,10 +395,12 @@ export class ListroomComponent implements OnInit {
   deleteRoomAPI(id: number): void {
     this.http.delete<any>(`${this.apiBase}/${id}`).subscribe({
       next: (res) => {
-        res.status === 'Success' ? this.showSuccess(res.retMsg) : this.showError(res.retMsg);
+        res.status === 'Success'
+          ? this.showSuccess(res.retMsg)
+          : this.showError(res.retMsg);
         this.fetchRooms();
       },
-      error: () => this.showError('Không thể kết nối')
+      error: () => this.showError('Không thể kết nối'),
     });
   }
 
@@ -387,7 +418,7 @@ export class ListroomComponent implements OnInit {
   formatPrice(value: number): string {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
-      currency: 'VND'
+      currency: 'VND',
     }).format(value);
   }
 
@@ -408,7 +439,9 @@ export class ListroomComponent implements OnInit {
   }
 
   filteredRooms = computed(() => this.rooms());
-  totalPages = computed(() => Math.ceil(this.filteredRooms().length / this.itemsPerPage()));
+  totalPages = computed(() =>
+    Math.ceil(this.filteredRooms().length / this.itemsPerPage())
+  );
   paginatedRooms = computed(() => {
     const start = (this.currentPage() - 1) * this.itemsPerPage();
     return this.filteredRooms().slice(start, start + this.itemsPerPage());
@@ -426,12 +459,12 @@ export class ListroomComponent implements OnInit {
   }
   toRoomType(type: string): 'Standard' | 'Deluxe' | 'Suite' {
     const allowed = ['Standard', 'Deluxe', 'Suite'];
-    return allowed.includes(type) ? type as any : 'Standard';
+    return allowed.includes(type) ? (type as any) : 'Standard';
   }
 
   toRoomStatus(status: string): 'Vacant' | 'Booked' | 'Inactive' {
     const allowed = ['Vacant', 'Booked', 'Inactive'];
-    return allowed.includes(status) ? status as any : 'Vacant';
+    return allowed.includes(status) ? (status as any) : 'Vacant';
   }
   logout(): void {
     this.authService.logout(); // gọi hàm đã có trong auth.service.ts
@@ -454,7 +487,7 @@ export class ListroomComponent implements OnInit {
     this.showUserDropdown.set(!this.showUserDropdown());
   }
   getRoomMainImage(room: Room): string | null {
-    const mainImage = room.images?.find(img => img.isMain);
+    const mainImage = room.images?.find((img) => img.isMain);
     if (!mainImage || !mainImage.imageUrl) return null;
 
     // ✅ Thêm domain backend nếu đường dẫn là tương đối
@@ -462,72 +495,70 @@ export class ListroomComponent implements OnInit {
       return mainImage.imageUrl;
     }
 
-    return `http://localhost:8080${mainImage.imageUrl}`;
+    return `${API_URL}${mainImage.imageUrl}`;
   }
 
-
   handleMultipleFiles(event: Event): void {
-  const input = event.target as HTMLInputElement;
-  if (!input.files?.length) return;
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
 
-  Array.from(input.files).forEach((file, index) => {
+    Array.from(input.files).forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageUrl = reader.result as string;
+        const images = [...this.newRoom().images];
+        images.push({
+          imageUrl,
+          file,
+          isMain: images.length === 0,
+        });
+        this.newRoom.set({ ...this.newRoom(), images });
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  setNewRoomType(roomType: 'Standard' | 'Deluxe' | 'Suite'): void {
+    const current = this.newRoom();
+    this.newRoom.set({
+      ...current,
+      roomType: roomType,
+    });
+  }
+
+  setEditRoomType(roomType: 'Standard' | 'Deluxe' | 'Suite'): void {
+    const current = this.editingRoom();
+    if (current) {
+      this.editingRoom.set({
+        ...current,
+        roomType: roomType,
+      });
+    }
+  }
+
+  setNewRoomStatus(status: 'Vacant' | 'Booked' | 'Inactive'): void {
+    const current = this.newRoom();
+    this.newRoom.set({
+      ...current,
+      status: status,
+    });
+  }
+
+  handleEditImageUpload(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const file = input.files[0];
     const reader = new FileReader();
     reader.onload = () => {
       const imageUrl = reader.result as string;
-      const images = [...this.newRoom().images];
-      images.push({
-        imageUrl,
-        file,
-        isMain: images.length === 0
-      });
-      this.newRoom.set({ ...this.newRoom(), images });
+      const current = this.editingRoom();
+      if (current) {
+        const images = [...current.images];
+        images.push({ imageUrl, file, isMain: images.length === 0 });
+        this.editingRoom.set({ ...current, images });
+      }
     };
     reader.readAsDataURL(file);
-  });
-}
-
-setNewRoomType(roomType: 'Standard' | 'Deluxe' | 'Suite'): void {
-  const current = this.newRoom();
-  this.newRoom.set({
-    ...current,
-    roomType: roomType
-  });
-}
-
-setEditRoomType(roomType: 'Standard' | 'Deluxe' | 'Suite'): void {
-  const current = this.editingRoom();
-  if (current) {
-    this.editingRoom.set({
-      ...current,
-      roomType: roomType
-    });
   }
-}
-
-setNewRoomStatus(status: 'Vacant' | 'Booked' | 'Inactive'): void {
-  const current = this.newRoom();
-  this.newRoom.set({
-    ...current,
-    status: status
-  });
-}
-
-handleEditImageUpload(event: Event): void {
-  const input = event.target as HTMLInputElement;
-  if (!input.files?.length) return;
-
-  const file = input.files[0];
-  const reader = new FileReader();
-  reader.onload = () => {
-    const imageUrl = reader.result as string;
-    const current = this.editingRoom();
-    if (current) {
-      const images = [...current.images];
-      images.push({ imageUrl, file, isMain: images.length === 0 });
-      this.editingRoom.set({ ...current, images });
-    }
-  };
-  reader.readAsDataURL(file);
-}
-
 }

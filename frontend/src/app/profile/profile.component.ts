@@ -1,19 +1,24 @@
-import {Component, signal, OnInit, HostListener, inject} from '@angular/core';
+import { Component, signal, OnInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../services/auth.service';
+import { API_URL } from '../../constants';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css'
+  styleUrl: './profile.component.css',
 })
-
 export class ProfileComponent implements OnInit {
   showUserDropdown = signal(false);
   showLogoutModal = signal(false);
@@ -32,12 +37,12 @@ export class ProfileComponent implements OnInit {
     gender: '',
     nationality: '',
     role: '',
-    status: ''
+    status: '',
   });
 
   authService = inject(AuthService);
   profileForm: FormGroup;
-  readonly apiBaseUrl = 'http://localhost:8080/api/users';
+  readonly apiBaseUrl = `${API_URL}/api/users`;
 
   constructor(
     private fb: FormBuilder,
@@ -63,13 +68,15 @@ export class ProfileComponent implements OnInit {
   private createProfileForm(): FormGroup {
     const profile = this.userProfile();
     return this.fb.group({
-      fullName: [profile.fullName, [Validators.required, Validators.minLength(2)]],
+      fullName: [
+        profile.fullName,
+        [Validators.required, Validators.minLength(2)],
+      ],
       email: [profile.email, [Validators.required, Validators.email]],
       phone: [profile.phone, [Validators.pattern(/^[\+]?[0-9\s\-\(\)]+$/)]],
       gender: [profile.gender],
-      nationality: [profile.nationality]
+      nationality: [profile.nationality],
     });
-
   }
 
   private loadUserProfile(): void {
@@ -77,7 +84,7 @@ export class ProfileComponent implements OnInit {
     if (!username) return;
 
     this.http.get<any>(`${this.apiBaseUrl}/${username}`).subscribe({
-      next: res => {
+      next: (res) => {
         if (res?.status === 'SUCCESS') {
           const profile: UserProfile = res.data;
           this.userProfile.set(profile);
@@ -85,10 +92,9 @@ export class ProfileComponent implements OnInit {
           localStorage.setItem('userProfile', JSON.stringify(profile));
         }
       },
-      error: () => this.showErrorToast('Không thể tải thông tin người dùng')
+      error: () => this.showErrorToast('Không thể tải thông tin người dùng'),
     });
   }
-
 
   goBack(): void {
     this.location.back();
@@ -119,7 +125,13 @@ export class ProfileComponent implements OnInit {
     this.showLogoutModal.set(false);
     localStorage.clear();
     this.showSuccessToast('Đăng xuất thành công. Đang chuyển hướng...');
-    setTimeout(() => this.router.navigate(['/login']).catch(() => this.router.navigate(['/'])), 1500);
+    setTimeout(
+      () =>
+        this.router
+          .navigate(['/login'])
+          .catch(() => this.router.navigate(['/'])),
+      1500
+    );
   }
 
   toggleEditMode(): void {
@@ -148,7 +160,7 @@ export class ProfileComponent implements OnInit {
     const username = this.userProfile().username;
     const updatedData = {
       ...this.userProfile(),
-      ...this.profileForm.value
+      ...this.profileForm.value,
     };
 
     this.http.put(`${this.apiBaseUrl}/${username}`, updatedData).subscribe({
@@ -158,7 +170,7 @@ export class ProfileComponent implements OnInit {
         localStorage.setItem('userProfile', JSON.stringify(updatedData));
         this.showSuccessToast('Thông tin cá nhân đã được cập nhật');
       },
-      error: () => this.showErrorToast('Lỗi khi cập nhật thông tin cá nhân')
+      error: () => this.showErrorToast('Lỗi khi cập nhật thông tin cá nhân'),
     });
   }
 
@@ -171,11 +183,10 @@ export class ProfileComponent implements OnInit {
     const roleMap: { [key: string]: string } = {
       accountant: 'Kế toán',
       user: 'Người dùng',
-      staff: 'Nhân viên'
+      staff: 'Nhân viên',
     };
     return roleMap[this.userProfile().role.toLowerCase()] || 'Người dùng';
   }
-
 
   private showSuccessToast(message: string): void {
     this.showToastMessage('success', 'Thành công', message);
@@ -206,7 +217,7 @@ export class ProfileComponent implements OnInit {
       success: 'success-icon',
       error: 'error-icon',
       warning: 'warning-icon',
-      info: 'info-icon'
+      info: 'info-icon',
     };
     return iconMap[this.toastType()] || 'info-icon';
   }
