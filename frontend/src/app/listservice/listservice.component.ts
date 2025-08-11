@@ -5,7 +5,11 @@ import { RouterModule, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { catchError, finalize, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { API_URL } from '../../constants';
+import {
+  API_URL,
+  CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_UPLOAD_PRESET,
+} from '../../constants';
 
 interface Service {
   id: number;
@@ -114,39 +118,56 @@ export class ListserviceComponent {
       return;
     }
 
-    const formData = new FormData();
+    const performCreate = async () => {
+      try {
+        this.isLoading.set(true);
 
-    const dto = {
-      name: service.name,
-      price: service.price,
-      description: service.description || '',
+        let imageUrl: string | undefined = undefined;
+        if (service.imageFile instanceof File) {
+          const uploaded = await this.uploadToCloudinary(
+            service.imageFile,
+            'hotel-services'
+          );
+          if (!uploaded?.url) {
+            this.errorMessage.set(
+              'Tải ảnh lên Cloudinary thất bại. Vui lòng thử lại.'
+            );
+            return;
+          }
+          imageUrl = uploaded.url;
+        }
+
+        const payload = {
+          name: service.name,
+          price: service.price,
+          description: service.description || '',
+          imageUrl,
+        };
+
+        this.http
+          .post(`${API_URL}/api/v1/hotel-services`, payload)
+          .pipe(finalize(() => this.isLoading.set(false)))
+          .subscribe({
+            next: () => {
+              this.successMessage.set('Thêm dịch vụ thành công');
+              this.showAddServiceModal.set(false);
+              this.fetchServices();
+              setTimeout(() => this.successMessage.set(''), 3000);
+            },
+            error: (err) => {
+              console.error('Create failed:', err);
+              this.errorMessage.set('Thêm dịch vụ thất bại. Vui lòng thử lại.');
+            },
+          });
+      } catch (e) {
+        console.error(e);
+        this.isLoading.set(false);
+        this.errorMessage.set('Có lỗi xảy ra. Vui lòng thử lại.');
+      }
     };
 
-    formData.append(
-      'service',
-      new Blob([JSON.stringify(dto)], { type: 'application/json' })
-    );
-
-    if (service.imageFile instanceof File) {
-      formData.append('image', service.imageFile);
-    }
-
-    this.isLoading.set(true);
-    this.http
-      .post(`${API_URL}/api/v1/hotel-services`, formData)
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: () => {
-          this.successMessage.set('Thêm dịch vụ thành công');
-          this.showAddServiceModal.set(false);
-          this.fetchServices();
-          setTimeout(() => this.successMessage.set(''), 3000);
-        },
-        error: (err) => {
-          console.error('Create failed:', err);
-          this.errorMessage.set('Thêm dịch vụ thất bại. Vui lòng thử lại.');
-        },
-      });
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    performCreate();
   }
 
   updateService() {
@@ -159,37 +180,101 @@ export class ListserviceComponent {
       return;
     }
 
-    const formData = new FormData();
-    const dto = {
-      name: service.name,
-      price: service.price ?? 0,
-      description: service.description ?? '',
+    const performUpdate = async () => {
+      try {
+        this.isLoading.set(true);
+
+        let imageUrl = service.imageUrl;
+        if (service.imageFile instanceof File) {
+          const uploaded = await this.uploadToCloudinary(
+            service.imageFile,
+            'hotel-services'
+          );
+          if (!uploaded?.url) {
+            this.errorMessage.set(
+              'Tải ảnh lên Cloudinary thất bại. Vui lòng thử lại.'
+            );
+            return;
+          }
+          imageUrl = uploaded.url;
+        }
+
+        const payload = {
+          name: service.name,
+          price: service.price ?? 0,
+          description: service.description ?? '',
+          imageUrl,
+        };
+
+        this.http
+          .put(`${API_URL}/api/v1/hotel-services/${service.id}`, payload)
+          .pipe(finalize(() => this.isLoading.set(false)))
+          .subscribe({
+            next: () => {
+              this.successMessage.set('Cập nhật dịch vụ thành công');
+              this.showEditServiceModal.set(false);
+              this.fetchServices();
+              setTimeout(() => this.successMessage.set(''), 3000);
+            },
+            error: (err) => {
+              console.error('Update failed:', err);
+              this.errorMessage.set(
+                'Cập nhật dịch vụ thất bại. Vui lòng thử lại.'
+              );
+            },
+          });
+      } catch (e) {
+        console.error(e);
+        this.isLoading.set(false);
+        this.errorMessage.set('Có lỗi xảy ra. Vui lòng thử lại.');
+      }
     };
-    formData.append(
-      'service',
-      new Blob([JSON.stringify(dto)], { type: 'application/json' })
-    );
 
-    if (service.imageFile instanceof File) {
-      formData.append('image', service.imageFile);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    performUpdate();
+  }
+
+  private async uploadToCloudinary(
+    file: File,
+    folder = 'default'
+  ): Promise<
+    { url: string; public_id: string; mime: string; size: number } | undefined
+  > {
+    try {
+      const cloudName = CLOUDINARY_CLOUD_NAME;
+      const uploadPreset = CLOUDINARY_UPLOAD_PRESET;
+
+      if (!cloudName || !uploadPreset) {
+        console.error('Cloudinary config is missing');
+        return undefined;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', uploadPreset);
+      formData.append('folder', folder);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+      const data = await response.json();
+      if (data.secure_url) {
+        return {
+          url: data.secure_url,
+          public_id: data.public_id,
+          mime: `${data.resource_type}/${data.format}`,
+          size: data.bytes,
+        };
+      }
+      throw new Error(data.error?.message || 'Upload failed');
+    } catch (error) {
+      console.error('Error uploading file to Cloudinary:', error);
+      return undefined;
     }
-
-    this.isLoading.set(true);
-    this.http
-      .put(`${API_URL}/api/v1/hotel-services/${service.id}`, formData)
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: () => {
-          this.successMessage.set('Cập nhật dịch vụ thành công');
-          this.showEditServiceModal.set(false);
-          this.fetchServices();
-          setTimeout(() => this.successMessage.set(''), 3000);
-        },
-        error: (err) => {
-          console.error('Update failed:', err);
-          this.errorMessage.set('Cập nhật dịch vụ thất bại. Vui lòng thử lại.');
-        },
-      });
   }
 
   deleteService(id: number) {

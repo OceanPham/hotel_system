@@ -80,6 +80,10 @@ export class ProfileComponent implements OnInit {
   }
 
   private loadUserProfile(): void {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return;
+    }
+
     const username = localStorage.getItem('username');
     if (!username) return;
 
@@ -89,7 +93,9 @@ export class ProfileComponent implements OnInit {
           const profile: UserProfile = res.data;
           this.userProfile.set(profile);
           this.profileForm.patchValue(profile);
-          localStorage.setItem('userProfile', JSON.stringify(profile));
+          if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem('userProfile', JSON.stringify(profile));
+          }
         }
       },
       error: () => this.showErrorToast('Không thể tải thông tin người dùng'),
@@ -123,7 +129,9 @@ export class ProfileComponent implements OnInit {
 
   confirmLogout(): void {
     this.showLogoutModal.set(false);
-    localStorage.clear();
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.clear();
+    }
     this.showSuccessToast('Đăng xuất thành công. Đang chuyển hướng...');
     setTimeout(
       () =>
@@ -167,7 +175,9 @@ export class ProfileComponent implements OnInit {
       next: () => {
         this.userProfile.set(updatedData);
         this.isEditMode.set(false);
-        localStorage.setItem('userProfile', JSON.stringify(updatedData));
+        if (typeof window !== 'undefined' && window.localStorage) {
+          localStorage.setItem('userProfile', JSON.stringify(updatedData));
+        }
         this.showSuccessToast('Thông tin cá nhân đã được cập nhật');
       },
       error: () => this.showErrorToast('Lỗi khi cập nhật thông tin cá nhân'),

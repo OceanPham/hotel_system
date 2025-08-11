@@ -25,9 +25,11 @@ export class ChangePasswordComponent {
 
   constructor(private http: HttpClient, private router: Router) {
     // ✅ Lấy username từ localStorage sau khi đăng nhập
-    const stored = localStorage.getItem('user');
-    if (stored) {
-      this.username = JSON.parse(stored).username;
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        this.username = JSON.parse(stored).username;
+      }
     }
   }
 

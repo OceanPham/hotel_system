@@ -5,8 +5,10 @@ import {
   OnInit,
   HostListener,
   inject,
+  Inject,
+  PLATFORM_ID,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -116,11 +118,24 @@ export class BookinghistoryComponent implements OnInit {
     '/api/v1'
   )}/feedbacks`;
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
+
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
 
   ngOnInit(): void {
-    this.loadUserData();
-    this.loadBookingHistory();
+    if (this.isBrowser()) {
+      this.loadUserData();
+      this.loadBookingHistory();
+    } else {
+      // On server: don't access window/localStorage
+      this.isLoading.set(false);
+    }
   }
 
   @HostListener('window:scroll', ['$event'])
@@ -182,6 +197,7 @@ export class BookinghistoryComponent implements OnInit {
 
   // Data loading methods
   private loadUserData(): void {
+    if (!this.isBrowser()) return;
     const userJson = localStorage.getItem('user');
     if (userJson) {
       const user = JSON.parse(userJson);
@@ -191,6 +207,10 @@ export class BookinghistoryComponent implements OnInit {
 
   private loadBookingHistory(): void {
     this.isLoading.set(true);
+    if (!this.isBrowser()) {
+      this.isLoading.set(false);
+      return;
+    }
 
     const token = localStorage.getItem('token');
     if (!token) {
@@ -406,6 +426,8 @@ export class BookinghistoryComponent implements OnInit {
     const booking = this.selectedCancelBooking();
     if (!booking) return;
 
+    if (!this.isBrowser()) return;
+
     const token = localStorage.getItem('token');
     if (!token) {
       this.showNotificationMessage('Bạn chưa đăng nhập.', 'error');
@@ -508,6 +530,8 @@ export class BookinghistoryComponent implements OnInit {
       return;
     }
 
+    if (!this.isBrowser()) return;
+
     const token = localStorage.getItem('token');
     if (!token) {
       this.showNotificationMessage('Bạn chưa đăng nhập.', 'error');
@@ -550,6 +574,8 @@ export class BookinghistoryComponent implements OnInit {
   }
 
   getMyFeedbackForBooking(bookingId: number): void {
+    if (!this.isBrowser()) return;
+
     const token = localStorage.getItem('token');
     if (!token) return;
 
@@ -584,6 +610,8 @@ export class BookinghistoryComponent implements OnInit {
   }
 
   deleteFeedback(feedbackId: number): void {
+    if (!this.isBrowser()) return;
+
     const token = localStorage.getItem('token');
     if (!token) {
       this.showNotificationMessage('Bạn chưa đăng nhập.', 'error');

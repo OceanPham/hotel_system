@@ -60,6 +60,18 @@ public class RoomRestController {
         }
     }
 
+    // ✅ CREATE ROOM (ảnh đã là URL Cloudinary, gửi JSON thuần)
+    @PostMapping(value = "", consumes = "application/json")
+    @PreAuthorize("hasRole('STAFF')")
+    public Result createRoomJson(@RequestBody RoomDTO.Req roomReq) {
+        try {
+            roomService.insertFromUrls(roomReq);
+            return new Result("Success", "Room created with image URLs.");
+        } catch (Exception e) {
+            return new Result("Error", e.getMessage());
+        }
+    }
+
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     @PreAuthorize("hasRole('STAFF')")
     public Result updateRoom(
@@ -71,6 +83,22 @@ public class RoomRestController {
             roomReq.setId(id);
             roomService.updateWithImages(roomReq, images);
             return new Result("Success", "Room updated with images.");
+        } catch (Exception e) {
+            return new Result("Error", e.getMessage());
+        }
+    }
+
+    // ✅ UPDATE ROOM (ảnh đã là URL Cloudinary, gửi JSON thuần)
+    @PutMapping(value = "/{id}", consumes = "application/json")
+    @PreAuthorize("hasRole('STAFF')")
+    public Result updateRoomJson(
+            @PathVariable Integer id,
+            @RequestBody RoomDTO.Req roomReq
+    ) {
+        try {
+            roomReq.setId(id);
+            roomService.updateFromUrls(roomReq);
+            return new Result("Success", "Room updated with image URLs.");
         } catch (Exception e) {
             return new Result("Error", e.getMessage());
         }

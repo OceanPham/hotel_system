@@ -11,7 +11,11 @@ import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpClientModule, HttpParams } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
-import { API_URL } from '../../constants';
+import {
+  API_URL,
+  CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_UPLOAD_PRESET,
+} from '../../constants';
 interface RoomImage {
   id?: number;
   roomId?: number;
@@ -240,13 +244,15 @@ export class ListroomComponent implements OnInit {
 
   showAddConfirmation(): void {
     const nr = this.newRoom();
+
+    console.log('data submit', nr);
     if (!nr.roomName || !nr.roomNumber) {
       this.showError('Vui lòng nhập đủ thông tin phòng');
       return;
     }
     const duplicate = this.rooms().some(
       (r) =>
-        r.roomNumber.toLowerCase() === nr.roomNumber.toLowerCase() ||
+        r.roomNumber === nr.roomNumber ||
         r.roomName.toLowerCase() === nr.roomName.toLowerCase()
     );
     if (duplicate) {
@@ -268,43 +274,48 @@ export class ListroomComponent implements OnInit {
     this.showConfirmationModal.set(true);
   }
 
-  createRoomAPI(room: Room): void {
-    const formData = new FormData();
+  async createRoomAPI(room: Room): Promise<void> {
+    try {
+      const uploadedUrls: { imageUrl: string; isMain?: boolean }[] = [];
+      for (const img of room.images) {
+        if (img.file) {
+          const url = await this.uploadToCloudinary(img.file, 'hotel-rooms');
+          if (!url) {
+            this.showError('Upload ảnh thất bại');
+            return;
+          }
+          uploadedUrls.push({ imageUrl: url, isMain: img.isMain });
+        } else if (img.imageUrl) {
+          uploadedUrls.push({ imageUrl: img.imageUrl, isMain: img.isMain });
+        }
+      }
 
-    // Chỉ lấy những ảnh có file (tức là sẽ upload)
-    const imagesToUpload = room.images.filter((img) => img.file);
+      const payload = {
+        roomNumber: room.roomNumber,
+        roomName: room.roomName,
+        roomType: this.toRoomType(room.roomType),
+        basePrice: room.basePrice,
+        status: this.toRoomStatus(room.status),
+        description: room.description,
+        images: uploadedUrls,
+      };
 
-    // Tạo room JSON tương ứng với file upload
-    const roomData = {
-      roomNumber: room.roomNumber,
-      roomName: room.roomName,
-      roomType: this.toRoomType(room.roomType),
-      basePrice: room.basePrice,
-      status: this.toRoomStatus(room.status),
-      description: room.description,
-      images: imagesToUpload.map((i) => ({ isMain: i.isMain })),
-    };
-
-    // Thêm phần JSON
-    formData.append(
-      'room',
-      new Blob([JSON.stringify(roomData)], { type: 'application/json' })
-    );
-
-    // Thêm ảnh từ máy
-    imagesToUpload.forEach((img, i) => {
-      formData.append('images', img.file!, `room-${Date.now()}-${i}.jpg`);
-    });
-
-    this.http.post<any>(this.apiBase, formData).subscribe({
-      next: (res) => {
-        res.status === 'Success'
-          ? this.showSuccess(res.retMsg)
-          : this.showError(res.retMsg);
-        this.fetchRooms();
-      },
-      error: () => this.showError('Không thể kết nối'),
-    });
+      this.http
+        .post<any>(this.apiBase, payload, {
+          headers: { 'Content-Type': 'application/json' },
+        })
+        .subscribe({
+          next: (res) => {
+            res.status === 'Success'
+              ? this.showSuccess(res.retMsg || 'Đã tạo phòng')
+              : this.showError(res.retMsg || 'Tạo phòng thất bại');
+            this.fetchRooms();
+          },
+          error: () => this.showError('Không thể kết nối'),
+        });
+    } catch (e) {
+      this.showError('Có lỗi khi tạo phòng');
+    }
   }
 
   showEditRoom(room: Room): void {
@@ -341,43 +352,57 @@ export class ListroomComponent implements OnInit {
     this.showConfirmationModal.set(true);
   }
 
-  updateRoomAPI(id: number, room: Room): void {
-    const formData = new FormData();
-
-    const roomData = {
-      id: room.id,
-      roomNumber: room.roomNumber,
-      roomName: room.roomName,
-      roomType: this.toRoomType(room.roomType),
-      basePrice: room.basePrice,
-      status: this.toRoomStatus(room.status),
-      description: room.description,
-      images: room.images.map((i) => ({
-        id: i.id,
-        isMain: i.isMain,
-      })),
-    };
-
-    formData.append(
-      'room',
-      new Blob([JSON.stringify(roomData)], { type: 'application/json' })
-    );
-
-    room.images.forEach((img, i) => {
-      if (img.file) {
-        formData.append('images', img.file, `room-${Date.now()}-${i}.jpg`);
+  async updateRoomAPI(id: number, room: Room): Promise<void> {
+    try {
+      const uploadedUrls: {
+        id?: number;
+        imageUrl: string;
+        isMain?: boolean;
+      }[] = [];
+      for (const img of room.images) {
+        if (img.file) {
+          const url = await this.uploadToCloudinary(img.file, 'hotel-rooms');
+          if (!url) {
+            this.showError('Upload ảnh thất bại');
+            return;
+          }
+          uploadedUrls.push({ imageUrl: url, isMain: img.isMain });
+        } else if (img.imageUrl) {
+          uploadedUrls.push({
+            id: img.id,
+            imageUrl: img.imageUrl,
+            isMain: img.isMain,
+          });
+        }
       }
-    });
 
-    this.http.put<any>(`${this.apiBase}/${id}`, formData).subscribe({
-      next: (res) => {
-        res.status === 'Success'
-          ? this.showSuccess(res.retMsg)
-          : this.showError(res.retMsg);
-        this.fetchRooms();
-      },
-      error: () => this.showError('Không thể kết nối'),
-    });
+      const payload = {
+        id: room.id,
+        roomNumber: room.roomNumber,
+        roomName: room.roomName,
+        roomType: this.toRoomType(room.roomType),
+        basePrice: room.basePrice,
+        status: this.toRoomStatus(room.status),
+        description: room.description,
+        images: uploadedUrls,
+      };
+
+      this.http
+        .put<any>(`${this.apiBase}/${id}`, payload, {
+          headers: { 'Content-Type': 'application/json' },
+        })
+        .subscribe({
+          next: (res) => {
+            res.status === 'Success'
+              ? this.showSuccess(res.retMsg || 'Đã cập nhật phòng')
+              : this.showError(res.retMsg || 'Cập nhật phòng thất bại');
+            this.fetchRooms();
+          },
+          error: () => this.showError('Không thể kết nối'),
+        });
+    } catch (e) {
+      this.showError('Có lỗi khi cập nhật phòng');
+    }
   }
 
   deleteRoom(room: Room): void {
@@ -507,11 +532,7 @@ export class ListroomComponent implements OnInit {
       reader.onload = () => {
         const imageUrl = reader.result as string;
         const images = [...this.newRoom().images];
-        images.push({
-          imageUrl,
-          file,
-          isMain: images.length === 0,
-        });
+        images.push({ imageUrl, file, isMain: images.length === 0 });
         this.newRoom.set({ ...this.newRoom(), images });
       };
       reader.readAsDataURL(file);
@@ -560,5 +581,30 @@ export class ListroomComponent implements OnInit {
       }
     };
     reader.readAsDataURL(file);
+  }
+
+  // ===== Upload ảnh lên Cloudinary, trả về secure_url =====
+  private async uploadToCloudinary(
+    file: File,
+    folder = 'hotel-rooms'
+  ): Promise<string | undefined> {
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      form.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      form.append('folder', folder);
+      const resp = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`,
+        {
+          method: 'POST',
+          body: form,
+        }
+      );
+      const data = await resp.json();
+      return data?.secure_url as string | undefined;
+    } catch (e) {
+      console.error('Upload Cloudinary error', e);
+      return undefined;
+    }
   }
 }

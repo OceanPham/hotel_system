@@ -121,6 +121,21 @@ public class RoomService {
         saveRoomImages(req.getId(), images, req);
     }
 
+    // ✅ Tạo phòng từ danh sách imageUrl (Cloudinary) gửi trực tiếp trong JSON
+    public void insertFromUrls(RoomDTO.Req req) {
+        insert(req);
+        saveRoomImageUrls(req.getId(), req);
+    }
+
+    // ✅ Cập nhật phòng với imageUrl (Cloudinary) từ JSON
+    public void updateFromUrls(RoomDTO.Req req) {
+        updateRoom(req);
+        // Xóa ảnh cũ rồi ghi lại theo danh sách mới
+        roomImageService.getImagesByRoomId(req.getId())
+                .forEach(img -> roomImageService.deleteImage(img.getId()));
+        saveRoomImageUrls(req.getId(), req);
+    }
+
     // ✅ Ghi ảnh vào thư mục uploads và lưu imageUrl vào DB
     private void saveRoomImages(Integer roomId, List<MultipartFile> files, RoomDTO.Req req) {
         if (files == null || files.isEmpty()) return;
@@ -138,6 +153,21 @@ public class RoomService {
             } catch (IOException e) {
                 throw new RuntimeException("Failed to save image: " + file.getOriginalFilename(), e);
             }
+        }
+    }
+
+    // ✅ Lưu danh sách imageUrl (ví dụ URL Cloudinary) trực tiếp vào DB
+    private void saveRoomImageUrls(Integer roomId, RoomDTO.Req req) {
+        if (req.getImages() == null || req.getImages().isEmpty()) return;
+        for (int i = 0; i < req.getImages().size(); i++) {
+            RoomImageDTO.Req imageReq = req.getImages().get(i);
+            imageReq.setRoomId(roomId);
+            // Đảm bảo cờ ảnh chính đúng vị trí
+            Boolean isMain = imageReq.getIsMain();
+            if (isMain == null) {
+                imageReq.setIsMain(i == 0);
+            }
+            roomImageService.addImage(imageReq.toModel());
         }
     }
 

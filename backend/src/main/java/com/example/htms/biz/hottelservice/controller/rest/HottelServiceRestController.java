@@ -7,15 +7,10 @@ import com.example.htms.biz.hottelservice.service.HottelServiceService;
 import com.example.htms.common.http.model.Result;
 import com.example.htms.common.http.model.ResultData;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.nio.file.*;
 import java.util.List;
-import java.util.UUID;
+ 
 
 @Tag(name = "Hotel Service API v1")
 @RestController
@@ -50,19 +45,11 @@ public class HottelServiceRestController {
     }
 
     /* ---------- CREATE ---------- */
-    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("")
     @PreAuthorize("hasRole('STAFF')")
-    public Result create(
-            @RequestPart("service") HottelServiceDTO.Req req,
-            @RequestPart(value = "image", required = false) MultipartFile image
-    ) {
+    public Result create(@RequestBody HottelServiceDTO.Req req) {
         try {
             HottelService entity = req.toModel();
-
-            if (image != null && !image.isEmpty()) {
-                entity.setImageUrl(saveUploadedFile(image));
-            }
-
             service.insert(entity);
             return new Result("Success", "Service created successfully.");
         } catch (IllegalArgumentException e) {
@@ -75,21 +62,15 @@ public class HottelServiceRestController {
 
 
     /* ---------- UPDATE ---------- */
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}")
     @PreAuthorize("hasRole('STAFF')")
     public Result update(
             @PathVariable Integer id,
-            @RequestPart("service") HottelServiceDTO.Req req,
-            @RequestPart(value = "image", required = false) MultipartFile image
+            @RequestBody HottelServiceDTO.Req req
     ) {
         try {
             HottelService entity = req.toModel();
             entity.setId(id);
-
-            if (image != null && !image.isEmpty()) {
-                entity.setImageUrl(saveUploadedFile(image));
-            }
-
             boolean ok = service.update(entity);
             return ok
                     ? new Result("Success", "Service updated successfully.")
@@ -112,17 +93,4 @@ public class HottelServiceRestController {
     }
 
     /* ---------- Helper ---------- */
-    private String saveUploadedFile(MultipartFile file) throws IOException {
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path uploadPath = Paths.get("uploads");
-
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
-        Path filePath = uploadPath.resolve(fileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        return "/uploads/" + fileName;
-    }
 }

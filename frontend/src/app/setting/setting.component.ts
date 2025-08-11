@@ -1,6 +1,20 @@
-import {Component, signal, computed, OnInit, HostListener, inject} from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  OnInit,
+  HostListener,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
@@ -46,7 +60,7 @@ interface SettingTab {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule, FormsModule],
   templateUrl: './setting.component.html',
-  styleUrl: './setting.component.css'
+  styleUrl: './setting.component.css',
 })
 export class SettingComponent implements OnInit {
   authService = inject(AuthService);
@@ -66,16 +80,24 @@ export class SettingComponent implements OnInit {
   showLogoutModal = signal(false);
 
   settingTabs: SettingTab[] = [
-    { key: 'profile', label: 'Thông tin cá nhân', iconClass: 'icon profile-icon' },
+    {
+      key: 'profile',
+      label: 'Thông tin cá nhân',
+      iconClass: 'icon profile-icon',
+    },
     { key: 'security', label: 'Bảo mật', iconClass: 'icon security-icon' },
-    { key: 'notifications', label: 'Thông báo', iconClass: 'icon notification-tab-icon' },
-    { key: 'system', label: 'Hệ thống', iconClass: 'icon system-icon' }
+    {
+      key: 'notifications',
+      label: 'Thông báo',
+      iconClass: 'icon notification-tab-icon',
+    },
+    { key: 'system', label: 'Hệ thống', iconClass: 'icon system-icon' },
   ];
 
   themeOptions = [
     { key: 'light', name: 'Sáng', class: 'light' },
     { key: 'dark', name: 'Tối', class: 'dark' },
-    { key: 'auto', name: 'Tự động', class: 'auto' }
+    { key: 'auto', name: 'Tự động', class: 'auto' },
   ];
 
   userProfile = signal<UserProfile>({
@@ -84,12 +106,13 @@ export class SettingComponent implements OnInit {
     phone: '+84 912 345 678',
     role: 'admin',
     address: '123 Đường ABC, Quận 1, TP.HCM',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    avatar:
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
   });
 
   securitySettings = signal<SecuritySettings>({
     twoFactorEnabled: false,
-    loginNotifications: true
+    loginNotifications: true,
   });
 
   systemSettings = signal<SystemSettings>({
@@ -98,7 +121,7 @@ export class SettingComponent implements OnInit {
     timezone: 'Asia/Ho_Chi_Minh',
     itemsPerPage: 10,
     collapsedSidebar: false,
-    animations: true
+    animations: true,
   });
 
   emailNotificationOptions: NotificationOption[] = [
@@ -106,26 +129,26 @@ export class SettingComponent implements OnInit {
       key: 'newBooking',
       title: 'Đặt phòng mới',
       description: 'Nhận thông báo khi có đặt phòng mới',
-      enabled: true
+      enabled: true,
     },
     {
       key: 'paymentReceived',
       title: 'Thanh toán thành công',
       description: 'Thông báo khi nhận được thanh toán từ khách hàng',
-      enabled: true
+      enabled: true,
     },
     {
       key: 'bookingCancellation',
       title: 'Hủy đặt phòng',
       description: 'Thông báo khi khách hàng hủy đặt phòng',
-      enabled: true
+      enabled: true,
     },
     {
       key: 'systemUpdates',
       title: 'Cập nhật hệ thống',
       description: 'Nhận thông báo về các cập nhật và bảo trì hệ thống',
-      enabled: false
-    }
+      enabled: false,
+    },
   ];
 
   pushNotificationOptions: NotificationOption[] = [
@@ -133,20 +156,20 @@ export class SettingComponent implements OnInit {
       key: 'urgentBooking',
       title: 'Đặt phòng khẩn cấp',
       description: 'Thông báo ngay lập tức cho đặt phòng cần xử lý gấp',
-      enabled: true
+      enabled: true,
     },
     {
       key: 'checkInReminder',
       title: 'Nhắc nhở check-in',
       description: 'Nhắc nhở trước 30 phút khi khách check-in',
-      enabled: true
+      enabled: true,
     },
     {
       key: 'maintenanceAlert',
       title: 'Cảnh báo bảo trì',
       description: 'Thông báo khi phòng cần bảo trì hoặc sửa chữa',
-      enabled: false
-    }
+      enabled: false,
+    },
   ];
 
   profileForm: FormGroup;
@@ -186,12 +209,17 @@ export class SettingComponent implements OnInit {
     this.showUserDropdown.set(false);
 
     // Navigate to profile page
-    this.router.navigate(['/profile']).then(() => {
-      this.showSuccessToast('Chuyển đến trang Profile');
-    }).catch(() => {
-      // If profile route doesn't exist, show error message
-      this.showErrorToast('Trang Profile chưa được tạo. Vui lòng tạo route /profile');
-    });
+    this.router
+      .navigate(['/profile'])
+      .then(() => {
+        this.showSuccessToast('Chuyển đến trang Profile');
+      })
+      .catch(() => {
+        // If profile route doesn't exist, show error message
+        this.showErrorToast(
+          'Trang Profile chưa được tạo. Vui lòng tạo route /profile'
+        );
+      });
   }
   logout(): void {
     this.authService.logout(); // gọi hàm đã có trong auth.service.ts
@@ -211,10 +239,12 @@ export class SettingComponent implements OnInit {
     this.showLogoutModal.set(false);
 
     // Clear any stored data
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    localStorage.removeItem('userProfile');
-    localStorage.removeItem('authToken');
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      localStorage.removeItem('userProfile');
+      localStorage.removeItem('authToken');
+    }
 
     // Show logout message
     this.showSuccessToast('Đăng xuất thành công. Đang chuyển hướng...');
@@ -235,16 +265,26 @@ export class SettingComponent implements OnInit {
       email: [profile.email, [Validators.required, Validators.email]],
       phone: [profile.phone, [Validators.pattern(/^[\+]?[0-9\s\-\(\)]+$/)]],
       role: [profile.role, Validators.required],
-      address: [profile.address]
+      address: [profile.address],
     });
   }
 
   private createSecurityForm(): FormGroup {
-    return this.fb.group({
-      currentPassword: ['', Validators.required],
-      newPassword: ['', [Validators.required, Validators.minLength(8), this.passwordValidator]],
-      confirmPassword: ['', Validators.required]
-    }, { validators: this.passwordMatchValidator });
+    return this.fb.group(
+      {
+        currentPassword: ['', Validators.required],
+        newPassword: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(8),
+            this.passwordValidator,
+          ],
+        ],
+        confirmPassword: ['', Validators.required],
+      },
+      { validators: this.passwordMatchValidator }
+    );
   }
 
   private createSystemForm(): FormGroup {
@@ -253,7 +293,10 @@ export class SettingComponent implements OnInit {
       theme: [settings.theme, Validators.required],
       language: [settings.language, Validators.required],
       timezone: [settings.timezone, Validators.required],
-      itemsPerPage: [settings.itemsPerPage, [Validators.required, Validators.min(5), Validators.max(100)]]
+      itemsPerPage: [
+        settings.itemsPerPage,
+        [Validators.required, Validators.min(5), Validators.max(100)],
+      ],
     });
   }
 
@@ -270,13 +313,17 @@ export class SettingComponent implements OnInit {
     return valid ? null : { passwordStrength: true };
   }
 
-  private passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+  private passwordMatchValidator(
+    control: AbstractControl
+  ): ValidationErrors | null {
     const newPassword = control.get('newPassword');
     const confirmPassword = control.get('confirmPassword');
 
     if (!newPassword || !confirmPassword) return null;
 
-    return newPassword.value === confirmPassword.value ? null : { passwordMismatch: true };
+    return newPassword.value === confirmPassword.value
+      ? null
+      : { passwordMismatch: true };
   }
 
   passwordStrength = computed(() => {
@@ -306,7 +353,9 @@ export class SettingComponent implements OnInit {
   }
 
   triggerAvatarUpload(): void {
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const input = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
     input?.click();
   }
 
@@ -318,7 +367,7 @@ export class SettingComponent implements OnInit {
         const currentProfile = this.userProfile();
         this.userProfile.set({
           ...currentProfile,
-          avatar: e.target?.result as string
+          avatar: e.target?.result as string,
         });
         this.showSuccessToast('Ảnh đại diện đã được cập nhật');
       };
@@ -333,11 +382,13 @@ export class SettingComponent implements OnInit {
 
       this.userProfile.set({
         ...currentProfile,
-        ...formData
+        ...formData,
       });
 
       // Save to localStorage
-      localStorage.setItem('userProfile', JSON.stringify(this.userProfile()));
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('userProfile', JSON.stringify(this.userProfile()));
+      }
 
       this.showSuccessToast('Thông tin cá nhân đã được lưu thành công');
     }
@@ -350,7 +401,7 @@ export class SettingComponent implements OnInit {
       email: profile.email,
       phone: profile.phone,
       role: profile.role,
-      address: profile.address
+      address: profile.address,
     });
   }
 
@@ -384,7 +435,7 @@ export class SettingComponent implements OnInit {
     const settings = this.securitySettings();
     this.securitySettings.set({
       ...settings,
-      twoFactorEnabled: event.target.checked
+      twoFactorEnabled: event.target.checked,
     });
 
     if (event.target.checked) {
@@ -398,19 +449,19 @@ export class SettingComponent implements OnInit {
     const settings = this.securitySettings();
     this.securitySettings.set({
       ...settings,
-      loginNotifications: event.target.checked
+      loginNotifications: event.target.checked,
     });
   }
 
   toggleEmailNotification(key: string, event: any): void {
-    const option = this.emailNotificationOptions.find(opt => opt.key === key);
+    const option = this.emailNotificationOptions.find((opt) => opt.key === key);
     if (option) {
       option.enabled = event.target.checked;
     }
   }
 
   togglePushNotification(key: string, event: any): void {
-    const option = this.pushNotificationOptions.find(opt => opt.key === key);
+    const option = this.pushNotificationOptions.find((opt) => opt.key === key);
     if (option) {
       option.enabled = event.target.checked;
     }
@@ -422,12 +473,18 @@ export class SettingComponent implements OnInit {
 
   resetNotificationSettings(): void {
     // Reset to default values
-    this.emailNotificationOptions.forEach(option => {
-      option.enabled = ['newBooking', 'paymentReceived', 'bookingCancellation'].includes(option.key);
+    this.emailNotificationOptions.forEach((option) => {
+      option.enabled = [
+        'newBooking',
+        'paymentReceived',
+        'bookingCancellation',
+      ].includes(option.key);
     });
 
-    this.pushNotificationOptions.forEach(option => {
-      option.enabled = ['urgentBooking', 'checkInReminder'].includes(option.key);
+    this.pushNotificationOptions.forEach((option) => {
+      option.enabled = ['urgentBooking', 'checkInReminder'].includes(
+        option.key
+      );
     });
 
     this.showInfoToast('Cài đặt thông báo đã được đặt lại về mặc định');
@@ -440,7 +497,7 @@ export class SettingComponent implements OnInit {
 
       this.systemSettings.set({
         ...currentSettings,
-        ...formData
+        ...formData,
       });
 
       this.showSuccessToast('Cài đặt hệ thống đã được lưu');
@@ -454,7 +511,7 @@ export class SettingComponent implements OnInit {
       timezone: 'Asia/Ho_Chi_Minh',
       itemsPerPage: 10,
       collapsedSidebar: false,
-      animations: true
+      animations: true,
     };
 
     this.systemSettings.set(defaultSettings);
@@ -466,7 +523,7 @@ export class SettingComponent implements OnInit {
     const settings = this.systemSettings();
     this.systemSettings.set({
       ...settings,
-      collapsedSidebar: event.target.checked
+      collapsedSidebar: event.target.checked,
     });
   }
 
@@ -474,7 +531,7 @@ export class SettingComponent implements OnInit {
     const settings = this.systemSettings();
     this.systemSettings.set({
       ...settings,
-      animations: event.target.checked
+      animations: event.target.checked,
     });
   }
 
@@ -494,7 +551,11 @@ export class SettingComponent implements OnInit {
     this.showToastMessage('info', 'Thông tin', message);
   }
 
-  private showToastMessage(type: 'success' | 'error' | 'warning' | 'info', title: string, message: string): void {
+  private showToastMessage(
+    type: 'success' | 'error' | 'warning' | 'info',
+    title: string,
+    message: string
+  ): void {
     this.toastType.set(type);
     this.toastTitle.set(title);
     this.toastMessage.set(message);
@@ -516,7 +577,7 @@ export class SettingComponent implements OnInit {
       success: 'success-icon',
       error: 'error-icon',
       warning: 'warning-icon',
-      info: 'info-icon'
+      info: 'info-icon',
     };
     return iconClasses[type] || 'info-icon';
   }

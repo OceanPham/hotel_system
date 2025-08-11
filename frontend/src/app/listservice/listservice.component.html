@@ -186,7 +186,7 @@
               <td>{{ (currentPage() - 1) * itemsPerPage() + i + 1 }}</td>
               <td>{{ service.name }}</td>
               <td>
-                <img *ngIf="service.imageUrl" [src]="'${API_URL}' + service.imageUrl" alt="Ảnh dịch vụ"
+                <img *ngIf="service.imageUrl" [src]="service.imageUrl" alt="Ảnh dịch vụ"
                   style="width: 60px; height: auto; border-radius: 4px;" />
 
                 <ng-template #noImage>

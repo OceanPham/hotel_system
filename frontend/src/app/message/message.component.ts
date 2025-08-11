@@ -1,4 +1,13 @@
-import { Component, OnInit, ViewChild, ElementRef, OnDestroy, AfterViewChecked, signal, HostListener } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  OnDestroy,
+  AfterViewChecked,
+  signal,
+  HostListener,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -37,7 +46,7 @@ interface Message {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './message.component.html',
-  styleUrls: ['./message.component.css']
+  styleUrls: ['./message.component.css'],
 })
 export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('messagesContainer') messagesContainer!: ElementRef;
@@ -66,57 +75,61 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
     phone: '',
     role: '',
     address: '',
-    avatar: ''
+    avatar: '',
   });
-
 
   // Dữ liệu mẫu conversations
   conversations: Conversation[] = [
     {
       id: 1,
       name: 'Nguyễn Văn An',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=48&h=48&fit=crop&crop=face&auto=format',
+      avatar:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=48&h=48&fit=crop&crop=face&auto=format',
       lastMessage: 'Chào admin, tôi muốn đặt phòng VIP cho tuần sau',
       lastMessageTime: '2 phút trước',
       isOnline: true,
-      unreadCount: 2
+      unreadCount: 2,
     },
     {
       id: 2,
       name: 'Trần Thị Bình',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612e742?w=48&h=48&fit=crop&crop=face&auto=format',
+      avatar:
+        'https://images.unsplash.com/photo-1494790108755-2616b612e742?w=48&h=48&fit=crop&crop=face&auto=format',
       lastMessage: 'Cảm ơn bạn về dịch vụ tuyệt vời!',
       lastMessageTime: '15 phút trước',
       isOnline: false,
-      unreadCount: 0
+      unreadCount: 0,
     },
     {
       id: 3,
       name: 'Lê Văn Cường',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=48&h=48&fit=crop&crop=face&auto=format',
+      avatar:
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=48&h=48&fit=crop&crop=face&auto=format',
       lastMessage: 'Phòng 203 có vấn đề với điều hòa',
       lastMessageTime: '1 giờ trước',
       isOnline: true,
-      unreadCount: 1
+      unreadCount: 1,
     },
     {
       id: 4,
       name: 'Phạm Thị Dung',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=48&h=48&fit=crop&crop=face&auto=format',
+      avatar:
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=48&h=48&fit=crop&crop=face&auto=format',
       lastMessage: 'Tôi sẽ check-out vào 11h sáng mai',
       lastMessageTime: '3 giờ trước',
       isOnline: false,
-      unreadCount: 0
+      unreadCount: 0,
     },
     {
       id: 5,
       name: 'Hoàng Văn Em',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=48&h=48&fit=crop&crop=face&auto=format',
+      avatar:
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=48&h=48&fit=crop&crop=face&auto=format',
       lastMessage: 'Có thể order thêm breakfast không?',
       lastMessageTime: '1 ngày trước',
       isOnline: true,
-      unreadCount: 0
-    }
+      unreadCount: 0,
+    },
   ];
 
   // Dữ liệu messages cho từng conversation
@@ -128,7 +141,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'customer-001',
         text: 'Chào admin, tôi là khách hàng mới',
         timestamp: new Date('2024-01-20T10:00:00'),
-        status: 'read'
+        status: 'read',
       },
       {
         id: 2,
@@ -136,7 +149,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'admin-001',
         text: 'Chào bạn! Chúng tôi rất vui được phục vụ bạn. Bạn cần hỗ trợ gì ạ?',
         timestamp: new Date('2024-01-20T10:01:00'),
-        status: 'read'
+        status: 'read',
       },
       {
         id: 3,
@@ -144,7 +157,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'customer-001',
         text: 'Tôi muốn đặt phòng VIP cho tuần sau, từ thứ 2 đến thứ 6',
         timestamp: new Date('2024-01-20T10:02:00'),
-        status: 'read'
+        status: 'read',
       },
       {
         id: 4,
@@ -152,7 +165,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'admin-001',
         text: 'Dạ được ạ! Hiện tại chúng tôi có phòng VIP Deluxe và VIP Suite. Bạn muốn xem chi tiết không?',
         timestamp: new Date('2024-01-20T10:03:00'),
-        status: 'read'
+        status: 'read',
       },
       {
         id: 5,
@@ -160,7 +173,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'customer-001',
         text: 'Tôi muốn xem giá phòng VIP Suite và các dịch vụ đi kèm',
         timestamp: new Date('2024-01-20T10:58:00'),
-        status: 'delivered'
+        status: 'delivered',
       },
       {
         id: 6,
@@ -168,8 +181,8 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'customer-001',
         text: 'Chào admin, tôi muốn đặt phòng VIP cho tuần sau',
         timestamp: new Date('2024-01-20T10:59:00'),
-        status: 'sent'
-      }
+        status: 'sent',
+      },
     ],
     2: [
       {
@@ -178,7 +191,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'customer-002',
         text: 'Cảm ơn khách sạn đã phục vụ tôi rất tốt trong 3 ngày qua',
         timestamp: new Date('2024-01-20T09:45:00'),
-        status: 'read'
+        status: 'read',
       },
       {
         id: 8,
@@ -186,7 +199,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'admin-001',
         text: 'Cảm ơn bạn đã tin tưởng và lựa chọn khách sạn chúng tôi! Hy vọng bạn có những trải nghiệm tuyệt vời.',
         timestamp: new Date('2024-01-20T09:46:00'),
-        status: 'read'
+        status: 'read',
       },
       {
         id: 9,
@@ -194,8 +207,8 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'customer-002',
         text: 'Cảm ơn bạn về dịch vụ tuyệt vời!',
         timestamp: new Date('2024-01-20T09:47:00'),
-        status: 'read'
-      }
+        status: 'read',
+      },
     ],
     3: [
       {
@@ -204,7 +217,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'customer-003',
         text: 'Phòng 203 có vấn đề với điều hòa, không mát lắm',
         timestamp: new Date('2024-01-20T09:00:00'),
-        status: 'read'
+        status: 'read',
       },
       {
         id: 11,
@@ -212,7 +225,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'admin-001',
         text: 'Dạ chúng tôi sẽ cử kỹ thuật viên lên kiểm tra ngay. Xin lỗi bạn về sự bất tiện này.',
         timestamp: new Date('2024-01-20T09:01:00'),
-        status: 'read'
+        status: 'read',
       },
       {
         id: 12,
@@ -220,8 +233,8 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'customer-003',
         text: 'Cảm ơn, tôi đang đợi kỹ thuật viên',
         timestamp: new Date('2024-01-20T09:02:00'),
-        status: 'read'
-      }
+        status: 'read',
+      },
     ],
     4: [
       {
@@ -230,7 +243,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'customer-004',
         text: 'Tôi sẽ check-out vào 11h sáng mai',
         timestamp: new Date('2024-01-20T06:00:00'),
-        status: 'read'
+        status: 'read',
       },
       {
         id: 14,
@@ -238,8 +251,8 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'admin-001',
         text: 'Dạ được ạ! Chúng tôi sẽ chuẩn bị hóa đơn cho bạn.',
         timestamp: new Date('2024-01-20T06:01:00'),
-        status: 'read'
-      }
+        status: 'read',
+      },
     ],
     5: [
       {
@@ -248,7 +261,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'customer-005',
         text: 'Có thể order thêm breakfast không?',
         timestamp: new Date('2024-01-19T08:00:00'),
-        status: 'read'
+        status: 'read',
       },
       {
         id: 16,
@@ -256,36 +269,96 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
         senderId: 'admin-001',
         text: 'Dạ được ạ! Menu breakfast từ 6h-10h sáng. Bạn muốn order gì?',
         timestamp: new Date('2024-01-19T08:01:00'),
-        status: 'read'
-      }
-    ]
+        status: 'read',
+      },
+    ],
   };
 
   // Messages hiện tại cho conversation được chọn
   currentMessages: Message[] = [];
 
   // Emojis cho emoji picker
-  emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '❤️', '💕', '💖', '💗', '💙', '💚', '💛', '🧡', '💜', '🖤', '🤍', '🤎', '💯', '💢', '💥', '💫', '💦', '💨', '🕳️', '💣', '💬', '👁️‍🗨️', '🗨️', '🗯️', '💭'];
+  emojis = [
+    '😀',
+    '😃',
+    '😄',
+    '😁',
+    '😆',
+    '😅',
+    '😂',
+    '🤣',
+    '😊',
+    '😇',
+    '🙂',
+    '🙃',
+    '😉',
+    '😌',
+    '😍',
+    '🥰',
+    '😘',
+    '😗',
+    '😙',
+    '😚',
+    '😋',
+    '😛',
+    '😝',
+    '😜',
+    '🤪',
+    '🤨',
+    '🧐',
+    '🤓',
+    '😎',
+    '🤩',
+    '🥳',
+    '😏',
+    '❤️',
+    '💕',
+    '💖',
+    '💗',
+    '💙',
+    '💚',
+    '💛',
+    '🧡',
+    '💜',
+    '🖤',
+    '🤍',
+    '🤎',
+    '💯',
+    '💢',
+    '💥',
+    '💫',
+    '💦',
+    '💨',
+    '🕳️',
+    '💣',
+    '💬',
+    '👁️‍🗨️',
+    '🗨️',
+    '🗯️',
+    '💭',
+  ];
 
   private typingTimeout: any;
 
   constructor(private router: Router) {}
   ngOnInit(): void {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      console.log('>>> ROLE CURRENT:', parsedUser.role); // ✅ Kiểm tra
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        console.log('>>> ROLE CURRENT:', parsedUser.role); // ✅ Kiểm tra
 
-      this.userProfile.set({
-        name: parsedUser.fullName || parsedUser.name || '',
-        email: parsedUser.email || '',
-        phone: parsedUser.phone || '',
-        role: parsedUser.role || '',
-        address: parsedUser.address || '',
-        avatar: parsedUser.avatar || 'https://default-avatar.url/avatar.png'
-      });
+        this.userProfile.set({
+          name: parsedUser.fullName || parsedUser.name || '',
+          email: parsedUser.email || '',
+          phone: parsedUser.phone || '',
+          role: parsedUser.role || '',
+          address: parsedUser.address || '',
+          avatar: parsedUser.avatar || 'https://default-avatar.url/avatar.png',
+        });
 
-      this.currentUserId = parsedUser.username || parsedUser.id || '';
+        this.currentUserId = parsedUser.username || parsedUser.id || '';
+      }
     }
 
     // ✅ KHÔNG redirect theo role ở đây nếu bạn chỉ muốn hiển thị đúng giao diện theo quyền
@@ -295,7 +368,6 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.selectConversation(this.conversations[0], 0);
     }
   }
-
 
   ngAfterViewChecked(): void {
     if (this.shouldScrollToBottom) {
@@ -331,12 +403,17 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.showUserDropdown.set(false);
 
     // Navigate to profile page
-    this.router.navigate(['/profile']).then(() => {
-      this.showSuccessToast('Chuyển đến trang Profile');
-    }).catch(() => {
-      // If profile route doesn't exist, show error message
-      this.showErrorToast('Trang Profile chưa được tạo. Vui lòng tạo route /profile');
-    });
+    this.router
+      .navigate(['/profile'])
+      .then(() => {
+        this.showSuccessToast('Chuyển đến trang Profile');
+      })
+      .catch(() => {
+        // If profile route doesn't exist, show error message
+        this.showErrorToast(
+          'Trang Profile chưa được tạo. Vui lòng tạo route /profile'
+        );
+      });
   }
 
   showLogoutConfirmation(): void {
@@ -352,10 +429,12 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.showLogoutModal.set(false);
 
     // Clear any stored data
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    localStorage.removeItem('userProfile');
-    localStorage.removeItem('authToken');
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      localStorage.removeItem('userProfile');
+      localStorage.removeItem('authToken');
+    }
 
     // Show logout message
     this.showSuccessToast('Đăng xuất thành công. Đang chuyển hướng...');
@@ -372,10 +451,10 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
   // Utility methods
   getRoleDisplayName(): string {
     const roleMap: { [key: string]: string } = {
-      'admin': 'Quản trị viên',
-      'manager': 'Quản lý',
-      'user': 'Người dùng',
-      'staff': 'Nhân viên'
+      admin: 'Quản trị viên',
+      manager: 'Quản lý',
+      user: 'Người dùng',
+      staff: 'Nhân viên',
     };
     return roleMap[this.userProfile().role.toLowerCase()] || 'Người dùng';
   }
@@ -414,7 +493,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
       senderId: this.currentUserId,
       text: this.newMessage.trim(),
       timestamp: new Date(),
-      status: 'sent'
+      status: 'sent',
     };
 
     // Add to conversation messages
@@ -424,7 +503,9 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.conversationMessages[this.selectedConversation.id].push(newMsg);
 
     // Update current messages
-    this.currentMessages = [...this.conversationMessages[this.selectedConversation.id]];
+    this.currentMessages = [
+      ...this.conversationMessages[this.selectedConversation.id],
+    ];
 
     // Update conversation's last message
     this.selectedConversation.lastMessage = this.newMessage.trim();
@@ -462,10 +543,11 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
       'OK, không có vấn đề gì.',
       'Tuyệt vời!',
       'Xin lỗi, tôi cần thêm thông tin.',
-      'Bạn có thể giúp tôi không?'
+      'Bạn có thể giúp tôi không?',
     ];
 
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+    const randomResponse =
+      responses[Math.floor(Math.random() * responses.length)];
 
     const customerMsg: Message = {
       id: Date.now() + 1,
@@ -473,11 +555,13 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
       senderId: `customer-00${this.selectedConversation.id}`,
       text: randomResponse,
       timestamp: new Date(),
-      status: 'read'
+      status: 'read',
     };
 
     this.conversationMessages[this.selectedConversation.id].push(customerMsg);
-    this.currentMessages = [...this.conversationMessages[this.selectedConversation.id]];
+    this.currentMessages = [
+      ...this.conversationMessages[this.selectedConversation.id],
+    ];
 
     this.selectedConversation.lastMessage = randomResponse;
     this.selectedConversation.lastMessageTime = 'Vừa xong';
@@ -502,20 +586,26 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (!this.searchText.trim()) {
       this.filteredConversations = [...this.conversations];
     } else {
-      this.filteredConversations = this.conversations.filter(conv =>
-        conv.name.toLowerCase().includes(this.searchText.toLowerCase()) ||
-        conv.lastMessage.toLowerCase().includes(this.searchText.toLowerCase())
+      this.filteredConversations = this.conversations.filter(
+        (conv) =>
+          conv.name.toLowerCase().includes(this.searchText.toLowerCase()) ||
+          conv.lastMessage.toLowerCase().includes(this.searchText.toLowerCase())
       );
     }
   }
 
   getTotalUnreadCount(): number {
-    return this.conversations.reduce((total, conv) => total + conv.unreadCount, 0);
+    return this.conversations.reduce(
+      (total, conv) => total + conv.unreadCount,
+      0
+    );
   }
 
   startNewChat(): void {
     console.log('Starting new chat...');
-    alert('Tính năng tạo cuộc trò chuyện mới sẽ được phát triển trong tương lai!');
+    alert(
+      'Tính năng tạo cuộc trò chuyện mới sẽ được phát triển trong tương lai!'
+    );
   }
 
   toggleEmojiPicker(): void {
@@ -528,7 +618,9 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     // Focus back to input
     setTimeout(() => {
-      const input = document.querySelector('.message-input') as HTMLInputElement;
+      const input = document.querySelector(
+        '.message-input'
+      ) as HTMLInputElement;
       if (input) {
         input.focus();
       }
@@ -557,7 +649,11 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
   showInfo(): void {
     if (this.selectedConversation) {
       console.log('Show info for:', this.selectedConversation.name);
-      alert(`Thông tin khách hàng: ${this.selectedConversation.name}\nTrạng thái: ${this.selectedConversation.isOnline ? 'Đang hoạt động' : 'Offline'}`);
+      alert(
+        `Thông tin khách hàng: ${this.selectedConversation.name}\nTrạng thái: ${
+          this.selectedConversation.isOnline ? 'Đang hoạt động' : 'Offline'
+        }`
+      );
     }
   }
 
@@ -577,7 +673,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
       day: '2-digit',
       month: '2-digit',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   }
 
@@ -609,7 +705,11 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.showToastMessage('info', 'Thông tin', message);
   }
 
-  private showToastMessage(type: 'success' | 'error' | 'warning' | 'info', title: string, message: string): void {
+  private showToastMessage(
+    type: 'success' | 'error' | 'warning' | 'info',
+    title: string,
+    message: string
+  ): void {
     this.toastType.set(type);
     this.toastTitle.set(title);
     this.toastMessage.set(message);
@@ -631,7 +731,7 @@ export class MessageComponent implements OnInit, OnDestroy, AfterViewChecked {
       success: 'success-icon',
       error: 'error-icon',
       warning: 'warning-icon',
-      info: 'info-icon'
+      info: 'info-icon',
     };
     return iconClasses[type] || 'info-icon';
   }
