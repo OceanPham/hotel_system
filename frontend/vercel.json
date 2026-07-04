@@ -8,7 +8,9 @@
   ],
   "functions": {
     "api/index.js": {
-      "includeFiles": "dist/angular-basic-project/**"
+      "includeFiles": "dist/angular-basic-project/**",
+      "memory": 1024,
+      "maxDuration": 30
     }
   }
 }

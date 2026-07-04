@@ -1,1 +1,3 @@
-export { reqHandler as default } from '../dist/angular-basic-project/server/server.mjs';
+export default import('../dist/angular-basic-project/server/server.mjs').then(
+  (module) => module.reqHandler,
+);
