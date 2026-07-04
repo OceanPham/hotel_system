@@ -1,5 +1,4 @@
 package com.example.htms.utils;
-// Lớp tiện ích để mã hóa và kiểm tra mật khẩu.
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class PasswordUtils {
