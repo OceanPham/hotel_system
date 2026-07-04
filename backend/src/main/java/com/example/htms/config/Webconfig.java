@@ -20,7 +20,12 @@ public class Webconfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("https://hotelsystem.oceanmind.id.vn", "http://localhost:4200")
+                        .allowedOriginPatterns(
+                                "https://*.vercel.app",
+                                "https://hotelsystem.oceanmind.id.vn",
+                                "http://localhost:4200",
+                                "http://localhost:4000"
+                        )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);

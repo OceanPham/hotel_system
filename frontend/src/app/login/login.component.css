@@ -61,9 +61,137 @@ html, body {
   font-size: 28px;
   font-weight: 700;
   color: #333;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
   text-align: left;
   line-height: 1.2;
+}
+
+.quick-login-section {
+  margin-bottom: 20px;
+}
+
+.quick-login-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #868e96;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.quick-login-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.quick-login-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  background: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.quick-login-card:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.quick-login-card:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.quick-login-card.role-user {
+  border-color: #74c0fc;
+  background: #e7f5ff;
+}
+
+.quick-login-card.role-user:hover:not(:disabled) {
+  border-color: #339af0;
+  background: #d0ebff;
+}
+
+.quick-login-card.role-staff {
+  border-color: #69db7c;
+  background: #ebfbee;
+}
+
+.quick-login-card.role-staff:hover:not(:disabled) {
+  border-color: #40c057;
+  background: #d3f9d8;
+}
+
+.quick-login-card.role-accountant {
+  border-color: #ffd43b;
+  background: #fff9db;
+}
+
+.quick-login-card.role-accountant:hover:not(:disabled) {
+  border-color: #fab005;
+  background: #ffec99;
+}
+
+.card-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.card-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.card-name {
+  font-size: 11px;
+  color: #868e96;
+  line-height: 1.3;
+}
+
+.card-username {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4c6ef5;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  color: #adb5bd;
+  font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e9ecef;
+}
+
+.divider span {
+  padding: 0 12px;
+}
+
+.error-message {
+  background: #fff5f5;
+  border: 1px solid #ffc9c9;
+  color: #c92a2a;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
 }
 
 .form-group {
@@ -198,6 +326,29 @@ html, body {
   .welcome-title {
     font-size: 24px;
     text-align: center;
+  }
+
+  .quick-login-cards {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .quick-login-card {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 12px 16px;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .card-icon {
+    font-size: 28px;
+  }
+
+  .card-label,
+  .card-name,
+  .card-username {
+    display: block;
   }
 }
 

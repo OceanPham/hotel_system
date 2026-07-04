@@ -80,7 +80,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of( "https://hotelsystem.oceanmind.id.vn", "http://localhost:4200"));
+        config.setAllowedOriginPatterns(List.of(
+                "https://*.vercel.app",
+                "https://hotelsystem.oceanmind.id.vn",
+                "http://localhost:4200",
+                "http://localhost:4000"
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // nếu bạn dùng cookie hoặc auth

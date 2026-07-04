@@ -4,12 +4,17 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "prebuild": "node scripts/generate-env.mjs",
     "build": "ng build",
+    "vercel-build": "node scripts/generate-env.mjs && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:angular-basic-project": "node dist/angular-basic-project/server/server.mjs"
   },
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "@angular/animations": "^19.2.14",
     "@angular/common": "^19.2.0",

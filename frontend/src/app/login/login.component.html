@@ -13,6 +13,30 @@
     <div class="login-form">
       <h1 class="welcome-title">Welcome to Azure Hotel</h1>
 
+      <!-- Quick login cards -->
+      <div class="quick-login-section">
+        <p class="quick-login-label">Đăng nhập nhanh (demo)</p>
+        <div class="quick-login-cards">
+          <button
+            type="button"
+            *ngFor="let account of demoAccounts"
+            class="quick-login-card"
+            [class]="'quick-login-card role-' + account.role.toLowerCase()"
+            [disabled]="isLoading"
+            (click)="quickLogin(account)"
+          >
+            <span class="card-icon">{{ account.icon }}</span>
+            <span class="card-label">{{ account.label }}</span>
+            <span class="card-name">{{ account.fullName }}</span>
+            <span class="card-username">@{{ account.username }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="divider">
+        <span>hoặc</span>
+      </div>
+
       <!-- Error message -->
       <div *ngIf="errorMessage" class="error-message">
         {{ errorMessage }}
@@ -65,9 +89,9 @@
         <button
           type="submit"
           class="login-btn"
-          [disabled]="!loginForm.form.valid"
+          [disabled]="!loginForm.form.valid || isLoading"
         >
-          LOG IN
+          {{ isLoading ? 'ĐANG ĐĂNG NHẬP...' : 'LOG IN' }}
         </button>
 
         <!-- Signup link -->

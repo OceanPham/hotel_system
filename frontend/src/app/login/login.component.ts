@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { API_URL } from '../../constants';
+import { DEMO_ACCOUNTS, DemoAccount } from './demo-accounts';
 
 @Component({
   selector: 'app-login',
@@ -18,14 +19,28 @@ export class LoginComponent {
   password: string = '';
   rememberMe: boolean = false;
   errorMessage: string = '';
+  isLoading: boolean = false;
+  readonly demoAccounts = DEMO_ACCOUNTS;
 
   constructor(private http: HttpClient, private router: Router) {}
+
+  quickLogin(account: DemoAccount) {
+    this.username = account.username;
+    this.password = account.password;
+    this.login();
+  }
 
   onSubmit() {
     if (!this.username || !this.password) {
       this.errorMessage = 'Vui lòng nhập đầy đủ thông tin.';
       return;
     }
+    this.login();
+  }
+
+  private login() {
+    this.isLoading = true;
+    this.errorMessage = '';
 
     const payload = {
       username: this.username,
@@ -34,16 +49,16 @@ export class LoginComponent {
 
     this.http.post<any>(`${API_URL}/api/users/login`, payload).subscribe({
       next: (res) => {
+        this.isLoading = false;
         if (res.status === 'SUCCESS') {
           const token = res.data.token;
           const user = res.data.user;
 
-          // ✅ Lưu vào localStorage
           localStorage.setItem('token', token);
           localStorage.setItem('username', user.username);
           localStorage.setItem('role', user.role);
           localStorage.setItem('user', JSON.stringify(user));
-          // ✅ Điều hướng theo role
+
           switch (user.role) {
             case 'STAFF':
               this.router.navigate(['/dashboard']);
@@ -64,6 +79,7 @@ export class LoginComponent {
         }
       },
       error: (err: HttpErrorResponse) => {
+        this.isLoading = false;
         if (err.status === 401) {
           this.errorMessage = '❌ Sai tên đăng nhập hoặc mật khẩu.';
         } else {
