@@ -22,6 +22,7 @@ public class Webconfig {
                 registry.addMapping("/api/**")
                         .allowedOriginPatterns(
                                 "https://*.vercel.app",
+                                "https://*.onrender.com",
                                 "https://hotelsystem.oceanmind.id.vn",
                                 "http://localhost:4200",
                                 "http://localhost:4000"
