@@ -2,15 +2,8 @@
   "version": 2,
   "installCommand": "npm install",
   "buildCommand": "npm run vercel-build",
+  "outputDirectory": "dist/angular-basic-project/browser",
   "rewrites": [
-    { "source": "/", "destination": "/api" },
-    { "source": "/(.*)", "destination": "/api" }
-  ],
-  "functions": {
-    "api/index.js": {
-      "includeFiles": "dist/angular-basic-project/**",
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  }
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

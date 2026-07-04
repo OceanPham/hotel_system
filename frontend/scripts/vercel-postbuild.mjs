@@ -1,4 +1,4 @@
-import { existsSync, unlinkSync } from 'node:fs';
+import { copyFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -7,8 +7,9 @@ const browserDir = join(
   '../dist/angular-basic-project/browser',
 );
 const csrIndex = join(browserDir, 'index.csr.html');
+const spaIndex = join(browserDir, 'index.html');
 
 if (existsSync(csrIndex)) {
-  unlinkSync(csrIndex);
-  console.log('Removed index.csr.html for Vercel SSR routing');
+  copyFileSync(csrIndex, spaIndex);
+  console.log('Created index.html from index.csr.html for Vercel SPA routing');
 }
