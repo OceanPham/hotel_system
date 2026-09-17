@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "userId": 3,
+    "bookingId": 1,
+    "rating": 5,
+    "comment": "Rất hài lòng với dịch vụ",
+    "createdAt": "2025-06-04T10:00:00"
+  },
+  {
+    "id": 2,
+    "userId": 4,
+    "bookingId": 4,
+    "rating": 4,
+    "comment": "Ổn nhưng cần cải thiện wifi",
+    "createdAt": "2025-06-17T11:00:00"
+  },
+  {
+    "id": 3,
+    "userId": 5,
+    "bookingId": 7,
+    "rating": 5,
+    "comment": "Phòng sạch sẽ, yên tĩnh",
+    "createdAt": "2025-06-07T09:30:00"
+  },
+  {
+    "id": 4,
+    "userId": 6,
+    "bookingId": 10,
+    "rating": 4,
+    "comment": "Nhân viên thân thiện",
+    "createdAt": "2025-06-03T14:00:00"
+  },
+  {
+    "id": 5,
+    "userId": 7,
+    "bookingId": 13,
+    "rating": 5,
+    "comment": "Trải nghiệm tuyệt vời",
+    "createdAt": "2025-06-12T15:00:00"
+  }
+]

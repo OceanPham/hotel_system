@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-display: 'Playfair Display', serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #FAF8F5;
+    color: #1E293B;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif-title {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+  }
+
+  .font-display-title {
+    font-family: var(--font-display);
+  }
+}
+
+/* Custom luxury gradients */
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #F5DF9E 0%, #D4AF37 50%, #A88420 100%);
+}
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, #E2C068 0%, #D4AF37 40%, #BF9526 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gold-bright {
+  background: linear-gradient(135deg, #FFF1C5 0%, #E6C875 50%, #C49F3A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-emerald-gradient {
+  background: linear-gradient(145deg, #07382E 0%, #0B2B26 60%, #051A17 100%);
+}
+
+.bg-dark-emerald {
+  background-color: #062C24;
+}
+
+.bg-champagne {
+  background-color: #F7F3E9;
+}
+
+/* Glassmorphism effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.glass-panel-dark {
+  background: rgba(6, 44, 36, 0.75);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+.glass-navbar {
+  background: rgba(6, 44, 36, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+.border-gold-subtle {
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+.border-gold-glow {
+  border-color: #D4AF37;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
+}
+
+.shadow-luxury {
+  box-shadow: 0 20px 40px -15px rgba(6, 44, 36, 0.08), 0 0 1px 1px rgba(212, 175, 55, 0.15);
+}
+
+.shadow-luxury-hover {
+  box-shadow: 0 25px 50px -12px rgba(6, 44, 36, 0.18), 0 0 20px rgba(212, 175, 55, 0.25);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0B2B26;
+}
+::-webkit-scrollbar-thumb {
+  background: #A88420;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D4AF37;
+}

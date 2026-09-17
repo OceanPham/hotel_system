@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "bookingId": 1,
+    "hotelServiceId": 1,
+    "quantity": 2,
+    "priceOverride": null
+  },
+  {
+    "id": 2,
+    "bookingId": 1,
+    "hotelServiceId": 2,
+    "quantity": 1,
+    "priceOverride": null
+  },
+  {
+    "id": 3,
+    "bookingId": 4,
+    "hotelServiceId": 3,
+    "quantity": 1,
+    "priceOverride": null
+  },
+  {
+    "id": 4,
+    "bookingId": 7,
+    "hotelServiceId": 4,
+    "quantity": 1,
+    "priceOverride": null
+  },
+  {
+    "id": 5,
+    "bookingId": 10,
+    "hotelServiceId": 1,
+    "quantity": 2,
+    "priceOverride": null
+  },
+  {
+    "id": 6,
+    "bookingId": 13,
+    "hotelServiceId": 5,
+    "quantity": 2,
+    "priceOverride": null
+  }
+]

@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8085
   servlet:
     context-path: /
 
@@ -28,11 +28,11 @@ debug: false
 mail:
   host: smtp.gmail.com
   port: 587
-  username: huutien01092019@gmail.com
+  username: oceanpham0102@gmail.com
   password: "seygbgphtoqrelrq"
   smtp:
     auth: true
     starttls:
       enable: true
     debug: true
-  from: huutien01092019@gmail.com
+  from: oceanpham0102@gmail.com

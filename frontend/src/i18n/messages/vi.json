@@ -1,0 +1,29 @@
+{
+  "developer": {
+    "name": "OceanLabs",
+    "credit": "Phát triển bởi OceanLabs",
+    "website": "https://oceanlabs.pro.vn/",
+    "facebook": "https://www.facebook.com/oceanlabs.dev",
+    "linkedin": "https://www.linkedin.com/in/oceandev",
+    "github": "https://github.com/OceanPham",
+    "email": "oceanpham0102@gmail.com",
+    "phone": "+84876557737",
+    "threads": "https://www.threads.com/@oceanlabs.dev",
+    "address": "phường Kim Liên, thành phố Hà Nội"
+  },
+  "contact": {
+    "title": "Thông Tin Liên Hệ",
+    "hotline": "+84876557737",
+    "phoneDisplay": "+84 876 557 737",
+    "zalo": "https://zalo.me/84876557737",
+    "whatsapp": "https://wa.me/84876557737",
+    "email": "oceanpham0102@gmail.com",
+    "address": "phường Kim Liên, thành phố Hà Nội",
+    "website": "https://oceanlabs.pro.vn/",
+    "facebook": "https://www.facebook.com/oceanlabs.dev",
+    "linkedin": "https://www.linkedin.com/in/oceandev",
+    "github": "https://github.com/OceanPham",
+    "threads": "https://www.threads.com/@oceanlabs.dev",
+    "workHours": "Phục vụ 24/7"
+  }
+}

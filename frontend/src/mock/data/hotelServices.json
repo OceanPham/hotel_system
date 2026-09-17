@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "name": "Bữa sáng",
+    "price": 100000,
+    "description": "Buffet sáng tại nhà hàng",
+    "imageUrl": "https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": 2,
+    "name": "Giặt ủi",
+    "price": 50000,
+    "description": "Dịch vụ giặt là chuyên nghiệp",
+    "imageUrl": "https://images.unsplash.com/photo-1582735689369-4fe89db7114c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": 3,
+    "name": "Spa",
+    "price": 300000,
+    "description": "Thư giãn cơ thể toàn diện",
+    "imageUrl": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": 4,
+    "name": "Xe đưa đón",
+    "price": 200000,
+    "description": "Đưa đón sân bay 2 chiều",
+    "imageUrl": "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": 5,
+    "name": "Bữa tối",
+    "price": 150000,
+    "description": "Set menu buổi tối cao cấp",
+    "imageUrl": "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=600&q=80"
+  },
+  {
+    "id": 6,
+    "name": "Trà chiều",
+    "price": 90000,
+    "description": "Trà chiều theo phong cách Anh",
+    "imageUrl": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    "id": 7,
+    "name": "Thuê xe đạp",
+    "price": 30000,
+    "description": "Xe đạp tham quan khuôn viên",
+    "imageUrl": "https://images.unsplash.com/photo-1571068316344-75bc76f77890?auto=format&fit=crop&w=600&q=80"
+  }
+]

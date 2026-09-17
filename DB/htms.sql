@@ -100,16 +100,16 @@ CREATE TABLE IF NOT EXISTS Feedback (
 
 -- UserAccount  passwword:abc123456
 INSERT INTO UserAccount (username,password,role,full_name,phone,email,gender,nationality,status) VALUES
-('ntminh', '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'STAFF', 'Nguyễn Thị Minh', '0901234501', 'minh.nt@example.com', 'Nữ', 'Vietnam', 'Active'),
-('nva',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'ACCOUNTANT', 'Nguyễn Văn An', '0901234502', 'an.nv@example.com', 'Nam', 'Vietnam', 'Active'),
-('ttb',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Trần Thị Bình', '0901234503', 'huutien27012004@gmail.com', 'Nữ', 'Vietnam', 'Active'),
-('ptt',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Phạm Thị Thảo', '0901234504', 'huutien27012004@gmail.com', 'Nữ', 'Vietnam', 'Active'),
-('lhd',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Lê Hoàng Dũng', '0901234505', 'huutien27012004@gmail.com', 'Nam', 'Vietnam', 'Active'),
-('dth',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Đinh Thị Hồng', '0901234506', 'huutien27012004@gmail.com', 'Nữ', 'Vietnam', 'Active'),
-('btq',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Bùi Tuấn Quang', '0901234507', 'huutien27012004@gmail.com', 'Nam', 'Vietnam', 'Active'),
-('cmt',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Cao Minh Tuấn', '0901234508', 'huutien27012004@gmail.com', 'Nam', 'Vietnam', 'Active'),
-('nttr',   '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Ngô Thị Trang', '0901234509', 'huutien27012004@gmail.com', 'Nữ', 'Vietnam', 'Active'),
-('hmt',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Hoàng Minh Tú', '0901234510', 'huutien27012004@gmail.com', 'Nam', 'Vietnam', 'Active');
+('ntminh', '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'STAFF', 'Nguyễn Thị Minh', '+84876557737', 'minh.nt@example.com', 'Nữ', 'Vietnam', 'Active'),
+('nva',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'ACCOUNTANT', 'Nguyễn Văn An', '+84876557737', 'an.nv@example.com', 'Nam', 'Vietnam', 'Active'),
+('ttb',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Trần Thị Bình', '+84876557737', 'oceanpham0102@gmail.com', 'Nữ', 'Vietnam', 'Active'),
+('ptt',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Phạm Thị Thảo', '+84876557737', 'oceanpham0102@gmail.com', 'Nữ', 'Vietnam', 'Active'),
+('lhd',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Lê Hoàng Dũng', '+84876557737', 'oceanpham0102@gmail.com', 'Nam', 'Vietnam', 'Active'),
+('dth',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Đinh Thị Hồng', '+84876557737', 'oceanpham0102@gmail.com', 'Nữ', 'Vietnam', 'Active'),
+('btq',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Bùi Tuấn Quang', '+84876557737', 'oceanpham0102@gmail.com', 'Nam', 'Vietnam', 'Active'),
+('cmt',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Cao Minh Tuấn', '+84876557737', 'oceanpham0102@gmail.com', 'Nam', 'Vietnam', 'Active'),
+('nttr',   '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Ngô Thị Trang', '+84876557737', 'oceanpham0102@gmail.com', 'Nữ', 'Vietnam', 'Active'),
+('hmt',    '$2a$10$iNXJ3UKC87VxbXdU5gottOcaaPx53GqbYdFrOlft3K2aXRyJzHZaa', 'USER', 'Hoàng Minh Tú', '+84876557737', 'oceanpham0102@gmail.com', 'Nam', 'Vietnam', 'Active');
 -- Room
 INSERT INTO Room (room_number, room_name, room_type, base_price, status, description) VALUES
 ('101', 'Garden Deluxe', 'Standard', 500000, 'Vacant', 'Phòng tiêu chuẩn nhìn ra vườn, không gian xanh mát.'),
@@ -124,27 +124,27 @@ INSERT INTO Room (room_number, room_name, room_type, base_price, status, descrip
 ('110', 'Luxury Bath Suite', 'Suite', 1500000, 'Vacant', 'Suite cao cấp có bồn tắm hiện đại, sang trọng.');
 
 INSERT INTO RoomImage (room_id, image_url, is_main) VALUES
-(1, 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=600&q=80', TRUE),
-(2, 'https://images.unsplash.com/photo-1613977257363-707ba934822a?w=600&q=80', TRUE),
-(3, 'https://images.unsplash.com/photo-1560347876-aeef00ee58a1?w=600&q=80', TRUE),
-(4, 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80', TRUE),
-(5, 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=600&q=80', TRUE),
-(6, 'https://images.unsplash.com/photo-1613977257746-d3b5b0d8dbd3?w=600&q=80', TRUE),
-(7, 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&q=80', TRUE),
-(8, 'https://images.unsplash.com/photo-1582719478141-9ff51a6f095d?w=600&q=80', TRUE),
-(9, 'https://images.unsplash.com/photo-1578898886411-9b4d818bba59?w=600&q=80', TRUE),
-(10, 'https://images.unsplash.com/photo-1622495890063-7763e31fa940?w=600&q=80', TRUE);
+(1, 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=800&q=80', TRUE),
+(2, 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=800&q=80', TRUE),
+(3, 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80', TRUE),
+(4, 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80', TRUE),
+(5, 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80', TRUE),
+(6, 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80', TRUE),
+(7, 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80', TRUE),
+(8, 'https://images.unsplash.com/photo-1595576508898-0ad5c879a061?auto=format&fit=crop&w=800&q=80', TRUE),
+(9, 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=800&q=80', TRUE),
+(10, 'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=800&q=80', TRUE);
 
 
 -- HotelService (không còn cột unit)
 INSERT INTO HotelService (name, price, description, image_url) VALUES
-('Bữa sáng',       100000, 'Buffet sáng tại nhà hàng',      'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'),
-('Giặt ủi',         50000, 'Dịch vụ giặt là chuyên nghiệp', 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'),
-('Spa',            300000, 'Thư giãn cơ thể toàn diện',     'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'),
-('Xe đưa đón',     200000, 'Đưa đón sân bay 2 chiều',       'https://images.unsplash.com/photo-1583301284852-f72f359cd88b?w=600&q=80'),
+('Bữa sáng',       100000, 'Buffet sáng tại nhà hàng',      'https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?auto=format&fit=crop&w=600&q=80'),
+('Giặt ủi',         50000, 'Dịch vụ giặt là chuyên nghiệp', 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'),
+('Spa',            300000, 'Thư giãn cơ thể toàn diện',     'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'),
+('Xe đưa đón',     200000, 'Đưa đón sân bay 2 chiều',       'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=600&q=80'),
 ('Bữa tối',        150000, 'Set menu buổi tối cao cấp',      'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=600&q=80'),
-('Trà chiều',       90000, 'Trà chiều theo phong cách Anh', 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=80'),
-('Thuê xe đạp',     30000, 'Xe đạp tham quan khuôn viên',   'https://images.unsplash.com/photo-1532274402917-5aadf881bdf8?w=600&q=80');
+('Trà chiều',       90000, 'Trà chiều theo phong cách Anh', 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80'),
+('Thuê xe đạp',     30000, 'Xe đạp tham quan khuôn viên',   'https://images.unsplash.com/photo-1571068316344-75bc76f77890?auto=format&fit=crop&w=600&q=80');
 
 -- Booking Data
 INSERT INTO Booking (id, user_id, room_id, check_in_date, check_out_date, status, booking_type, created_at, note) VALUES

@@ -1,0 +1,167 @@
+[
+  {
+    "id": 1,
+    "bookingId": 1,
+    "createdAt": "2025-06-03T12:00:00",
+    "roomAmount": 1000000,
+    "serviceAmount": 200000,
+    "tax": 120000,
+    "totalAmount": 1320000,
+    "paymentMethod": "Tien mat",
+    "status": "Paid"
+  },
+  {
+    "id": 2,
+    "bookingId": 2,
+    "createdAt": "2025-07-12T12:00:00",
+    "roomAmount": 1000000,
+    "serviceAmount": 0,
+    "tax": 100000,
+    "totalAmount": 1100000,
+    "paymentMethod": "Chuyen khoan",
+    "status": "Paid"
+  },
+  {
+    "id": 3,
+    "bookingId": 3,
+    "createdAt": "2025-08-05T12:00:00",
+    "roomAmount": 1000000,
+    "serviceAmount": 0,
+    "tax": 100000,
+    "totalAmount": 1100000,
+    "paymentMethod": "Tien mat",
+    "status": "Unpaid"
+  },
+  {
+    "id": 4,
+    "bookingId": 4,
+    "createdAt": "2025-06-16T12:00:00",
+    "roomAmount": 1600000,
+    "serviceAmount": 300000,
+    "tax": 190000,
+    "totalAmount": 2090000,
+    "paymentMethod": "Tien mat",
+    "status": "Paid"
+  },
+  {
+    "id": 5,
+    "bookingId": 5,
+    "createdAt": "2025-07-20T12:00:00",
+    "roomAmount": 1600000,
+    "serviceAmount": 0,
+    "tax": 160000,
+    "totalAmount": 1760000,
+    "paymentMethod": "Tien mat",
+    "status": "Unpaid"
+  },
+  {
+    "id": 6,
+    "bookingId": 6,
+    "createdAt": "2025-08-10T12:00:00",
+    "roomAmount": 1500000,
+    "serviceAmount": 0,
+    "tax": 150000,
+    "totalAmount": 1650000,
+    "paymentMethod": "Chuyen khoan",
+    "status": "Unpaid"
+  },
+  {
+    "id": 7,
+    "bookingId": 7,
+    "createdAt": "2025-06-12T12:00:00",
+    "roomAmount": 1000000,
+    "serviceAmount": 150000,
+    "tax": 115000,
+    "totalAmount": 1265000,
+    "paymentMethod": "Chuyen khoan",
+    "status": "Paid"
+  },
+  {
+    "id": 8,
+    "bookingId": 8,
+    "createdAt": "2025-07-12T12:00:00",
+    "roomAmount": 1600000,
+    "serviceAmount": 0,
+    "tax": 160000,
+    "totalAmount": 1760000,
+    "paymentMethod": "Tien mat",
+    "status": "Paid"
+  },
+  {
+    "id": 9,
+    "bookingId": 9,
+    "createdAt": "2025-08-15T12:00:00",
+    "roomAmount": 1600000,
+    "serviceAmount": 0,
+    "tax": 160000,
+    "totalAmount": 1760000,
+    "paymentMethod": "Tien mat",
+    "status": "Unpaid"
+  },
+  {
+    "id": 10,
+    "bookingId": 10,
+    "createdAt": "2025-06-03T12:00:00",
+    "roomAmount": 1000000,
+    "serviceAmount": 200000,
+    "tax": 120000,
+    "totalAmount": 1320000,
+    "paymentMethod": "Tien mat",
+    "status": "Paid"
+  },
+  {
+    "id": 11,
+    "bookingId": 11,
+    "createdAt": "2025-07-17T12:00:00",
+    "roomAmount": 1000000,
+    "serviceAmount": 0,
+    "tax": 100000,
+    "totalAmount": 1100000,
+    "paymentMethod": "Chuyen khoan",
+    "status": "Paid"
+  },
+  {
+    "id": 12,
+    "bookingId": 12,
+    "createdAt": "2025-08-20T12:00:00",
+    "roomAmount": 1000000,
+    "serviceAmount": 0,
+    "tax": 100000,
+    "totalAmount": 1100000,
+    "paymentMethod": "Tien mat",
+    "status": "Unpaid"
+  },
+  {
+    "id": 13,
+    "bookingId": 13,
+    "createdAt": "2025-06-12T12:00:00",
+    "roomAmount": 1600000,
+    "serviceAmount": 300000,
+    "tax": 190000,
+    "totalAmount": 2090000,
+    "paymentMethod": "Tien mat",
+    "status": "Paid"
+  },
+  {
+    "id": 14,
+    "bookingId": 14,
+    "createdAt": "2025-07-27T12:00:00",
+    "roomAmount": 1000000,
+    "serviceAmount": 150000,
+    "tax": 115000,
+    "totalAmount": 1265000,
+    "paymentMethod": "Chuyen khoan",
+    "status": "Paid"
+  },
+  {
+    "id": 15,
+    "bookingId": 15,
+    "createdAt": "2025-09-01T12:00:00",
+    "roomAmount": 1600000,
+    "serviceAmount": 0,
+    "tax": 160000,
+    "totalAmount": 1760000,
+    "paymentMethod": "Tien mat",
+    "status": "Unpaid"
+  }
+]

@@ -1,0 +1,164 @@
+[
+  {
+    "id": 101,
+    "roomName": "Palm Courtyard",
+    "roomNumber": "201",
+    "roomType": "Standard",
+    "basePrice": 520000,
+    "description": "Phòng hướng sân trong nhiệt đới, ánh sáng tự nhiên dễ chịu.",
+    "status": "Vacant"
+  },
+  {
+    "id": 102,
+    "roomName": "Harbor Breeze Deluxe",
+    "roomNumber": "202",
+    "roomType": "Deluxe",
+    "basePrice": 850000,
+    "description": "Deluxe thoáng đãng với gió biển và nội thất gỗ ấm.",
+    "status": "Vacant"
+  },
+  {
+    "id": 103,
+    "roomName": "Coral Reef Suite",
+    "roomNumber": "203",
+    "roomType": "Suite",
+    "basePrice": 1600000,
+    "description": "Suite rộng với tông san hô và góc nghỉ riêng tư.",
+    "status": "Vacant"
+  },
+  {
+    "id": 104,
+    "roomName": "Bamboo Garden",
+    "roomNumber": "204",
+    "roomType": "Standard",
+    "basePrice": 530000,
+    "description": "Không gian xanh nhìn ra hàng tre, yên tĩnh.",
+    "status": "Vacant"
+  },
+  {
+    "id": 105,
+    "roomName": "Pearl Harbor Deluxe",
+    "roomNumber": "205",
+    "roomType": "Deluxe",
+    "basePrice": 880000,
+    "description": "Deluxe ánh ngọc trai, cửa kính lớn đón nắng chiều.",
+    "status": "Vacant"
+  },
+  {
+    "id": 106,
+    "roomName": "Emerald Lagoon Suite",
+    "roomNumber": "206",
+    "roomType": "Suite",
+    "basePrice": 1650000,
+    "description": "Suite cao cấp hướng đầm phá xanh ngọc.",
+    "status": "Vacant"
+  },
+  {
+    "id": 107,
+    "roomName": "Sunrise Loft",
+    "roomNumber": "207",
+    "roomType": "Standard",
+    "basePrice": 540000,
+    "description": "Phòng gác xép đón bình minh, phù hợp cặp đôi.",
+    "status": "Vacant"
+  },
+  {
+    "id": 108,
+    "roomName": "Misty Highlands Deluxe",
+    "roomNumber": "208",
+    "roomType": "Deluxe",
+    "basePrice": 870000,
+    "description": "Deluxe tông đất ấm, cảm giác nghỉ dưỡng núi.",
+    "status": "Vacant"
+  },
+  {
+    "id": 109,
+    "roomName": "Royal Orchid Suite",
+    "roomNumber": "209",
+    "roomType": "Suite",
+    "basePrice": 1700000,
+    "description": "Suite hoa lan hoàng gia, phòng khách riêng.",
+    "status": "Vacant"
+  },
+  {
+    "id": 110,
+    "roomName": "Sand Dune Retreat",
+    "roomNumber": "210",
+    "roomType": "Standard",
+    "basePrice": 510000,
+    "description": "Phòng tông cát ấm, gần lối ra bãi biển.",
+    "status": "Vacant"
+  },
+  {
+    "id": 111,
+    "roomName": "Azure Horizon Deluxe",
+    "roomNumber": "211",
+    "roomType": "Deluxe",
+    "basePrice": 900000,
+    "description": "Deluxe xanh azure với tầm nhìn đường chân trời.",
+    "status": "Vacant"
+  },
+  {
+    "id": 112,
+    "roomName": "Moonlight Pavilion",
+    "roomNumber": "212",
+    "roomType": "Suite",
+    "basePrice": 1750000,
+    "description": "Suite ánh trăng, ban công rộng ngắm vịnh về đêm.",
+    "status": "Vacant"
+  },
+  {
+    "id": 113,
+    "roomName": "Fern Valley",
+    "roomNumber": "213",
+    "roomType": "Standard",
+    "basePrice": 525000,
+    "description": "Phòng nhìn thung lũng dương xỉ, không khí trong lành.",
+    "status": "Vacant"
+  },
+  {
+    "id": 114,
+    "roomName": "Cliffside Deluxe",
+    "roomNumber": "214",
+    "roomType": "Deluxe",
+    "basePrice": 920000,
+    "description": "Deluxe sát vách đá, view biển ấn tượng.",
+    "status": "Vacant"
+  },
+  {
+    "id": 115,
+    "roomName": "Golden Lotus Suite",
+    "roomNumber": "215",
+    "roomType": "Suite",
+    "basePrice": 1800000,
+    "description": "Suite sen vàng, phòng tắm đá marble cao cấp.",
+    "status": "Vacant"
+  },
+  {
+    "id": 116,
+    "roomName": "Riverside Quiet",
+    "roomNumber": "216",
+    "roomType": "Standard",
+    "basePrice": 515000,
+    "description": "Phòng ven sông yên tĩnh, lý tưởng làm việc và nghỉ.",
+    "status": "Vacant"
+  },
+  {
+    "id": 117,
+    "roomName": "Twilight Bay Deluxe",
+    "roomNumber": "217",
+    "roomType": "Deluxe",
+    "basePrice": 890000,
+    "description": "Deluxe vịnh hoàng hôn, ánh đèn ấm mỗi chiều.",
+    "status": "Vacant"
+  },
+  {
+    "id": 118,
+    "roomName": "Infinity Crown Suite",
+    "roomNumber": "218",
+    "roomType": "Suite",
+    "basePrice": 1850000,
+    "description": "Suite đỉnh cao với không gian mở và bồn tắm đứng.",
+    "status": "Vacant"
+  }
+]

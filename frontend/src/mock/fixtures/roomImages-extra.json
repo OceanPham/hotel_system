@@ -1,0 +1,110 @@
+[
+  {
+    "id": 1000,
+    "roomId": 101,
+    "imageUrl": "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1001,
+    "roomId": 102,
+    "imageUrl": "https://images.unsplash.com/photo-1617859047452-8510bcf207fd?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1002,
+    "roomId": 103,
+    "imageUrl": "https://images.unsplash.com/photo-1587985064135-0366536eab42?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1003,
+    "roomId": 104,
+    "imageUrl": "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1004,
+    "roomId": 105,
+    "imageUrl": "https://images.unsplash.com/photo-1568495248636-6432b97bd949?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1005,
+    "roomId": 106,
+    "imageUrl": "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1006,
+    "roomId": 107,
+    "imageUrl": "https://images.unsplash.com/photo-1610641818989-c2051b5e2cfd?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1007,
+    "roomId": 108,
+    "imageUrl": "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1008,
+    "roomId": 109,
+    "imageUrl": "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1009,
+    "roomId": 110,
+    "imageUrl": "https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1010,
+    "roomId": 111,
+    "imageUrl": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1011,
+    "roomId": 112,
+    "imageUrl": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1012,
+    "roomId": 113,
+    "imageUrl": "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1013,
+    "roomId": 114,
+    "imageUrl": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1014,
+    "roomId": 115,
+    "imageUrl": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1015,
+    "roomId": 116,
+    "imageUrl": "https://images.unsplash.com/photo-1560184897-ae75f418493e?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1016,
+    "roomId": 117,
+    "imageUrl": "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  },
+  {
+    "id": 1017,
+    "roomId": 118,
+    "imageUrl": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
+    "isMain": true
+  }
+]

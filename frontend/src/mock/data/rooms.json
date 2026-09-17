@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "roomName": "Garden Deluxe",
+    "roomNumber": "101",
+    "roomType": "Standard",
+    "basePrice": 500000,
+    "status": "Vacant",
+    "description": "Phòng tiêu chuẩn nhìn ra vườn, không gian xanh mát."
+  },
+  {
+    "id": 2,
+    "roomName": "Cozy Standard",
+    "roomNumber": "102",
+    "roomType": "Standard",
+    "basePrice": 500000,
+    "status": "Vacant",
+    "description": "Phòng tiêu chuẩn thiết kế ấm cúng, đầy đủ tiện nghi."
+  },
+  {
+    "id": 3,
+    "roomName": "City View Deluxe",
+    "roomNumber": "103",
+    "roomType": "Deluxe",
+    "basePrice": 800000,
+    "status": "Vacant",
+    "description": "Phòng deluxe với cửa sổ lớn nhìn ra thành phố."
+  },
+  {
+    "id": 4,
+    "roomName": "Balcony Retreat",
+    "roomNumber": "104",
+    "roomType": "Deluxe",
+    "basePrice": 800000,
+    "status": "Vacant",
+    "description": "Phòng deluxe có ban công riêng, thoáng đãng."
+  },
+  {
+    "id": 5,
+    "roomName": "Ocean Suite",
+    "roomNumber": "105",
+    "roomType": "Suite",
+    "basePrice": 1500000,
+    "status": "Vacant",
+    "description": "Phòng suite cao cấp với view biển tuyệt đẹp."
+  },
+  {
+    "id": 6,
+    "roomName": "Premier Sea Suite",
+    "roomNumber": "106",
+    "roomType": "Suite",
+    "basePrice": 1500000,
+    "status": "Vacant",
+    "description": "Suite sang trọng, hướng biển toàn cảnh."
+  },
+  {
+    "id": 7,
+    "roomName": "Budget Smart",
+    "roomNumber": "107",
+    "roomType": "Standard",
+    "basePrice": 500000,
+    "status": "Vacant",
+    "description": "Phòng tiết kiệm với không gian tiện nghi cơ bản."
+  },
+  {
+    "id": 8,
+    "roomName": "Tranquil Corner",
+    "roomNumber": "108",
+    "roomType": "Standard",
+    "basePrice": 500000,
+    "status": "Vacant",
+    "description": "Phòng ở vị trí yên tĩnh, phù hợp nghỉ ngơi."
+  },
+  {
+    "id": 9,
+    "roomName": "Skyline Deluxe",
+    "roomNumber": "109",
+    "roomType": "Deluxe",
+    "basePrice": 800000,
+    "status": "Vacant",
+    "description": "Phòng deluxe tầng cao, view toàn cảnh thành phố."
+  },
+  {
+    "id": 10,
+    "roomName": "Luxury Bath Suite",
+    "roomNumber": "110",
+    "roomType": "Suite",
+    "basePrice": 1500000,
+    "status": "Vacant",
+    "description": "Suite cao cấp có bồn tắm hiện đại, sang trọng."
+  }
+]

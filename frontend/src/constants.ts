@@ -1,1 +1,0 @@
-export { API_URL, CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from './env.config';
